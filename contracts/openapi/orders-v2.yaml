@@ -1,0 +1,231 @@
+openapi: 3.1.0
+
+info:
+  title: Pedidos — API v2
+  version: 2.0.0
+  description: |
+    Aceitação **assíncrona** de pedidos (ADR-0007).
+
+    ## Diferença semântica em relação à v1 — leia antes de integrar
+
+    `201 Created` significa **pedido recebido e persistido**, não venda
+    confirmada. O desfecho chega depois, por evento (`PedidoConfirmado` ou
+    `PedidoRejeitado`) — ver `contracts/asyncapi/order-status.yaml`.
+
+    O JSON desta versão é **idêntico** ao da v1: mesmos campos, mesmos tipos,
+    mesmo status code. Apenas o valor de `status` e o momento do ciclo de vida
+    mudam. Nenhum diff de schema detecta essa diferença, e é por isso que a
+    ADR-0004 trata compatibilidade semântica como categoria própria de
+    breaking change.
+
+    **Não migre um consumidor de v1 para v2 sem tratar os estados.** Um
+    consumidor que emite nota fiscal ou baixa comissão na resposta do POST
+    passará a fazê-lo sobre pedido que ainda pode ser rejeitado.
+
+    ## Idempotência
+
+    `Idempotency-Key` é **obrigatória** nesta versão (ADR-0001). A chave deve
+    ser estável entre retries da mesma intenção — gerar uma nova a cada
+    tentativa anula a proteção por completo.
+
+servers:
+  - url: https://api.exemplo.com.br
+    description: Produção
+  - url: http://127.0.0.1:8000
+    description: Fatia executável local
+
+tags:
+  - name: pedidos
+
+paths:
+  /v2/orders:
+    post:
+      tags: [pedidos]
+      summary: Aceita um pedido
+      operationId: criarPedidoV2
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKeyObrigatoria'
+        - $ref: '#/components/parameters/Chamador'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NovoPedido' }
+      responses:
+        '201':
+          description: |
+            Pedido **recebido**. `status` = `RECEBIDO`. Não é confirmação de venda.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pedido' }
+        '200':
+          description: |
+            Replay: a chave já havia sido usada com o mesmo payload.
+            O corpo traz o **estado corrente** do pedido, não a resposta
+            originalmente gravada (ADR-0001) — com aceite assíncrono, replay
+            literal devolveria um estado vencido.
+          headers:
+            Idempotency-Replayed:
+              schema: { type: string, enum: ['true'] }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pedido' }
+        '409':
+          description: A mesma chave já foi usada com um payload diferente.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Erro' }
+        '422':
+          description: Oferta expirada, adulterada, ausente, ou header obrigatório faltando.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Erro' }
+
+  /v2/orders/{pedidoId}:
+    get:
+      tags: [pedidos]
+      summary: Consulta um pedido
+      operationId: consultarPedidoV2
+      description: |
+        Responde exclusivamente a partir do snapshot gravado no pedido.
+        **Não consulta o Catálogo** — garantido pelo teste que executa esta
+        rota com o Catálogo fora do ar (ADR-0003).
+      parameters:
+        - name: pedidoId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Pedido encontrado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Pedido' }
+        '404':
+          description: Pedido inexistente.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Erro' }
+
+components:
+  parameters:
+    IdempotencyKeyObrigatoria:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Chave estável entre retries da mesma intenção de compra.
+      schema: { type: string, format: uuid }
+    Chamador:
+      name: X-Chamador
+      in: header
+      required: false
+      description: |
+        Identidade do integrador. Compõe o escopo da chave de idempotência
+        junto com ela: `(chamador, chave)`. Dois parceiros podem gerar o
+        mesmo UUID sem colidir.
+      schema: { type: string, default: web }
+
+  schemas:
+    NovoPedido:
+      type: object
+      required: [cliente_id, oferta]
+      properties:
+        cliente_id: { type: string }
+        canal:
+          type: string
+          enum: [web, app, parceiro]
+          default: web
+        oferta: { $ref: '#/components/schemas/Oferta' }
+
+    Oferta:
+      type: object
+      description: |
+        Emitida pelo Carrinho e **carregada** pela criação, não relida
+        (ADR-0007). É o que remove o Catálogo do caminho crítico.
+      required: [itens, catalogo_versao, expira_em, assinatura]
+      properties:
+        itens:
+          type: array
+          minItems: 1
+          items: { $ref: '#/components/schemas/ItemOfertado' }
+        catalogo_versao:
+          type: string
+          description: Versão do Catálogo lida na cotação. Evidência de auditoria.
+        expira_em:
+          type: number
+          description: Epoch em segundos. Oferta vencida obriga recotação.
+        assinatura:
+          type: string
+          description: HMAC-SHA256 do corpo. Adulteração resulta em 422.
+
+    ItemOfertado:
+      type: object
+      required: [sku, quantidade, descricao, preco_unitario, moeda, unidade, peso_gramas]
+      properties:
+        sku: { type: string }
+        quantidade: { type: number }
+        descricao: { type: string }
+        preco_unitario:
+          type: integer
+          description: Em **centavos**. Nunca float — evita erro de arredondamento em valor cobrado.
+        moeda: { type: string, examples: [BRL] }
+        unidade:
+          type: string
+          description: |
+            Congela no snapshot. "quantidade 2" não significa nada sem "kg" ou "un".
+          examples: [un, kg]
+        peso_gramas:
+          type: integer
+          description: Congela no snapshot — é base do frete cotado ao cliente.
+        promocao_id:
+          type: [string, 'null']
+
+    Pedido:
+      type: object
+      required: [id, cliente_id, canal, status, criado_em, itens]
+      properties:
+        id: { type: string, format: uuid }
+        cliente_id: { type: string }
+        canal: { type: string }
+        status:
+          type: string
+          enum: [RECEBIDO, CONFIRMADO, REJEITADO]
+          description: |
+            Em v2 o POST devolve `RECEBIDO`. `CONFIRMADO` e `REJEITADO` chegam
+            depois, por evento.
+        criado_em: { type: string, format: date-time }
+        itens:
+          type: array
+          items: { $ref: '#/components/schemas/ItemDoPedido' }
+
+    ItemDoPedido:
+      type: object
+      description: |
+        Snapshot **imutável** dos termos acordados (ADR-0003). Cópia, não
+        referência: mudança posterior no Catálogo não altera estes valores.
+      required: [sku, quantidade, descricao, preco_unitario, moeda, unidade, peso_gramas, catalogo_versao]
+      properties:
+        sku: { type: string }
+        quantidade: { type: number }
+        descricao: { type: string }
+        preco_unitario: { type: integer }
+        moeda: { type: string }
+        unidade: { type: string }
+        peso_gramas: { type: integer }
+        promocao_id: { type: [string, 'null'] }
+        catalogo_versao: { type: string }
+
+    Erro:
+      type: object
+      properties:
+        detail:
+          type: object
+          properties:
+            erro:
+              type: string
+              enum:
+                - chave_idempotencia_conflitante
+                - oferta_expirada
+                - oferta_invalida
+                - pedido_nao_encontrado
+            detalhe: { type: string }

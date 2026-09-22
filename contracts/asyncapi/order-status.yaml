@@ -1,0 +1,164 @@
+asyncapi: 3.0.0
+
+info:
+  title: Pedidos — eventos de ciclo de vida
+  version: 1.0.0
+  description: |
+    Eventos publicados por Pedidos (ADR-0002). Atendem `CTX-08` — notificação
+    assíncrona de mudança de status para parceiros de marketplace — e são
+    também o **mecanismo de continuidade do processo** (ADR-0007): a validação
+    de estoque, pagamento e fraude acontece em cima deles.
+
+    Evento perdido aqui não é aviso perdido. É **venda parada**.
+
+    ## Garantia de entrega: at-least-once
+
+    O relay publica **antes** de marcar como publicado. Se cair entre as duas
+    operações, o evento sai de novo na retomada. Escolhemos duplicar em vez de
+    perder — a ordem inversa produziria at-most-once.
+
+    ## Deduplicação é OBRIGAÇÃO do consumidor, não zelo
+
+    Todo consumidor **precisa** deduplicar por `event_id`. Consumidor que não
+    deduplica está violando este contrato, não sendo descuidado. A exigência
+    está aqui, no contrato, e não em documentação à parte, justamente por ser
+    condição de corretude.
+
+    ## Ordenação
+
+    Garantida **por agregado**, via `chave_particao` = `pedido_id`. Eventos do
+    mesmo pedido chegam em ordem. Entre pedidos distintos **não há garantia** —
+    restrição declarada, não omissão. Consumidor que dependa de ordem global
+    não é suportado.
+
+defaultContentType: application/json
+
+servers:
+  broker:
+    host: broker.exemplo.com.br:9092
+    protocol: kafka
+    description: |
+      Em produção, broker gerenciado. Na fatia executável o transporte é um
+      stub em memória, porque a decisão provada — "pedido e evento nunca
+      divergem" — vive na transação e no relay, não no transporte.
+
+channels:
+  pedidos.ciclo-de-vida:
+    address: pedidos.ciclo-de-vida
+    description: Mudanças de estado do pedido.
+    messages:
+      PedidoRecebido:
+        $ref: '#/components/messages/PedidoRecebido'
+      PedidoConfirmado:
+        $ref: '#/components/messages/PedidoConfirmado'
+      PedidoRejeitado:
+        $ref: '#/components/messages/PedidoRejeitado'
+
+operations:
+  receberEventosDePedido:
+    action: receive
+    channel:
+      $ref: '#/channels/pedidos.ciclo-de-vida'
+    summary: Consumir os eventos de ciclo de vida do pedido.
+    description: |
+      Consumidores típicos: validação (estoque, pagamento, antifraude),
+      gateway de notificação a parceiros, fiscal e logística.
+
+      Todos deduplicam por `event_id`.
+
+components:
+  messages:
+    PedidoRecebido:
+      name: PedidoRecebido
+      title: Pedido aceito, aguardando validação
+      summary: |
+        Emitido no aceite (ADR-0007). **Não significa venda confirmada.**
+        Dispara a validação assíncrona.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/EnvelopePedidoRecebido'
+
+    PedidoConfirmado:
+      name: PedidoConfirmado
+      title: Venda confirmada
+      summary: Validação concluída com sucesso. A venda passa a existir comercialmente.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/EnvelopeMudancaDeEstado'
+
+    PedidoRejeitado:
+      name: PedidoRejeitado
+      title: Pedido recusado após o aceite
+      summary: |
+        Rejeição pós-aceite é **modo de operação previsto**, não incidente
+        (ADR-0007). O canal de parceiro tem taxa estruturalmente maior, por
+        não ter carrinho — logo, nem oferta nem reserva.
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/EnvelopeMudancaDeEstado'
+
+  schemas:
+    Envelope:
+      type: object
+      required: [event_id, tipo, versao, chave_particao, payload, criado_em]
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          description: |
+            **Chave de deduplicação.** Estável entre reentregas do mesmo
+            evento — é o mesmo valor que sai na republicação após queda do
+            relay. Consumidor deduplica por ele.
+        tipo:
+          type: string
+          enum: [PedidoRecebido, PedidoConfirmado, PedidoRejeitado]
+        versao:
+          type: string
+          description: Versão do contrato do evento. Mudança semântica exige bump.
+          examples: ['1.0']
+        chave_particao:
+          type: string
+          description: '`pedido_id`. Garante ordenação por agregado.'
+        criado_em:
+          type: string
+          format: date-time
+        publicado_em:
+          type: [string, 'null']
+          format: date-time
+          description: |
+            Preenchido pelo relay ao marcar. `null` na primeira entrega após
+            queda — sinal de reentrega, não de erro.
+
+    EnvelopePedidoRecebido:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            payload:
+              type: object
+              required: [pedido_id, cliente_id, itens]
+              properties:
+                pedido_id: { type: string, format: uuid }
+                cliente_id: { type: string }
+                itens:
+                  type: array
+                  items:
+                    type: object
+                    required: [sku, quantidade]
+                    properties:
+                      sku: { type: string }
+                      quantidade: { type: number }
+
+    EnvelopeMudancaDeEstado:
+      allOf:
+        - $ref: '#/components/schemas/Envelope'
+        - type: object
+          properties:
+            payload:
+              type: object
+              required: [pedido_id, status]
+              properties:
+                pedido_id: { type: string, format: uuid }
+                status:
+                  type: string
+                  enum: [CONFIRMADO, REJEITADO]
