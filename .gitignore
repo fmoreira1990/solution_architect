@@ -23,3 +23,10 @@ slice/*.db-shm
 .idea/
 Thumbs.db
 desktop.ini
+
+# Auxiliares de visualização — derivados do Markdown, que é a fonte versionada
+diagramas.html
+TESTE-MERMAID.md
+
+# Nota de retomada — interna, não é entregável
+RETOMAR-AQUI.md
