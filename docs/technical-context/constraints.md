@@ -1,0 +1,147 @@
+# Constraints — Plataforma de Pedidos e Catálogo
+
+**Slug do PRD:** pedidos-catalogo
+**Escopo deste documento:** as restrições que limitam a solução, com número ou critério verificável. Inclui o dimensionamento derivado delas. Nenhuma camada da arquitetura pode existir sem um `CTX` desta lista que a justifique (regra Q11).
+**Fontes:** `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf` (§2.2, §2.2.1), `docs/prd/pedidos-catalogo.md`, `docs/business-context/jornada.md`
+**Data:** 2026-09-22
+
+---
+
+## 1. Performance e escala
+
+| ID | Restrição | Número verificável | Origem | Consequência arquitetural |
+|---|---|---|---|---|
+| CTX-02 | Crescimento de tráfego | **10×** o volume atual em 90 dias | §2.2.1 | Autoscaling, eliminação do N+1, cache |
+| CTX-04 | Latência de criação de pedido | **p95 ≤ 500 ms** | §2.2.1 | Orçamento por hop (§5); sem dependência síncrona evitável |
+| CTX-05 | Acoplamento síncrono com o Catálogo | **9 chamadas** por pedido de 8 itens (1 + N) | §2.2.1 | Resolução em lote e/ou snapshot |
+| PR-01 | Volumetria (premissa declarada) | **60k pedidos/dia hoje → 600k/dia no alvo** | premissa | Base de todo o dimensionamento |
+| PR-02 | Tamanho do pedido (premissa declarada) | **8 itens em média, 15 no p95** | premissa | Define o peso do N+1 |
+
+## 2. Disponibilidade e resiliência
+
+| ID | Restrição | Número verificável | Origem | Consequência arquitetural |
+|---|---|---|---|---|
+| CTX-03 | Disponibilidade mensal | **99,9%** → error budget de **43 min/mês** | §2.2.1 | Multi-AZ, degradação controlada |
+| CTX-12 | Consumidores atuais não podem ser interrompidos | **zero** interrupção durante a evolução | §2.2 | Convivência de versões |
+| CTX-11 | Primeira melhoria em produção | **30 dias, com zero janela de indisponibilidade** | §2.2.1 | Feature flag, rollout progressivo, rollback sem deploy |
+
+## 3. Equipe
+
+| ID | Restrição | Número verificável | Origem | Consequência arquitetural |
+|---|---|---|---|---|
+| CTX-13 | Tamanho e senioridade do time | **`???`** | não informado | **Bloqueia `/estimativa` (`D-05`)** |
+| CTX-14 | Conhecimento atual do time na stack-alvo | **`???`** | não informado | Define rampa e peso do critério (3) do gate G2 |
+
+O desafio não informa nenhuma das duas. São a premissa mais consequente ainda em aberto: `D-05` exige composição de time e esforço por senioridade, e nenhum dos dois é derivável de §2.2.1. Serão declarados como premissa em `/estimativa`, com o efeito de cada uma explicitado caso seja falsa.
+
+## 4. Orçamento
+
+| ID | Restrição | Número verificável | Origem | Consequência arquitetural |
+|---|---|---|---|---|
+| CTX-15 | Custo de infraestrutura | **`???`** — sem teto informado | não informado | Impede validar a perna (e) da hipótese do PRD |
+| CTX-16 | Custo por pedido não cresce proporcionalmente ao volume | critério relativo, sem baseline | `docs/prd` §2(e) | Favorece cache e lote sobre escala horizontal bruta |
+
+Sem teto de custo declarado, a decisão arquitetural fica sem uma das cinco dimensões do §2.1. Registrado como risco aberto nº 2.
+
+## 5. Regulação
+
+| ID | Restrição | Critério verificável | Origem | Consequência arquitetural |
+|---|---|---|---|---|
+| CTX-09a | LGPD — dados pessoais de clientes | minimização, base legal, retenção definida | §2.2.1 | Classificação de PII, criptografia, expurgo |
+| CTX-09b | Residência de dados do segundo país | PII do país B **não** sai do país B | §2.2.1 | Silo regional ou PII regional + transacional global |
+| CTX-06 | Auditabilidade de preço | provar **qual preço o cliente viu** no momento da compra | §2.2.1 | Snapshot imutável no item do pedido |
+| PR-03 | Qual é o segundo país | **`???`** | premissa em aberto | **Bloqueia a ADR-0006 de residência** |
+
+## 6. Prazo e compatibilidade
+
+| ID | Restrição | Número verificável | Origem | Consequência arquitetural |
+|---|---|---|---|---|
+| CTX-10 | Compatibilidade dos contratos atuais | **≥ 6 meses** | §2.2.1 | Versionamento aditivo, expand-and-contract |
+| CTX-01 | Novos canais e geografia | app móvel + marketplace + 2º país em **90 dias** | §2.2 | API pública, BFF multi-canal, multi-região |
+| CTX-07 | Integridade da criação e da publicação | **zero** pedido duplicado com a mesma chave; **zero** evento perdido | §2.2.1 | `Idempotency-Key` + outbox transacional |
+| CTX-08 | Demanda dos parceiros | API pública versionada + notificação assíncrona de status | §2.2.1 | OpenAPI + AsyncAPI, webhook assinado |
+
+---
+
+## 7. Dimensionamento derivado (F0.5)
+
+Premissas de distribuição: **60% do volume em 8 horas comerciais**, **pico de 3×** sobre a média comercial.
+
+### 7.1 Taxa de requisição
+
+| Medida | Hoje (60k/dia) | Alvo (600k/dia) |
+|---|---|---|
+| Média comercial | 1,25 pedidos/s | **12,5 pedidos/s** |
+| Pico (3×) | 3,75 pedidos/s | **37,5 pedidos/s** |
+| Carga no Catálogo **com N+1** (8 itens) | ~34 req/s | **~338 req/s** |
+| Carga no Catálogo **com N+1** (p95, 15 itens) | ~60 req/s | **~600 req/s** |
+| Carga no Catálogo **com lote** (2 chamadas) | ~7,5 req/s | **~75 req/s** — redução de **78%** |
+
+O N+1 multiplica **duas vezes**: por item e por pedido concorrente. O Catálogo recebe ~27× mais requisições do que Pedidos — ele satura antes, e derruba a criação junto se for dependência síncrona.
+
+### 7.2 Orçamento de latência do caminho crítico (`CTX-04`: 500 ms)
+
+| Etapa de `POST /orders` | Orçamento | % |
+|---|---|---|
+| Autenticação e autorização na borda | 20 ms | 4% |
+| Verificação de idempotência (lookup da chave) | 30 ms | 6% |
+| Resolução do catálogo **em lote** | 80 ms | 16% |
+| Validação de domínio, preço e promoção | 100 ms | 20% |
+| Persistência transacional (pedido + itens + snapshot + outbox) | 120 ms | 24% |
+| Serialização, resposta e overhead de rede interno | 50 ms | 10% |
+| **Reserva** | **100 ms** | **20%** |
+| **Total** | **500 ms** | 100% |
+
+A publicação do evento pelo relay do outbox é **assíncrona** e fica fora deste orçamento — é justamente o que o outbox compra: confiabilidade sem custo de latência no caminho crítico.
+
+**Com o N+1 atual, o orçamento é impossível:** 9 chamadas a 40 ms consomem 360 ms dos 500, sobrando 140 ms para todo o resto. No p95 de 15 itens, 16 chamadas consomem 640 ms — **estouram o SLA sozinhas**, antes de qualquer outra etapa.
+
+### 7.3 Volume de dados
+
+| Medida | Alvo |
+|---|---|
+| Linhas de item de pedido | 600k × 8 = **4,8M/dia** ≈ 1,75 bilhão/ano |
+| Volume aproximado | ~5 KB/pedido → **~3 GB/dia** ≈ 1,1 TB/ano |
+| Eventos no outbox (criação + ~4 mudanças de status) | **~3M/dia** ≈ 35/s médio, ~105/s no pico |
+
+Justifica política de particionamento e de retenção/arquivamento — não justifica, por si só, banco distribuído.
+
+---
+
+## 8. Restrição derivada crítica — indisponibilidade composta
+
+> **`CTX-17` — Dependência síncrona no caminho crítico torna `CTX-03` matematicamente inatingível.**
+
+Se Pedidos depende sincronamente do Catálogo para criar um pedido, a disponibilidade percebida é o **produto** das duas:
+
+```
+Pedidos 99,9%  ×  Catálogo 99,9%  =  99,8%
+99,8% de 43.200 min/mês  →  86,4 min de indisponibilidade
+Error budget de CTX-03    →  43,2 min
+
+Estouro: 2× o budget — e isso no cenário em que
+tudo o mais funciona perfeitamente.
+```
+
+Três saídas, e a escolha entre elas é decisão de arquitetura, não de implementação:
+
+1. **Exigir 99,99% do Catálogo** — transfere o custo para outro time e não elimina a dependência.
+2. **Remover a dependência do caminho crítico** — snapshot de preço, que é o que a onda 30 já faz por outro motivo (auditabilidade, `CTX-06`).
+3. **Degradar de forma controlada** — cache com TTL e fallback quando o Catálogo não responde, aceitando preço levemente defasado sob falha.
+
+A opção 2 resolve `CTX-03`, `CTX-04`, `CTX-05` e `CTX-06` de uma vez. Este é o argumento quantitativo que sustenta a ADR-0003, e é mais forte do que "desacoplar é boa prática": **com a dependência síncrona, o SLA não fecha na aritmética**, independentemente de quão bem o código for escrito.
+
+---
+
+## Riscos abertos
+
+1. **`CTX-13` e `CTX-14` (equipe) em aberto bloqueiam `D-05`.** A estimativa é requisito obrigatório da vaga, não apenas do PDF. Precisam ser declarados como premissa em `/estimativa`, com efeito explícito caso falsos.
+2. **`CTX-15` (orçamento) sem teto retira uma das cinco dimensões do §2.1.** Sem custo-limite, "equilibrar custo" vira afirmação não verificável.
+3. **`PR-03` (segundo país) bloqueia a ADR-0006.** Residência de dados não pode ser decidida em abstrato — o regime muda conforme o país.
+4. **As premissas de distribuição (60% em 8h, pico 3×) são inventadas.** Se o varejo tiver pico concentrado de campanha — Black Friday, lançamento — o fator de pico pode ser 10× ou 20×, não 3×. Isso muda o dimensionamento inteiro da seção 7.
+
+## Pendências registradas
+
+- Os `CTX-*` migraram de `docs/requisitos/matriz-entregaveis.md` para cá; a matriz continua valendo como checklist de entregáveis, e esta é agora a fonte das restrições.
+- `CTX-09a` precisa de classificação de PII item a item — feito em `/threat-model`, junto com `docs/security-context/lgpd-residencia-dados.md`.
+- O valor de 40 ms por chamada ao Catálogo (usado em §7.2) é estimativa de ordem de grandeza, não medição. Marcado como a medir em `/metricas`.

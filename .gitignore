@@ -1,0 +1,25 @@
+# === CONFIDENCIAL — NÃO VERSIONAR ===
+# O enunciado é marcado "Confidencial · Stefanini Group".
+contexto/
+
+# Plano de trabalho interno — não é entregável do desafio
+ROTEIRO-EXECUCAO.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Banco local da prova
+slice/*.db
+slice/*.db-wal
+slice/*.db-shm
+
+# Editores / SO
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

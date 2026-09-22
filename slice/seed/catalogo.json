@@ -1,0 +1,56 @@
+[
+  {
+    "sku": "TV-55-QLED",
+    "descricao": "Smart TV 55\" QLED 4K",
+    "preco_unitario": 349900,
+    "moeda": "BRL",
+    "unidade": "un",
+    "peso_gramas": 18400,
+    "promocao_id": "BLACK-SETEMBRO"
+  },
+  {
+    "sku": "CAFE-GRAO-1KG",
+    "descricao": "Café em grãos torra média",
+    "preco_unitario": 6890,
+    "moeda": "BRL",
+    "unidade": "kg",
+    "peso_gramas": 1000,
+    "promocao_id": null
+  },
+  {
+    "sku": "CAMISETA-ALG-M",
+    "descricao": "Camiseta algodão manga curta - M",
+    "preco_unitario": 7990,
+    "moeda": "BRL",
+    "unidade": "un",
+    "peso_gramas": 180,
+    "promocao_id": null
+  },
+  {
+    "sku": "FONE-BT-ANC",
+    "descricao": "Fone Bluetooth com cancelamento de ruído",
+    "preco_unitario": 89900,
+    "moeda": "BRL",
+    "unidade": "un",
+    "peso_gramas": 250,
+    "promocao_id": "BLACK-SETEMBRO"
+  },
+  {
+    "sku": "ARROZ-5KG",
+    "descricao": "Arroz branco tipo 1",
+    "preco_unitario": 2790,
+    "moeda": "BRL",
+    "unidade": "kg",
+    "peso_gramas": 5000,
+    "promocao_id": null
+  },
+  {
+    "sku": "PANELA-INOX-20",
+    "descricao": "Panela de inox 20cm",
+    "preco_unitario": 12900,
+    "moeda": "BRL",
+    "unidade": "un",
+    "peso_gramas": 1300,
+    "promocao_id": null
+  }
+]
