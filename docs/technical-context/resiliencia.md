@@ -76,6 +76,8 @@ espera = min(base × 2^tentativa, teto) × (0,5 + random(0,5))
 | Workers de webhook, por parceiro | 5 simultâneos | parceiro lento monopolizar a entrega |
 | Requisições por parceiro (quota) | por contrato | parceiro abusivo degradar os demais |
 
+**O pool tem teto global.** Conexões por tarefa × tarefas no máximo do autoscaling ≤ metade do `max_connections` do RDS. Com o aceite a 6 tarefas e pool de 20, são 120 conexões. Sem essa conta, escalar a aplicação derruba o banco — o único componente que para o aceite. A política de autoscaling está em [`servicos-aws.md`](servicos-aws.md).
+
 O bulkhead mais importante é o **gateway de notificação**: ele mantém a instabilidade dos parceiros — a fronteira mais imprevisível do desenho — fora da plataforma.
 
 ---

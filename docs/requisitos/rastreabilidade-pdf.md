@@ -171,7 +171,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | **esforço** | 63 d.p. com IA, derivados de 79 d.p. em 47 tarefas | ✅ |
 | **composição de time** | 5 pessoas, 1 SRE, **derivada** do esforço | ✅ |
-| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.775–2.949/mês** para Pedidos **e** Catálogo, na mesma infraestrutura · licenças de IA: US$ 100–350/mês | ✅ |
+| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.812–3.034/mês** para Pedidos **e** Catálogo, na mesma infraestrutura · licenças de IA: US$ 100–350/mês | ✅ |
 | **premissas** | 8 premissas com efeito declarado se falsas | ✅ |
 | **riscos** | 6 riscos com impacto e resposta, mais faixa de confiança | ✅ |
 
@@ -190,9 +190,9 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](chec
 | Bullet do PDF | Resposta | |
 |---|---|---|
 | *"Repositório no GitHub com README, premissas, instruções de execução e índice dos artefatos"* | `README.md` — os 4 itens, mais roteiro de leitura por tempo disponível | ✅ |
-| *"Diagramas C4 e de sequência em formato versionável, como Mermaid, PlantUML ou Structurizr DSL"* | 16 blocos Mermaid, validados pelo parser oficial no CI | ✅ |
+| *"Diagramas C4 e de sequência em formato versionável, como Mermaid, PlantUML ou Structurizr DSL"* | 17 diagramas validados pelo parser oficial no CI | ✅ |
 | *"Mapa de domínios, no mínimo quatro ADRs, threat model e plano incremental de 30/60/90 dias"* | os 4, com 7 ADRs | ✅ |
-| *"Especificações OpenAPI e AsyncAPI/schema, acompanhadas da fatia executável e seus testes"* | os 3 contratos + `slice/` com 127 testes | ✅ |
+| *"Especificações OpenAPI e AsyncAPI/schema, acompanhadas da fatia executável e seus testes"* | os 3 contratos + `slice/` com 128 testes | ✅ |
 | *"Documento explicativo da ferramenta de IA utilizada, motivo da escolha, prompts relevantes, validações e cuidados com dados"* | `uso-de-ia.md` — os 5 itens em seções próprias | ✅ |
 | *"Resumo executivo de até duas páginas com recomendação, investimento, riscos e decisões que precisam de validação"* | `resumo-executivo.md` — os 4 itens | ✅ |
 | *(desejável)* *"breve apresentação em vídeo ou slides"* | `apresentacao/slides.md` — 10 slides | ✅ |

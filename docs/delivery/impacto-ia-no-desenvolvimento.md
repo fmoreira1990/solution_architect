@@ -121,7 +121,7 @@ Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e hí
 | Pessoas | 5,5 · 1,5 SRE | **4,5 · 1 SRE** |
 | Prazo | 20 dias úteis | 20 dias úteis |
 | Licenças de IA | — | **US$ 100–350/mês** |
-| Infraestrutura AWS | US$ 1.775–2.949/mês | igual |
+| Infraestrutura AWS | US$ 1.812–3.034/mês | igual |
 | Preço de pessoas *(faturado)* | R$ 149.832 | **R$ 123.374** |
 | *com contingência de 15%* | *R$ 172.306* | ***R$ 141.880*** |
 

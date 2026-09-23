@@ -42,8 +42,10 @@ O diagrama de contêineres (`c4/containers-to-be.md`) é **lógico**: diz quem c
 flowchart TB
     ext(["Cliente · Parceiro<br/><i>internet</i>"])
 
-    subgraph borda["🛡️ Gerenciado, fora da VPC — fronteira de confiança"]
-        apigw["<b>API Gateway</b> HTTP API<br/><i>quota e throttling por chave</i>"]
+    subgraph borda["🛡️ Borda gerenciada, fora da VPC — fronteira de confiança"]
+        r53["<b>Route 53</b><br/><i>api.&lt;domínio&gt; · certificado ACM</i>"]
+        cf["<b>CloudFront + WAF</b><br/><i>regras gerenciadas · limite por IP</i>"]
+        apigw["<b>API Gateway</b> HTTP API<br/><i>quota por chave · rotas por versão</i>"]
         cognito["<b>Cognito</b><br/><i>OAuth2 client credentials</i>"]
     end
 
@@ -52,14 +54,15 @@ flowchart TB
     end
 
     subgraph privnet["🔒 VPC · subredes privadas · 2 AZs — sem rota de entrada da internet"]
-        aceite["<b>ECS Fargate — aceite</b><br/><i>2 tarefas, autoscaling até 6</i>"]
-        relay["<b>ECS Fargate — relay</b><br/><i>1 tarefa</i>"]
-        valid["<b>ECS Fargate — validador</b><br/><i>1 tarefa</i>"]
+        alb["<b>ALB interno</b><br/><i>regra por caminho<br/>least outstanding requests</i>"]
+        aceite["<b>ECS Fargate — aceite</b><br/><i>2 → 6 tarefas · req/tarefa</i>"]
+        relay["<b>ECS Fargate — relay</b><br/><i>1 → 2 · idade do outbox</i>"]
+        valid["<b>ECS Fargate — validador</b><br/><i>1 → 4 · fila acumulada</i>"]
         rds[("<b>RDS PostgreSQL</b> Multi-AZ<br/>db.m6g.large<br/><i>AZ-a primário · AZ-b standby</i>")]
         cache[("<b>ElastiCache</b><br/><i>primário AZ-a · réplica AZ-b</i>")]
 
         subgraph catb["Catálogo"]
-            catsvc["<b>ECS Fargate — Catálogo</b><br/><i>4 tarefas, autoscaling até 12</i>"]
+            catsvc["<b>ECS Fargate — Catálogo</b><br/><i>4 → 12 tarefas · req/tarefa</i>"]
             catrds[("<b>RDS PostgreSQL do Catálogo</b><br/>Multi-AZ + réplica de leitura<br/><i>instância própria</i>")]
         end
     end
@@ -72,9 +75,13 @@ flowchart TB
 
     apoio["Secrets Manager · KMS regional · ECR · S3<br/><i>via VPC Endpoint, não pelo NAT</i>"]
 
-    ext --> apigw
+    ext -.->|"resolve o nome"| r53
+    ext --> cf
+    cf --> apigw
     apigw -.->|"valida token"| cognito
-    apigw ==>|"única entrada"| aceite
+    apigw ==>|"VPC Link<br/>única entrada na VPC"| alb
+    alb ==>|"/v1 · /v2 · /v2/quotes"| aceite
+    alb -->|"/v2/catalog"| catsvc
 
     aceite ===>|"1 transação: pedido+snapshot<br/>+chave+outbox"| rds
     aceite -->|"cotação em lote<br/><i>fora do caminho crítico</i>"| cache
@@ -94,12 +101,13 @@ flowchart TB
 
     style rds stroke-width:4px
     style aceite stroke-width:3px
-    linkStyle 3 stroke:#080,stroke-width:4px
+    style cf stroke-width:3px
+    linkStyle 7 stroke:#080,stroke-width:4px
 ```
 
 ### O que o diagrama de implantação mostra e o lógico não
 
-**Uma única porta de entrada.** Nada na subrede privada tem rota vinda da internet. O API Gateway é o único ponto exposto, e é onde `CTX-08` (quota por parceiro) é resolvido sem código — coerente com a fronteira `F2` do threat model.
+**Uma única porta de entrada.** Nada na subrede privada tem rota vinda da internet. A entrada é uma só — CloudFront, API Gateway, VPC Link, ALB interno — e é no API Gateway que `CTX-08` (quota por parceiro) é resolvido sem código, coerente com a fronteira `F2` do threat model.
 
 **O SPOF tem nome e tem AZ.** O diagrama lógico diz *"banco de Pedidos é o único SPOF"*. Aqui ele vira `db.m6g.large` Multi-AZ, primário em AZ-a e standby síncrono em AZ-b. É o que transforma a afirmação de disponibilidade em configuração verificável.
 
@@ -108,6 +116,52 @@ flowchart TB
 **Secrets, KMS, ECR e S3 saem por VPC Endpoint, não pelo NAT.** Decisão de custo, não de segurança: tráfego de imagem e de segredo pelo NAT é pago duas vezes.
 
 **Catálogo e Pedidos dividem região, VPC e subredes — não dividem banco.** Não há seta entre os dois RDS, e é de propósito: Pedidos só alcança o Catálogo pelo cache e pelo validador, nunca pelo dado. O porquê está em §8.
+
+### Da internet até a tarefa
+
+Três camadas de roteamento, cada uma decidindo uma coisa:
+
+| Camada | Decide | Como |
+|---|---|---|
+| **Route 53** | para qual **entrada** a chamada vai | zona pública; `api.<domínio>` é alias para o CloudFront, com certificado do ACM |
+| **API Gateway** | qual **serviço e versão** atende | `/v1/orders`, `/v2/orders` e `/v2/quotes` vão para o aceite; `/v2/catalog`, para o Catálogo — todas pelo VPC Link |
+| **ALB interno** | qual **tarefa** atende | regra por caminho escolhe o target group; o algoritmo escolhe a tarefa |
+
+Uma **zona privada** do Route 53 dá nome estável ao ALB interno (`catalogo.interno`) para as chamadas entre serviços — validador e cache alcançam o Catálogo sem endereço de balanceador no código.
+
+**Por que ALB entre o API Gateway e as tarefas.** O API Gateway não alcança tarefas Fargate em subrede privada sem um alvo de VPC Link. Das três opções que ele aceita, o ALB é a única que atende `CTX-11`:
+
+| Alvo do VPC Link | Decisão | Por quê |
+|---|---|---|
+| **ALB interno** | ✅ **Escolhido** | health check por HTTP, **drenagem de conexões** no deploy, regra por caminho — um ALB serve aceite e Catálogo |
+| NLB | ❌ Rejeitado | camada 4: sem regra por caminho, health check mais pobre |
+| Cloud Map, sem balanceador | ❌ Rejeitado | mais barato, mas sem drenagem — cada deploy cortaria requisições em andamento, e a restrição é **zero janela de indisponibilidade** |
+
+**Distribuição.** *Least outstanding requests*: a chamada vai para a tarefa com menos requisições em andamento. Round-robin distribui por contagem e ignora que um pedido de 15 itens pesa mais que um de 1. Tarefas nas duas AZs, com balanceamento entre zonas; tarefa que falha no health check sai da rotação antes de receber tráfego.
+
+**Autoscaling, por serviço — cada um pela métrica que representa a sua carga:**
+
+| Serviço | Mín. → máx. | Escala por | Por quê |
+|---|---|---|---|
+| **Aceite** | 2 → 6 | requisições por tarefa no ALB; CPU a 60% como segunda regra | tráfego síncrono. O mínimo de 2 é disponibilidade — uma tarefa por AZ —, não carga |
+| **Catálogo** | 4 → 12 | requisições por tarefa no ALB | leitura pura, 338 req/s no pico com o N+1 |
+| **Validador** | 1 → 4 | mensagens acumuladas na fila, por tarefa | consumidor de fila escala pelo acúmulo, não pela CPU |
+| **Relay** | 1 → 2 | idade do evento mais antigo no outbox | é o SLI de `A11.1`; o `SKIP LOCKED` permite duas instâncias sem trabalho duplicado |
+
+Escala para cima em 60 s e para baixo em 300 s, para não oscilar em rajada. O alvo exato de requisições por tarefa depende da vazão real por tarefa, que só o teste de carga mede — está no plano da onda 90 como *"autoscaling calibrado"*; até lá, o valor é declarado como inicial.
+
+**O limite que costuma faltar:** conexões por tarefa × tarefas no máximo ≤ metade do `max_connections` do RDS. Com 6 tarefas e pool de 20, são 120 conexões — folgado num `db.m6g.large`. Sem essa conta, escalar a aplicação derruba o banco, que é o único componente que para o aceite. A divisão do pool está em [`resiliencia.md`](resiliencia.md).
+
+**Deploy sem janela.** Rolling update com mínimo de 100% saudável e máximo de 200% — a versão nova sobe antes de a antiga sair —, drenagem de 30 s no ALB e *deployment circuit breaker* do ECS, que reverte sozinho um deploy com falha. A feature flag reverte comportamento; isto garante que trocar a versão não derruba ninguém.
+
+### Na onda 90: duas regiões, roteamento por domicílio
+
+A `ADR-0006` exige roteamento **por domicílio do titular, não por geografia da requisição**. Isso proíbe usar geolocalização ou latência do Route 53 para decidir a região do dado:
+
+- **Entrada:** `api.<domínio>` com roteamento por latência leva à região mais próxima — só desempenho.
+- **Região do dado:** vem da **identidade**. O token carrega a região de domicílio do titular; chamada que chega à região errada é encaminhada ao endereço da região certa (`api-br.<domínio>`, `api-us.<domínio>`).
+- **Parceiros:** usam o endereço da região fixado em contrato.
+- **Sem failover automático entre regiões para dado pessoal.** Desviar o tráfego de uma região caída para a outra processaria dado brasileiro nos EUA — transferência internacional sem instrumento. A continuidade é **dentro da região**: Multi-AZ e backup regional.
 
 ### Cada contêiner lógico, e o serviço que o hospeda
 
@@ -210,10 +264,30 @@ flowchart TB
 | Alternativa | Decisão | Por quê |
 |---|---|---|
 | **API Gateway (HTTP API) + Cognito** | ✅ **Escolhido** | Quota e throttling **por chave de API** resolvem `CTX-08` sem código; Cognito faz OAuth2 *client credentials* para parceiros |
-| ALB + autenticação na aplicação | ❌ Rejeitado | Mais barato, mas quota por parceiro viraria código nosso — e é exatamente o que `P1-16` pede pronto |
+| ALB público + autenticação na aplicação, **no lugar** do API Gateway | ❌ Rejeitado | Mais barato, mas quota por parceiro viraria código nosso — e é exatamente o que `P1-16` pede pronto. O ALB **interno**, atrás do API Gateway, existe e é outra coisa |
 | API Gateway REST API | ❌ Rejeitado | ~3,5× o custo da HTTP API; os recursos extras (modelos, validação de request) não são necessários |
 
-**Custo:** **US$ 40–90/mês** *(HTTP API ~US$ 1,00 por milhão; ~20M req/mês incluindo consultas)*
+### WAF
+
+A API é pública para parceiros, e o **AWS WAF não se associa a HTTP API** — só a REST API, ALB e CloudFront.
+
+| Alternativa | Decisão | Por quê |
+|---|---|---|
+| **CloudFront + WAF na frente do API Gateway** | ✅ **Escolhido** | regras gerenciadas, limite por IP e bloqueio geográfico, sem trocar o tipo de API |
+| Trocar para REST API | ❌ Rejeitado | WAF nativo, mas ~3,5× o custo do gateway |
+| Só o throttling do API Gateway | ❌ Rejeitado | limita volume, não filtra conteúdo — para API aberta a terceiros, é a lacuna que primeiro aparece |
+
+> **O WAF só protege se a origem não for alcançável por fora dele.** O endpoint padrão `execute-api` é desativado, e o CloudFront envia à origem um cabeçalho secreto, rotacionado, sem o qual a chamada é recusada. Sem isso, quem descobrir o endereço regional do API Gateway contorna o WAF.
+
+**Custo da borda:**
+
+| Item | US$/mês |
+|---|---|
+| API Gateway HTTP API + Cognito *(~US$ 1,00 por milhão; ~20M req/mês)* | 40–90 |
+| CloudFront + WAF *(web ACL, regras gerenciadas, requisições)* | 15–40 |
+| ALB interno *(hora + LCU)* | 20–40 |
+| Route 53 *(zona pública e privada, consultas)* | 2–5 |
+| **Total** | **US$ 77–175** |
 
 ---
 
@@ -302,15 +376,15 @@ De `constraints.md` §7, a carga do Catálogo:
 | Cache do Catálogo | ElastiCache, 2 nós `cache.t4g.medium` | 90 | 160 |
 | Computação | ECS Fargate, 4 tarefas | 90 | 220 |
 | Broker | SNS + SQS FIFO | 25 | 60 |
-| Borda | API Gateway HTTP + Cognito | 40 | 90 |
+| Borda | CloudFront + WAF, API Gateway HTTP + Cognito, ALB interno, Route 53 | 77 | 175 |
 | Observabilidade | CloudWatch + X-Ray | 120 | 350 |
 | Rede e apoio | NAT, Secrets, KMS, S3, ECR | 80 | 149 |
-| | **Subtotal — Pedidos** | **US$ 925** | **US$ 1.649** |
+| | **Subtotal — Pedidos** | **US$ 962** | **US$ 1.734** |
 | | | | |
 | Catálogo — computação | ECS Fargate, 4→12 tarefas | 150 | 400 |
 | Catálogo — store | RDS PostgreSQL Multi-AZ + réplica de leitura | 700 | 900 |
 | | **Subtotal — Catálogo** | **US$ 850** | **US$ 1.300** |
-| | **Total — plataforma** | **US$ 1.775** | **US$ 2.949** |
+| | **Total — plataforma** | **US$ 1.812** | **US$ 3.034** |
 
 **O Catálogo é quase metade da conta** e é leitura: a linha que mais pesa é a réplica que sustenta os 338 req/s do N+1 — e a única que encolhe depois da onda 60.
 
@@ -330,8 +404,8 @@ Duas escolhas respondem por ~US$ 700/mês, e as duas seguem o mesmo raciocínio:
 ## Custo por pedido
 
 ```
-US$ 1.775–2.949/mês ÷ 18.000.000 pedidos/mês
-= US$ 0,000099 a 0,000164   ≈  R$ 0,00053 a 0,00089
+US$ 1.812–3.034/mês ÷ 18.000.000 pedidos/mês
+= US$ 0,000101 a 0,000169   ≈  R$ 0,00054 a 0,00091
 ```
 
 **Menos de meio centavo por pedido.** Isso responde a perna (e) da hipótese do PRD — *"o ganho de escala não exige crescimento proporcional de infraestrutura"* — e mostra que `CTX-16` é atendível: a maior parte do custo é **fixo** (Multi-AZ, NAT, control planes), não por transação.
@@ -350,6 +424,7 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 | 90 | **Segunda região** (`ADR-0006`): RDS, ECS, NAT e observabilidade duplicados na região dos EUA | **+70 a 90%** — o salto real |
 | 90 | **BFF multi-canal** — tarefas Fargate adicionais | **+5 a 10%** |
 | 90 | Escala 10× | pouco em fixo, mais em I/O e ingestão de log; o **cache sobe de tier** ou vira read model |
+| 90+ | **Assistente de consulta de pedidos**, se o caso de negócio fechar — Bedrock, pgvector e Fargate ([`arquitetura-ia.md`](../ai-context/arquitetura-ia.md)) | por uso; dimensionável só com o volume de chamados, que é `???` |
 
 **O salto de custo é a onda 90, não a 30.** Multi-região duplica quase toda a infraestrutura fixa. Isso precisa estar claro antes de alguém aprovar as três ondas olhando só o número da primeira.
 

@@ -46,9 +46,9 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | **Prazo** | 20 dias úteis · **cabe nos 30 corridos**, que têm 21 dias úteis |
 | **Contingência** | +15% (9,5 d.p.), como linha separada e negociável — com destino previsto: meio SRE nas semanas 3 e 4, se a recalibração da semana 2 pedir |
 | **Preço de pessoas** | **R$ 141.880** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
-| **Custo de infraestrutura** | **US$ 1.775–2.949/mês** para Pedidos **e** Catálogo, que já dividem a mesma infraestrutura · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
+| **Custo de infraestrutura** | **US$ 1.812–3.034/mês** para Pedidos **e** Catálogo, que já dividem a mesma infraestrutura · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
 | **Licenças de IA** | US$ 100–350/mês |
-| **Total da fase 1** | **≈ R$ 152.000 – 159.700** — pessoas com contingência + um mês de licenças e de infraestrutura, a R$ 5,40/US$. Sem IA seriam ≈ R$ 181.900 – 188.200 |
+| **Total da fase 1** | **≈ R$ 152.200 – 160.200** — pessoas com contingência + um mês de licenças e de infraestrutura, a R$ 5,40/US$. Sem IA seriam ≈ R$ 182.100 – 188.700 |
 
 **A composição do time saiu do esforço, não o contrário** — e revelou que quem define o prazo é o SRE, não o dev. A exigência de *zero janela de indisponibilidade* faz rollout progressivo, alertas de falha silenciosa e reversibilidade sem deploy pesarem **26% do esforço**, e a IA quase não os acelera: os degraus do rollout levam o tempo que levam.
 

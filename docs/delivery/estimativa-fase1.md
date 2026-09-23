@@ -147,15 +147,15 @@ Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`]
 | Cache do Catálogo | ElastiCache, 2 nós `cache.t4g.medium` | 90–160 |
 | Computação | ECS Fargate, 4 tarefas | 90–220 |
 | Broker | SNS + SQS FIFO | 25–60 |
-| Borda | API Gateway HTTP + Cognito | 40–90 |
+| Borda | CloudFront + WAF, API Gateway HTTP + Cognito, ALB interno, Route 53 | 77–175 |
 | Observabilidade | CloudWatch + X-Ray | 120–350 |
 | Rede e apoio | NAT, Secrets, KMS, S3, ECR | 80–149 |
-| **Subtotal — Pedidos** | | **US$ 925–1.649** |
+| **Subtotal — Pedidos** | | **US$ 962–1.734** |
 | Catálogo — computação | ECS Fargate, 4→12 tarefas | 150–400 |
 | Catálogo — store | RDS Multi-AZ + réplica de leitura | 700–900 |
-| **Total — plataforma** | | **US$ 1.775–2.949** |
+| **Total — plataforma** | | **US$ 1.812–3.034** |
 
-**Custo por pedido: menos de meio centavo** — US$ 0,000099 a 0,000164. A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
+**Custo por pedido: menos de meio centavo** — US$ 0,000101 a 0,000169. A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
 
 > **Pedidos e Catálogo já rodam na mesma infraestrutura e continuam nela.** Por isso a conta é uma só, e a onda 30 não tem esforço de migração: o trabalho dentro do Catálogo começa na onda 60.
 

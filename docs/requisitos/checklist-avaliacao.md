@@ -196,11 +196,9 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 | AV-04 Evolução | ordem por natureza do dano + **flag testada, com contraste legado** | rollout em produção não é simulável |
 | AV-05 Segurança | **3 defeitos próprios achados e corrigidos** | 19 de 26 ameaças sem verificação |
 | AV-06 Prova | 2 critérios críticos + mutação + ciclo do zero + **CI verde** | broker stub, não real — escopo declarado |
-| AV-07 IA | rejeições são o corpo do log | capacidade de IA sem teste |
-| AV-08 Sênior | ausências com gatilho numérico | 45 documentos é muito |
+| AV-07 IA | método documentado, com 10 rejeições e o motivo de cada | capacidade de IA sem teste |
+| AV-08 Sênior | ausências com gatilho numérico | 46 documentos é muito |
 
-**A lacuna que era mais urgente — `AV-06` — está fechada.** O caminho de erro foi testado, estava quebrado, e foi corrigido.
-
-**A feature flag do `AV-04` também foi fechada**, com 10 testes e o caminho legado implementado para dar o contraste.
+**`AV-06` e `AV-04` não têm lacuna aberta.** O caminho de erro do `prova.py` é testado em máquina limpa, e a feature flag tem testes próprios e o caminho legado implementado para dar o contraste.
 
 O que resta é **escopo declarado de onda futura** — gateway de notificação e segurança de borda, ambos da onda 60. Implementá-los agora seria construir a onda 60 numa prova que o enunciado pediu para cobrir **uma** decisão crítica.

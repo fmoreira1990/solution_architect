@@ -59,10 +59,10 @@ flowchart TB
         orq["<b>Orquestrador</b><br/><i>monta o prompt</i>"]
         red["<b>Redação de PII</b><br/><i>entrada e saída</i>"]
         guard["<b>Guardrails</b><br/><i>allowlist de ações</i>"]
-        idx[("Índice vetorial<br/><i>SÓ políticas</i>")]
+        idx[("pgvector<br/><i>SÓ políticas</i>")]
     end
 
-    modelo["Modelo<br/><i>provedor gerenciado</i>"]
+    modelo["Amazon Bedrock<br/><i>na região do titular · endpoint privado</i>"]
 
     subgraph plataforma["Plataforma"]
         api["API de Pedidos<br/><i>v2, somente leitura</i>"]
@@ -86,6 +86,17 @@ flowchart TB
     linkStyle 10 stroke:#c00,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
+### Serviços
+
+| Componente | Serviço | Por quê |
+|---|---|---|
+| Modelo | **Amazon Bedrock**, na região do titular | modelo gerenciado, alcançado por endpoint privado, sem tráfego pela internet; a cobrança por uso acompanha o volume, que é `???` |
+| Redação de PII | **Bedrock Guardrails** (filtro de PII) + regra própria para campos estruturados | o filtro cobre texto livre; campos conhecidos — nome, documento, endereço — são mascarados por regra, que não depende de detecção |
+| Índice de políticas | **pgvector** em instância RDS pequena, própria | o corpus é pequeno e estável; OpenSearch Serverless tem piso de custo mensal desproporcional a poucas centenas de documentos |
+| Orquestrador | **ECS Fargate**, como os demais serviços | mesma operação, mesmo pipeline |
+
+A disponibilidade de cada modelo varia por região. Confirmar que o modelo escolhido existe nas duas regiões é pendência — o serviço é regional por decisão da `ADR-0006`, e não pode cair para outra região quando o modelo faltar.
+
 ---
 
 ## 4. Isolamento e minimização
@@ -93,6 +104,21 @@ flowchart TB
 **O agente herda a autorização de quem pergunta.** Ele não tem identidade própria com acesso amplo: consulta a API `/v2/orders/{id}` **com o token do solicitante**. Se o cliente não pode ver aquele pedido, o agente também não. Isso elimina por construção a classe de falha "IA vaza dado de outro cliente".
 
 **Somente leitura.** O agente não cria, não cancela, não altera pedido. Ação de escrita exige confirmação humana explícita, fora do fluxo do modelo.
+
+**Isolamento de infraestrutura.** O serviço roda em subrede privada própria. O security group só alcança dois destinos: a API de Pedidos, em leitura, e o endpoint privado do Bedrock. Não há rota para a internet nem acesso direto ao banco de Pedidos — o dado chega **só pela API**, com a autorização dela. O papel IAM permite invocar o modelo configurado e ler o índice de políticas, nada além.
+
+**Falha isolada.** Quota, timeout e pool de conexões próprios. O assistente cair ou ser sobrecarregado não afeta o aceite de pedidos: ele é consumidor da API, como qualquer canal, e passa pelo mesmo throttling da borda.
+
+**Minimização por campo.** A ferramenta não devolve o pedido inteiro — devolve os campos que a pergunta exige:
+
+| Pergunta | Campos entregues ao modelo |
+|---|---|
+| *"Cadê meu pedido?"* | status e linha do tempo |
+| *"Quanto paguei nesse item?"* | itens, preço praticado do snapshot, versão do catálogo |
+| *"Por que foi rejeitado?"* | status e motivo da rejeição |
+| *"Quando chega?"* | status, prazo e **endereço de entrega** — o único caso em que o endereço entra |
+
+O que o modelo não recebe, não pode vazar. A redação de PII é a segunda linha; a primeira é não enviar.
 
 **Redação de PII antes do modelo.** Nome, e-mail, telefone, documento e endereço são substituídos por marcadores antes do prompt. O modelo recebe *"o pedido de [CLIENTE] com entrega em [ENDERECO]"*, e a resposta é reidratada na saída. O provedor do modelo nunca vê dado pessoal.
 
@@ -174,6 +200,19 @@ Nenhuma versão de prompt sobe sem passar no eval set.
 
 As duas linhas bloqueantes não têm tolerância. As demais admitem discussão.
 
+### Em produção
+
+O eval set avalia antes do deploy; o uso real traz perguntas que ninguém previu.
+
+| Mecanismo | O que faz |
+|---|---|
+| **Amostra semanal revisada por humano** | groundedness e adequação conferidas em conversas reais; tamanho da amostra depende do volume, que é `???` |
+| **Feedback do atendente** | útil / não útil em cada resposta, com motivo |
+| **Falha vira caso de teste** | toda resposta errada encontrada em produção entra no eval set — o conjunto cresce com o uso |
+| **Alerta de desvio** | groundedness, taxa de recusa e tentativas de injeção comparadas à linha de base da versão |
+
+Uma versão promovida continua sendo avaliada. Se a amostra mostrar groundedness abaixo do limiar de promoção, a versão anterior volta — o mesmo rollback por flag da onda 30.
+
 ---
 
 ## 8. Degradação
@@ -202,5 +241,5 @@ A última linha é a mais importante: sem a ferramenta, o modelo ainda "sabe" fa
 
 - Volume e custo de chamados, para o caso de negócio.
 - A retenção de prompts (30 dias) precisa de aprovação do DPO.
-- Escolha do provedor de modelo, com atenção a residência — o serviço é regional por decisão da `ADR-0006`.
+- Confirmar os modelos disponíveis no Bedrock nas duas regiões — o serviço é regional por decisão da `ADR-0006`.
 - O eval set precisa existir **antes** da primeira versão em produção, não depois.

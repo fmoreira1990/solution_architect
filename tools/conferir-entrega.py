@@ -79,6 +79,9 @@ esperado = {
     r"\*\*(\d+) testes\*\*": n_testes,
     r"(\d+) testes em PostgreSQL": n_testes,
     r"(\d+) testes no total": n_testes,
+    r"`slice/` com (\d+) testes": n_testes,
+    r"(\d+) blocos Mermaid": n_diagramas,
+    r"(\d+) documentos é": n_docs,
     r"\*\*(\d+) ADRs\*\*": n_adrs,
     r"(\d+) diagramas válidos": n_diagramas,
     r"(\d+) diagramas validados": n_diagramas,
@@ -256,13 +259,14 @@ secao("9. Narrativa de edição")
 # registro de IA, que o §2.5.1 exige com as decisões rejeitadas.
 PERMITIDOS = ("docs/ai-context/", "docs/decisions/ADR-0003-")
 MARCA_DATADA = re.compile(r"(Fechad|Corrigid|Implementad|Removid|Resolvid|Testad)[oa]s? em 20\d\d-")
+VERSAO_ANTERIOR = re.compile(r"vers[ãa]o anterior de(ste|sta)|premissa anterior", re.I)
 narrativa = 0
 for p in docs_md():
     rel = p.relative_to(RAIZ).as_posix()
     if rel.startswith(PERMITIDOS):
         continue
     for n, linha in enumerate(ler(p).splitlines(), 1):
-        if "~~" in linha or MARCA_DATADA.search(linha):
+        if "~~" in linha or MARCA_DATADA.search(linha) or VERSAO_ANTERIOR.search(linha):
             problemas.append(f"{rel}:{n}: narrativa de edição — {linha.strip()[:70]}")
             narrativa += 1
 print(f"  {'ocorrências: ' + str(narrativa) if narrativa else 'nenhuma'}")

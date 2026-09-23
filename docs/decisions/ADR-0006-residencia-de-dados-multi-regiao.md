@@ -12,11 +12,11 @@
 
 ## Contexto
 
-`PR-03` fechou: o segundo país são os **Estados Unidos**.
+O segundo país são os **Estados Unidos** (`PR-03`).
 
-Isso muda a premissa da versão anterior desta ADR, que assumia regime **LGPD-like** com residência obrigatória. O enunciado fala em *"requisitos de residência de dados do novo país"* (`CTX-09`), e essa formulação não encontra correspondente direto nos EUA.
+O enunciado fala em *"requisitos de residência de dados do novo país"* (`CTX-09`), e essa formulação não encontra correspondente direto nos EUA. A comparação com um regime do tipo LGPD mostra por quê:
 
-| | Premissa anterior (LATAM) | Estados Unidos |
+| | Regime do tipo LGPD | Estados Unidos |
 |---|---|---|
 | Lei nacional abrangente | sim | **não existe** no nível federal |
 | Residência obrigatória | presumida | **não há exigência geral** para dado comercial de varejo |
@@ -56,6 +56,8 @@ Isso muda a premissa da versão anterior desta ADR, que assumia regime **LGPD-li
 
 **Roteamento por domicílio, não por geografia da requisição.** Um brasileiro comprando durante uma viagem aos EUA continua sendo dado brasileiro. Errar isso não gera erro — gera não conformidade silenciosa.
 
+Por isso o DNS não decide a região do dado. O Route 53 roteia por latência só a **entrada**; a região vem da **identidade** — o token carrega o domicílio do titular, e a chamada que chega à região errada é encaminhada à certa. Detalhe em `servicos-aws.md`, *"Na onda 90"*.
+
 **Multi-moeda (USD)** entra no escopo. O snapshot já carrega `moeda` por item (`ADR-0003`), então o modelo suporta; o que falta é conversão, arredondamento e a regra de qual moeda vale na disputa.
 
 **Tributação americana fica fora** — escopo OUT nº 3 do PRD. Vale registrar que o *sales tax* americano é por estado e município, e é um projeto próprio, não um campo a mais.
@@ -78,9 +80,9 @@ Isso muda a premissa da versão anterior desta ADR, que assumia regime **LGPD-li
 
 ## Justificativa
 
-A decisão é a mesma da versão anterior; o argumento, não. Antes era *"a lei obriga"*. Agora é *"a lei não obriga, e mesmo assim compensa"* — porque reduz transferência internacional, simplifica a mecânica de direitos e serve à latência.
+Nos EUA, a lei não obriga a segregação — e mesmo assim ela compensa: reduz transferência internacional, simplifica a mecânica de direitos e serve à latência.
 
-Uma decisão que sobrevive à remoção da obrigação legal é mais sólida do que uma que dependia dela.
+Uma decisão que se sustenta sem obrigação legal é mais sólida do que uma que dependeria dela.
 
 ---
 
@@ -92,6 +94,7 @@ Uma decisão que sobrevive à remoção da obrigação legal é mais sólida do 
 - **Preferências de privacidade viram dependência nova** no fluxo de uso de dado. Se o serviço cair, o padrão seguro é o **mais restritivo** — tratar como opt-out.
 - **O mosaico estadual muda com o tempo.** Novos estados aprovam leis a cada ano. A arquitetura precisa suportar regra por jurisdição, não regra fixa por país.
 - **Chaves regionais complicam recuperação de desastre.** Não existe chave única que destrave tudo — e essa é a intenção.
+- **Sem failover automático entre regiões para dado pessoal.** Desviar o tráfego de uma região caída para a outra processaria dado brasileiro nos EUA — transferência internacional sem instrumento jurídico. A continuidade é **dentro da região**: Multi-AZ e backup regional. Uma região inteira fora afeta os titulares dela, e isso é aceito.
 
 ---
 

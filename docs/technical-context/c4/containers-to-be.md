@@ -15,7 +15,7 @@ flowchart TB
     legado(["Consumidor v1"])
 
     subgraph borda["🛡️ Borda — fronteira de confiança"]
-        gw["<b>API Gateway</b><br/><i>authn · escopos · quotas<br/>roteia /v1 e /v2</i>"]
+        gw["<b>WAF · API Gateway</b><br/><i>filtro · authn · escopos · quotas<br/>roteia /v1 e /v2</i>"]
     end
 
     subgraph app["🔒 Aplicação"]

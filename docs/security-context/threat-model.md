@@ -58,7 +58,7 @@ Agrava o problema o fato de `X-Chamador` ser um **header controlado pelo cliente
 | 2.3 | **T** | Enviar preço arbitrário no pedido | valor cobrado | parceiro **não tem oferta assinada**; preço é validado contra o Catálogo de forma assíncrona | ⚠️ *onda 60* | janela entre aceite e validação |
 | 2.4 | **R** | Negar ter enviado um pedido | disputa comercial | log imutável de requisição com identidade, timestamp e hash do payload | *onda 60* | — |
 | 2.5 | **I** | Consultar pedido de outro parceiro | pedido de concorrente | autorização por dono no `GET` | ✅ `test_consulta_de_pedido_alheio_responde_404` | escopo por parceiro fica para a onda 60 |
-| 2.6 | **D** | Inundar a API pública | disponibilidade dos demais | quota por parceiro + **bulkhead** de workers | *onda 60* | — |
+| 2.6 | **D** | Inundar a API pública | disponibilidade dos demais | **WAF** com limite por IP na borda + quota por parceiro + **bulkhead** de workers | *onda 60* | — |
 | 2.7 | **T** | **Injeção via conteúdo do parceiro** — descrição, nome, observação | log, painel, e futuro prompt de IA | tratar como **dado, nunca instrução**: escape na saída, sem interpolação em prompt | `docs/ai-context/arquitetura-ia.md` | — |
 
 **F2.7 é a que mais cresce em importância.** Hoje o conteúdo do parceiro chega a log e painel. Com a capacidade de IA da onda 90, ele pode alcançar um prompt — e aí vira *prompt injection*. A regra precisa existir **antes** de a IA existir.
