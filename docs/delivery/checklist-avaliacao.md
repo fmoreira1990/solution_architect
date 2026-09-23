@@ -131,9 +131,11 @@ E a honestidade de dizer que **a fricção piora antes de melhorar**: reconcilia
 
 **E três fitness functions foram validadas por teste de mutação** — quebra-se o que protegem e confirma-se o build vermelho. Uma delas **encontrou 7 violações reais** logo na primeira execução: nenhuma ADR declarava `Escopo` nem `Data`.
 
-**Onde ainda é fraco — e é o risco mais concreto da entrega:** o `prova.py` pressupõe PostgreSQL com usuário `prova` já criado. **O caminho de erro nunca foi testado em máquina limpa.** Se o avaliador rodar sem isso, a mensagem de erro é a única coisa entre ele e uma prova que "não funciona".
+**O caminho de erro foi testado — e estava quebrado.** Dois dos três cenários mais prováveis (banco inexistente, usuário inexistente) terminavam em `UnicodeEncodeError` antes de imprimir qualquer ajuda: o PostgreSQL responde em português com acento e o console do Windows usa cp1252. O avaliador veria um traceback e concluiria que a prova não funciona.
 
-Além disso: broker stub, não real — escopo declarado; e o CI nunca rodou, porque o repositório ainda não tem remote.
+Corrigido com saída UTF-8 tolerante e **diagnóstico por tipo de falha** — banco ausente, usuário ausente ou serviço parado geram instruções diferentes, com o comando exato. Ciclo completo validado: banco e usuário destruídos, prova executada, instruções seguidas ao pé da letra, **111 testes verdes do zero**.
+
+Permanece: broker stub, não real — escopo declarado; e o CI nunca rodou, porque o repositório ainda não tem remote configurado.
 
 ---
 
@@ -187,8 +189,10 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 | AV-03 Decisões | 7 ADRs; rejeição por prazo declarada | `ADR-0006` depende de enquadramento não jurídico |
 | AV-04 Evolução | ordem por natureza do dano | feature flag não existe no código |
 | AV-05 Segurança | **3 defeitos próprios achados e corrigidos** | 19 de 26 ameaças sem verificação |
-| AV-06 Prova | 2 critérios críticos + mutação | **caminho de erro do `prova.py` não testado** |
+| AV-06 Prova | 2 critérios críticos + mutação + ciclo do zero validado | CI nunca rodou — repositório sem remote |
 | AV-07 IA | rejeições são o corpo do log | capacidade de IA sem teste |
 | AV-08 Sênior | ausências com gatilho numérico | 40 documentos é muito |
 
-**A lacuna que eu fecharia primeiro** é a do `AV-06`: testar o `prova.py` em máquina sem o banco criado. É a única que pode fazer o entregável **parecer quebrado** na mão de quem avalia.
+**A lacuna que era mais urgente — `AV-06` — está fechada.** O caminho de erro foi testado, estava quebrado, e foi corrigido.
+
+**A próxima é a feature flag do `AV-04`:** ela sustenta o critério mais duro do gate G30 (zero janela de indisponibilidade), está decomposta em 5,5 dias-pessoa, e é a única decisão da onda 30 sem nenhuma verificação executável. Não cabia na fatia — mas é justo apontá-la.

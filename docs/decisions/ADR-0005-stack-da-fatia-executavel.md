@@ -73,7 +73,7 @@ Onde houve escolha real, ela foi feita por mérito: **Postgres em vez de SQLite*
 
 - **Python não é a escolha óbvia para núcleo transacional de varejo.** Para a prova é irrelevante — o que se demonstra é a semântica da transação, não a performance do runtime.
 - **Sem ORM, o SQL é explícito e verboso.** É intencional: o avaliador precisa ver a transação única com pedido, itens, snapshot, chave e outbox sem atravessar uma camada de abstração.
-- **A prova exige Postgres com o usuário `prova` já criado.** Numa máquina limpa isso falha. Mitigado por mensagem de erro com o comando exato de criação, mas **o caminho de erro não foi testado em máquina limpa** — débito registrado.
+- **A prova exige Postgres com o usuário `prova` já criado.** Numa máquina limpa isso falha. Mitigado por diagnóstico que **classifica a causa** (banco ausente, usuário ausente, serviço parado) e imprime o comando exato de correção, incluindo alternativa via Docker.
 - **O broker stub não exercita serialização, ordenação nem particionamento reais.** Escopo declarado, não lacuna esquecida.
 
 ---
@@ -98,6 +98,6 @@ Onde houve escolha real, ela foi feita por mérito: **Postgres em vez de SQLite*
 
 ## Pendências registradas
 
-- O caminho de erro do `prova.py` (Postgres ausente ou credencial errada) **não foi testado em máquina limpa**. É o risco mais concreto de a prova falhar na mão do avaliador.
+- ~~O caminho de erro não foi testado em máquina limpa.~~ **Testado em 2026-09-23**, e estava quebrado: dois dos três cenários mais prováveis terminavam em `UnicodeEncodeError`, porque o PostgreSQL responde em português com acento e o console do Windows usa cp1252 — a mensagem de ajuda **nunca chegava a ser impressa**, e o avaliador veria um traceback. Corrigido com saída em UTF-8 tolerante e diagnóstico por tipo de falha. Ciclo completo validado: banco e usuário destruídos, prova executada, instruções seguidas, 111 testes verdes.
 - A stack de produção continua indefinida e **depende de `CTX-13`/`CTX-14`**.
 - Node.js foi instalado depois do gate, para validar diagramas Mermaid. Vale registrar que isso **não** reabre a decisão: trocar a stack da prova depois dos testes verdes seria refazer trabalho sem ganho.

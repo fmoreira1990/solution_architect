@@ -55,7 +55,7 @@ As 19 respostas `200` do primeiro teste só existem pelo caminho de replay, que 
 
 ### Como rodar
 
-**Pré-requisito:** PostgreSQL acessível, com banco e usuário da prova:
+**Pré-requisito:** PostgreSQL acessível, com banco e usuário da prova. Se algo faltar, o `prova.py` **diagnostica a causa e imprime o comando exato** — incluindo alternativa via Docker.
 
 ```sql
 CREATE USER prova WITH PASSWORD 'prova';
@@ -70,6 +70,8 @@ python prova.py          # instala, cria schema, semeia e executa
 Variável opcional: `PROVA_DATABASE_URL` (padrão `postgresql://prova:prova@127.0.0.1:5432/prova_pedidos`).
 
 Dados são **sintéticos** — nenhum dado real, nenhuma PII.
+
+O ciclo foi validado do zero: banco e usuário destruídos, prova executada, instruções da própria saída seguidas, 111 testes verdes.
 
 ---
 
