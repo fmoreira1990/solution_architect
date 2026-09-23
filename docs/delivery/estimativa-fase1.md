@@ -97,19 +97,25 @@ O custo de pessoa depende de taxa por senioridade, que é **decisão comercial, 
 
 Preencher isto com faixa de mercado daria um número fechado e **enganoso** — taxa varia por praça, por contrato e por modelo de alocação. O que o arquiteto entrega é o esforço por perfil; o preço é do comercial.
 
-### 4.2 Infraestrutura — custo de *run*, derivado do dimensionamento
+### 4.2 Infraestrutura — custo de *run*
 
-Baseado em `constraints.md` §7: **600k pedidos/dia**, pico de 37,5 pedidos/s, ~1,1 TB/ano, ~3M eventos/dia.
+Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`](../technical-context/servicos-aws.md)**. Resumo:
 
-| Componente | Dimensionamento | Ordem de grandeza |
+| Componente | Serviço | US$/mês |
 |---|---|---|
-| Banco relacional gerenciado, multi-AZ | 37,5 escritas/s no pico; 1,1 TB/ano | **US$ 800–1.500/mês** |
-| Computação (aceite + relay + validador) | 3 serviços, autoscaling | **US$ 400–900/mês** |
-| Broker gerenciado | ~3M mensagens/dia | **US$ 200–500/mês** |
-| Observabilidade (tracing, métricas, log) | caminho crítico instrumentado | **US$ 300–800/mês** |
-| **Total estimado** | | **US$ 1.700–3.700/mês** |
+| Store transacional | RDS PostgreSQL Multi-AZ, `db.m6g.large` | 480–620 |
+| Computação | ECS Fargate, 4 tarefas | 90–220 |
+| Broker | SNS + SQS FIFO | 25–60 |
+| Borda | API Gateway HTTP + Cognito | 40–90 |
+| Observabilidade | CloudWatch + X-Ray | 120–350 |
+| Rede e apoio | NAT, Secrets, KMS, S3, ECR | 80–149 |
+| **Total** | | **US$ 835–1.489** |
 
-Faixas amplas de propósito: dependem de reserva versus sob demanda, de retenção de telemetria e da instância escolhida. São **ordem de grandeza para decisão**, não orçamento.
+**Custo por pedido: menos de meio centavo** (US$ 0,000046 a 0,000083). A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
+
+> **Uma versão anterior deste documento projetava US$ 1.700–3.700/mês** com componentes genéricos. Com os serviços nomeados, o número real é **metade disso**. A faixa anterior era conservadora por falta de especificidade, não por prudência — e quase toda a diferença veio de duas escolhas: SQS no lugar de Kafka gerenciado (~US$ 500/mês) e RDS no lugar de Aurora (~US$ 200/mês). Nos dois casos, a opção mais cara entregava capacidade que o dimensionamento não pede.
+
+**O salto de custo é a onda 90, não a 30:** multi-região duplica quase toda a infraestrutura fixa (**+70 a 90%**). Precisa estar claro antes de aprovar as três ondas olhando só o número da primeira.
 
 **Custo incremental da fase 1 é pequeno.** A onda 30 não muda a topologia — adiciona tabelas, um relay e observabilidade sobre infraestrutura que já existe. O salto de custo vem na **onda 90**, com multi-região e escala 10×.
 
@@ -178,6 +184,7 @@ Total com contingência: **91 dias-pessoa**.
 - **Ondas 60 e 90** — §2.5.3 limita o compromisso à fase 1. Estimá-las agora daria falsa precisão sobre escopo que o gate G30 pode redefinir.
 - **Custo de pessoa em moeda** — insumo pronto, preço é comercial.
 - **Licenças de software** — nenhuma identificada; a stack de produção ainda não foi decidida (`ADR-0005` decide a stack da **prova**).
+- **Custo das ondas 60 e 90** — dimensionado em ordem de grandeza em `servicos-aws.md`, não orçado.
 - **Treinamento e rampa** — depende de `CTX-14`, que é `???`.
 - **Contingência de escopo** — a reserva de 15% cobre variação de esforço, não escopo novo.
 
