@@ -1,7 +1,7 @@
 # Impacto de IA assistida no prazo e no time
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** se desenvolver a onda 30 com assistência de IA reduz prazo e equipe, quanto, e o que **não** reduz. Inclui licenças no custo. É cenário alternativo à `estimativa-fase1.md`, não substituição dela.
+**Escopo deste documento:** se desenvolver a onda 30 com assistência de IA reduz prazo e equipe, quanto, e o que **não** reduz. Inclui licenças no custo. É o cenário **adotado** na proposta; `estimativa-fase1.md` mantém o cenário sem IA como referência.
 **Requisitos cobertos:** `D-05`
 **Fontes:** `docs/delivery/decomposicao-onda-30.md`, `docs/technical-context/padroes-desenvolvimento.md` §7, `docs/ai-context/uso-de-ia.md`
 **Data:** 2026-09-24
@@ -30,7 +30,7 @@ O erro comum é aplicar um percentual único sobre o total. A decomposição em 
 | **C — Outbox e publicação** | 16 | **25%** | 12 | O relay ganha muito; **`A9.2`/`A9.3` ganham zero** — adequar consumidores depende de terceiros |
 | **D — Convivência e rollout** | 11,5 | **20%** | 9 | Feature flag ganha; **rollout progressivo em produção não acelera** — os degraus levam o tempo que levam |
 | **Transversal** | 15 | **0%** | 15 | Ver abaixo — e é o ponto mais importante deste documento |
-| **Total** | **79** | **~22%** | **63** | |
+| **Total** | **79** | **~20%** | **63** | |
 
 ### Por que o transversal não ganha nada
 
@@ -46,26 +46,29 @@ São 15 dias-pessoa de revisão de código, revisão de segurança, runbooks, ac
 
 O padrão: **código assistido por IA passa em teste com facilidade. O que ele erra é o que ninguém pensou em testar** — fronteira de autorização, modo de falha silenciosa, caminho de exceção.
 
-Se a revisão for tratada como despesa a cortar, o ganho de 22% vira dívida com juros. O transversal fica em 15 dias-pessoa **de propósito**, e a proporção dele sobe de 19% para **24%** do esforço total.
+Se a revisão for tratada como despesa a cortar, o ganho de ~20% vira dívida com juros. O transversal fica em 15 dias-pessoa **de propósito**, e a proporção dele sobe de 19% para **24%** do esforço total.
 
 ---
 
 ## Prazo: cai menos que o esforço
 
 ```
-63 d.p. ÷ alocação de 72%  ≈  16 dias úteis
+Sem IA:  SRE 20,5 d.p.  →  1,5 SRE para caber em 20 dias úteis
+Com IA:  SRE 14   d.p.  ÷  (1 × 70%)  =  20 dias úteis, com 1 SRE
 ```
 
-**De 20 para 16 dias úteis — 20% de redução, contra 22% de esforço.**
+**O prazo não cai: fica em 20 dias úteis. O ganho vira uma pessoa a menos.**
 
-A diferença não é arredondamento. É porque **o caminho crítico da onda 30 não é código**:
+O SRE define a data, e é o perfil que a IA menos acelera. Ele fecha em 14 d.p. porque os devs, desafogados pela IA, absorvem a instrumentação que mora no código — detalhe em [`estimativa-fase1.md`](estimativa-fase1.md) §2.
+
+Daria para trocar: manter 1,5 SRE e cair para ~17,5 dias úteis. Não compensa, porque **o caminho crítico da onda 30 não é código**:
 
 ```
 P1 baseline  →  P3 inventário  →  A9.2/A9.3 adequação de consumidores
    (medição)      (descoberta)        (depende de terceiros)
 ```
 
-Nenhum dos três acelera com IA. Somados, são ~21 dias-pessoa que definem o piso do cronograma.
+Nenhum dos três acelera com IA. Entregar o código três dias antes não antecipa um gate que espera terceiros; uma pessoa a menos é ganho que se realiza.
 
 > **Mais gente ou mais IA não comprime prazo que depende de terceiros.** Isso já estava registrado como risco `R1` da estimativa; a IA não muda.
 
@@ -73,14 +76,16 @@ Nenhum dos três acelera com IA. Somados, são ~21 dias-pessoa que definem o pis
 
 ## Equipe: muda a forma, não só o tamanho
 
-| Perfil | Sem IA | Com IA | Variação |
+| Perfil | Sem IA | Ganho da IA | Com IA, 1 SRE |
 |---|---|---|---|
-| Arquiteto de Soluções | 9,5 | **9,5** | — |
-| Dev Sênior | 33 | 26 | −21% |
-| Dev Pleno | 16 | **9** | **−44%** |
-| SRE / DevOps | 20,5 | 18,5 | −10% |
-| **Total** | **79** | **63** | −20% |
-| **Pessoas** | **5,5** | **4,5** | **−1** |
+| Arquiteto de Soluções | 9,5 | — | **9,5** |
+| Dev Sênior | 33 | −21% → 26 | 28 |
+| Dev Pleno | 16 | **−44% → 9** | 11,5 |
+| SRE / DevOps | 20,5 | −10% → 18,5 | **14** |
+| **Total** | **79** | −20% → 63 | **63** |
+| **Pessoas** | **5,5** | | **4,5** — 5 cabeças, arquiteto em meio período |
+
+A coluna do meio é o efeito da IA; a última, a redistribuição que ele permite: ~3,5 d.p. de instrumentação e ~1 d.p. de transversal saem do SRE para os devs.
 
 ### O que a tabela mostra
 
@@ -88,7 +93,9 @@ Nenhum dos três acelera com IA. Somados, são ~21 dias-pessoa que definem o pis
 
 **O pleno reduz quase pela metade.** Expurgo, backfill, reconciliação e job de adequação são tarefas bem especificadas, com padrão conhecido. É onde o ganho se concentra.
 
-**A proporção de sênior sobe** — de 42% para 41% do esforço, mas de 2 para 2 pessoas num time menor. Em time de 4,5, dois sêniores são 44% das pessoas contra 36% antes.
+**O SRE quase não reduz.** Rollout progressivo em produção leva o tempo dos degraus. A redução para um SRE não vem da IA sobre o trabalho dele — vem da IA sobre o trabalho dos devs, que abre espaço para absorver a instrumentação.
+
+**A proporção de sênior sobe** — de 42% para 44% do esforço, e de 36% para 44% das pessoas: dois sêniores num time de 4,5.
 
 > **A conclusão desconfortável para quem vende IA:** ela reduz o trabalho que um pleno faria, não o que um sênior faz. **Time menor, mais sênior, revisão mais cara por linha.**
 
@@ -100,9 +107,9 @@ Nenhum dos três acelera com IA. Somados, são ~21 dias-pessoa que definem o pis
 
 | Item | Assentos | US$/mês |
 |---|---|---|
-| Assistente de código com contexto de repositório | 4,5 | **US$ 90–270** |
+| Assistente de código com contexto de repositório | 5 | **US$ 100–300** |
 | Ambiente de execução para agentes *(opcional)* | — | US$ 0–50 |
-| **Total** | | **US$ 90–320/mês** |
+| **Total** | | **US$ 100–350/mês** |
 
 Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e híbrido. Ferramentas de assento cobram ~US$ 20–60/mês; as de consumo dependem de volume e podem passar disso num mês intenso — **é custo variável, não fixo, e precisa de teto**.
 
@@ -111,28 +118,29 @@ Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e hí
 | | Sem IA | Com IA |
 |---|---|---|
 | Esforço | 79 d.p. | **63 d.p.** |
-| Pessoas | 5,5 | **4,5** |
-| Prazo | 20 dias úteis | **16 dias úteis** |
-| Licenças de IA | — | **US$ 90–320/mês** |
+| Pessoas | 5,5 · 1,5 SRE | **4,5 · 1 SRE** |
+| Prazo | 20 dias úteis | 20 dias úteis |
+| Licenças de IA | — | **US$ 100–350/mês** |
 | Infraestrutura AWS | US$ 1.775–2.949/mês | igual |
-| Preço de pessoas *(faturado)* | R$ 149.832 | **R$ 123.795** |
+| Preço de pessoas *(faturado)* | R$ 149.832 | **R$ 123.374** |
+| *com contingência de 15%* | *R$ 172.306* | ***R$ 141.880*** |
 
 *Valores faturados, já com encargos CLT e com os tributos do Lucro Presumido — ver [taxas-de-mercado.md](taxas-de-mercado.md).*
 
-**A licença é irrelevante diante da economia.** ~R$ 26 mil economizados em pessoas contra R$ 490–1.730/mês de licença. O ponto de atenção não é o custo — é o **teto de consumo**, para que ferramenta cobrada por uso não vire surpresa.
+**A licença é irrelevante diante da economia.** ~R$ 26,5 mil economizados em pessoas contra R$ 540–1.890/mês de licença. O ponto de atenção não é o custo — é o **teto de consumo**, para que ferramenta cobrada por uso não vire surpresa.
 
 ### A economia em preço é menor que a economia em esforço
 
 | | Sem IA | Com IA | Variação |
 |---|---|---|---|
 | Esforço | 79 d.p. | 63 d.p. | **−20,3%** |
-| Preço de pessoas | R$ 149.832 | R$ 123.795 | **−17,4%** |
+| Preço de pessoas | R$ 149.832 | R$ 123.374 | **−17,7%** |
 
 Os quase 3 pontos de diferença não são arredondamento: a IA reduz proporcionalmente mais o trabalho de **pleno** (−44%), o perfil mais barato, e **nada** do arquiteto, o mais caro.
 
-> **Quanto mais sênior o time, menor o retorno financeiro da ferramenta** — ainda que o ganho de prazo permaneça. A taxa média ponderada sobe de R$ 1.897 para R$ 1.965 por dia-pessoa: o time fica menor e mais caro por cabeça.
+> **Quanto mais sênior o time, menor o retorno financeiro da ferramenta** — ainda que o ganho de prazo permaneça. A taxa média ponderada sobe de R$ 1.897 para R$ 1.958 por dia-pessoa: o time fica menor e mais caro por cabeça.
 
-> A economia **em margem** é menor ainda que a economia em preço. Cerca de 19,5% dos R$ 26 mil são tributos que deixam de ser recolhidos — dinheiro que nunca foi da empresa. O ganho líquido real para quem presta é da ordem de **R$ 21 mil**, e é esse o número a levar para discussão comercial.
+> A economia **em margem** é menor ainda que a economia em preço. Cerca de 19,5% dos R$ 26,5 mil são tributos que deixam de ser recolhidos — dinheiro que nunca foi da empresa. O ganho líquido real para quem presta é da ordem de **R$ 21 mil**, e é esse o número a levar para discussão comercial.
 
 > Outras licenças de software: **nenhuma identificada**. A stack de produção ainda não foi decidida (`CTX-13`/`CTX-14`), e a arquitetura usa serviços gerenciados AWS, sem licença própria. Se a escolha cair em runtime ou banco comercial, entra aqui.
 
@@ -160,8 +168,8 @@ Não é só contratar ferramenta.
 | # | Risco | Impacto | Resposta |
 |---|---|---|---|
 | **1** | **Cortar revisão para realizar o ganho** | Crítico — os três defeitos reais passariam | Transversal permanece em 15 d.p., inegociável |
-| 2 | Ganho de 22% não se confirmar | Alto — prazo volta a 20 dias | Recalibrar ao fim da semana 2, como o fator de produção |
-| 3 | Time de 4,5 pessoas ter menos folga para imprevisto | Médio | A contingência de 15% cobre |
+| 2 | Ganho de ~20% não se confirmar | Alto — o SRE estoura primeiro | Recalibrar ao fim da semana 2; meio SRE nas semanas 3 e 4, pago pela contingência |
+| 3 | **SRE único, sem folga** | Alto — define o prazo | Dedicação exclusiva; runbooks e sêniores no acompanhamento de rollout cobrem ausência curta |
 | 4 | Ferramenta cobrada por consumo estourar | Baixo | Teto declarado no contrato |
 | 5 | **Dependência de ferramenta externa** | Médio | O código resultante é convencional; não há *lock-in* técnico |
 | 6 | Dado do cliente em prompt | **Crítico** | Regra já registrada: nenhum dado real, nenhuma credencial |
@@ -170,24 +178,24 @@ Não é só contratar ferramenta.
 
 ## Recomendação
 
-**Propor o cenário com IA como alternativa declarada, não como o número principal.**
+**O cenário com IA é o da proposta, com o cenário sem IA mantido como referência.**
 
-| | Conservador | Com IA |
+| | Sem IA *(referência)* | Com IA *(proposta)* |
 |---|---|---|
 | Esforço | 79 d.p. | 63 d.p. |
-| Time | 5,5 | 4,5 |
-| Prazo | 20 dias úteis | 16 dias úteis |
+| Time | 5,5 · 1,5 SRE | 4,5 · 1 SRE |
+| Prazo | 20 dias úteis | 20 dias úteis |
 
-Razões para apresentar assim:
+Como o risco foi tratado:
 
-**O ganho de 22% é derivado, não medido em projeto do cliente.** A âncora é a fatia deste desafio — evidência real, mas de escopo pequeno.
+**O ganho de ~20% é derivado, não medido em projeto do cliente.** A âncora é a fatia deste desafio — evidência real, mas de escopo pequeno. Por isso a recalibração da semana 2 é marco do plano, e o meio SRE que o cenário sem IA pagaria sempre virou **gatilho** pago pela contingência.
 
-**O prazo depende de terceiros, e isso não muda.** Prometer 16 dias e depender da adequação de consumidores externos é assumir risco que não está sob controle.
+**O prazo depende de terceiros, e isso não muda.** Por isso o ganho foi convertido em time menor, não em data mais cedo: prometer menos de 20 dias dependendo da adequação de consumidores externos seria assumir risco fora de controle.
 
 **Um concorrente que prometer 40% de ganho estará ignorando o transversal.** Vale dizer isso na proposta: o ganho existe no código e **não existe na revisão** — e a revisão fica mais cara por linha, não mais barata.
 
 ## Pendências registradas
 
-- Recalibrar o ganho de 22% ao fim da semana 2, com dado real.
+- Recalibrar o ganho de IA ao fim da semana 2, com dado real — é o que decide o gatilho de meio SRE.
 - Definir teto de consumo se a ferramenta for cobrada por uso.
 - Confirmar que a política do cliente permite código assistido por IA e sob quais condições.

@@ -95,7 +95,7 @@ Tributo sobre faturamento incide sobre o **preço final**, não sobre o custo. S
 
 ## Preço da fase 1
 
-Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
+Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md), medidas sem IA. É a **referência**; o cenário proposto, com IA e um SRE, está [mais abaixo](#cenário-proposto--com-ia-e-um-sre):
 
 | Perfil | d.p. | Preço/dia | Subtotal |
 |---|---|---|---|
@@ -141,36 +141,42 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
 ### Total da fase 1
 
-| | |
-|---|---|
-| Serviços, com contingência | R$ 172.306 |
-| Infraestrutura *(plataforma completa)* | R$ 9.585–15.925 |
-| **Total** | **≈ R$ 181.900 – 188.200** |
+| | Proposta *(com IA)* | Referência *(sem IA)* |
+|---|---|---|
+| Serviços, com contingência | R$ 141.880 | R$ 172.306 |
+| Licenças de IA *(1 mês)* | R$ 540–1.890 | — |
+| Infraestrutura *(plataforma completa, 1 mês)* | R$ 9.585–15.925 | R$ 9.585–15.925 |
+| **Total** | **≈ R$ 152.000 – 159.700** | ≈ R$ 181.900 – 188.200 |
 
 ---
 
-## Cenário com desenvolvimento assistido por IA
+## Cenário proposto — com IA e um SRE
+
+Esforço e redistribuição derivados em [`estimativa-fase1.md`](estimativa-fase1.md) §2.
 
 | Perfil | d.p. | Subtotal |
 |---|---|---|
 | Arquiteto de Soluções Sr | 9,5 | R$ 28.985 |
-| Desenvolvedor Sênior | 26 | R$ 53.170 |
-| SRE / DevOps | 18,5 | R$ 30.858 |
-| Desenvolvedor Pleno | 9 | R$ 10.782 |
-| **Total — 63 d.p.** | | **R$ 123.795** |
-| Licenças de IA | | R$ 490–1.730/mês |
-| **Total** | | **≈ R$ 124.300 – 125.500** |
+| Desenvolvedor Sênior | 28 | R$ 57.260 |
+| SRE / DevOps | 14 | R$ 23.352 |
+| Desenvolvedor Pleno | 11,5 | R$ 13.777 |
+| **Total — 63 d.p.** | | **R$ 123.374** |
+| Contingência 15% (9,5 d.p.) | | R$ 18.506 |
+| **Total com contingência** | | **R$ 141.880** |
+| Licenças de IA | | R$ 540–1.890/mês |
+
+As proporções por camada são as mesmas da referência — 53,6% custo de pessoal, 19,5% tributos, 26,8% overhead e margem —, porque cada camada é um fator aplicado igualmente a todos os perfis.
 
 ### A economia em preço é **menor** que a economia em esforço
 
 | | Sem IA | Com IA | Variação |
 |---|---|---|---|
 | Esforço | 79 d.p. | 63 d.p. | **−20,3%** |
-| Preço | R$ 149.832 | R$ 123.795 | **−17,4%** |
+| Preço | R$ 149.832 | R$ 123.374 | **−17,7%** |
 
 **A diferença de quase 3 pontos não é arredondamento.** A IA reduz proporcionalmente mais o trabalho de **pleno** (−44%), o perfil mais barato, e **não reduz nada** do arquiteto, o mais caro.
 
-> Quanto mais o time se concentra em perfis sêniores, **menor o retorno financeiro de ferramenta de produtividade** — ainda que o ganho de prazo permaneça. O preço médio ponderado sobe de R$ 1.897 para **R$ 1.965** por dia-pessoa: time menor e mais caro por cabeça.
+> Quanto mais o time se concentra em perfis sêniores, **menor o retorno financeiro de ferramenta de produtividade** — ainda que o ganho de prazo permaneça. O preço médio ponderado sobe de R$ 1.897 para **R$ 1.958** por dia-pessoa: time menor e mais caro por cabeça.
 
 ---
 
@@ -194,16 +200,15 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
 **Não substitui a decisão comercial.** Preço envolve relacionamento com a conta, volume, prazo contratual e posicionamento competitivo — nenhum deles é decisão de arquitetura.
 
-**O que o arquiteto entrega é o esforço por perfil.** As 79 dias-pessoa da decomposição sustentam discussão técnica; as camadas acima apenas as traduzem para a linguagem de quem decide.
+**O que o arquiteto entrega é o esforço por perfil.** As dias-pessoa da decomposição — 79 sem IA, 63 com — sustentam discussão técnica; as camadas acima apenas as traduzem para a linguagem de quem decide.
 
 ## Riscos
 
 1. **`T1` é o maior risco.** Trocar o regime tributário não é mexer num fator — muda duas camadas simultaneamente, com sinais opostos, e exige refazer a conta.
-2. **`T4` é o menos ancorado.** Errar 0,2 no fator comercial move ~R$ 20 mil.
+2. **`T4` é o menos ancorado.** Errar 0,2 no fator comercial move ~R$ 16 mil na proposta, ~R$ 20 mil na referência.
 3. **Dados salariais têm dispersão alta** — faixas p25–p75 chegam a variar 2×. A média esconde isso.
 4. **O mercado de SRE está aquecido**, e a cauda longa sugere que contratar na média pode não ser realista.
 
 ## Pendências registradas
 
-- ~~Confirmar o regime tributário e a alíquota de ISS.~~ **Decidido:** Lucro Presumido e ISS a 5%, o teto. A escolha do teto é deliberada — se o município enquadrar TI em faixa menor, o desvio é a favor da proposta.
 - Substituir as camadas 2, 3 e 4 pelos números reais da empresa antes de virar proposta.

@@ -169,9 +169,9 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 
 | Exigência | Resposta | |
 |---|---|---|
-| **esforço** | 79 d.p. em 47 tarefas; cenário com IA em 63 d.p. | ✅ |
-| **composição de time** | 5,5 pessoas, **derivada** do esforço | ✅ |
-| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.775–2.949/mês** para Pedidos **e** Catálogo (US$ 925–1.649 só Pedidos, decisão `V11`) · licenças de IA: US$ 90–320/mês | ✅ |
+| **esforço** | 63 d.p. com IA, derivados de 79 d.p. em 47 tarefas | ✅ |
+| **composição de time** | 5 pessoas, 1 SRE, **derivada** do esforço | ✅ |
+| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.775–2.949/mês** para Pedidos **e** Catálogo (US$ 925–1.649 só Pedidos, decisão `V11`) · licenças de IA: US$ 100–350/mês | ✅ |
 | **premissas** | 8 premissas com efeito declarado se falsas | ✅ |
 | **riscos** | 6 riscos com impacto e resposta, mais faixa de confiança | ✅ |
 

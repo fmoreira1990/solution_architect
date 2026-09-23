@@ -18,7 +18,7 @@ Aqui cada entrega vira tarefas de 0,5 a 3 dias-pessoa, com perfil e dependência
 
 ## O que a fatia executável já responde
 
-A prova em `slice/` implementa o **núcleo** de `A1`–`A8`: idempotência com `PRIMARY KEY`, outbox transacional, relay com `SKIP LOCKED`, snapshot imutável, cotação assinada e contract test. Ela roda, com 127 testes.
+A prova em `slice/` implementa o **núcleo** de `A1`–`A8`: idempotência com `PRIMARY KEY`, outbox transacional, relay com `SKIP LOCKED`, snapshot imutável, cotação assinada e contract test. Ela roda, com 128 testes.
 
 Isso é uma âncora de calibração incomum: não estamos estimando algo nunca construído. Estamos estimando **a distância entre a prova e a produção**.
 
@@ -164,6 +164,8 @@ Omitir o transversal é como estimativas otimistas nascem. São 15 dias-pessoa �
 | **SRE** | 20,5 | Observabilidade, alertas, rollout, runbooks |
 | **Total** | **79** | |
 
+Esta é a distribuição **sem IA**, base verificável da estimativa. No time proposto — com IA e um SRE —, `P1.3` e `A3.3` passam ao Dev Sênior e `P1.4` e `A11.1` ao Dev Pleno; a derivação está em [`estimativa-fase1.md`](estimativa-fase1.md) §2.
+
 O perfil **saiu da decomposição**, não foi declarado antes. A proporção de SRE (26%) surpreende e é consequência direta de `CTX-11`: rollout progressivo com comparação a cada degrau é trabalho de operação, não de desenvolvimento.
 
 ---
@@ -189,4 +191,4 @@ O perfil **saiu da decomposição**, não foi declarado antes. A proporção de 
 ## Pendências registradas
 
 - `E5` depende de `CTX-14`, que é `???`. Rampa não está estimada.
-- O esforço total (79 d.p.) alimenta `estimativa-fase1.md`, onde vira prazo e composição de time.
+- O esforço total (79 d.p., sem IA) alimenta `estimativa-fase1.md`, onde recebe o ganho de IA e vira prazo e composição de time.

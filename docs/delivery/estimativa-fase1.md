@@ -3,7 +3,7 @@
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** esforço, composição de time, custos, premissas e riscos para executar a **onda 30**. Apenas a fase 1 é estimada — §2.5.3 limita o compromisso orçado a ela.
 **Requisitos cobertos:** `D-05`
-**Fontes:** `docs/delivery/decomposicao-onda-30.md`, `docs/technical-context/constraints.md` (§7), `slice/`
+**Fontes:** `docs/delivery/decomposicao-onda-30.md`, `docs/delivery/impacto-ia-no-desenvolvimento.md`, `docs/technical-context/constraints.md` (§7), `slice/`
 **Data:** 2026-09-23
 
 ---
@@ -15,46 +15,72 @@ A estimativa é **por decomposição**, não por analogia nem por palpite calibr
 ```
 1. Decompor até tarefas de 0,5 a 3 dias-pessoa   → 47 tarefas
 2. Atribuir perfil por tarefa                     → o perfil SAI daqui
-3. Somar por bloco e por perfil                   → 79 dias-pessoa
-4. Derivar prazo a partir de alocação realista    → ver §2
-5. Declarar premissas e faixa de confiança        → ver §5 e §6
+3. Somar por bloco e por perfil                   → 79 dias-pessoa, sem IA
+4. Aplicar o ganho de IA bloco a bloco            → 63 dias-pessoa
+5. Derivar time e prazo por perfil                → ver §2 e §3
+6. Declarar premissas e faixa de confiança        → ver §5 e §6
 ```
 
 **A composição do time é consequência do esforço, não premissa dele.** Declarar "squad de 5" antes de saber o que precisa ser feito produz um time que cabe no orçamento e não na tarefa.
 
-Há uma âncora de calibração incomum: a fatia executável em `slice/` **já implementa** o núcleo de idempotência, outbox, snapshot, cotação e contract test, com 127 testes. Não estamos estimando algo nunca construído — estamos estimando **a distância entre a prova e a produção**, e essa distância está decomposta item a item.
+Há uma âncora de calibração incomum: a fatia executável em `slice/` **já implementa** o núcleo de idempotência, outbox, snapshot, cotação e contract test, com 128 testes. Não estamos estimando algo nunca construído — estamos estimando **a distância entre a prova e a produção**, e essa distância está decomposta item a item.
 
 ---
 
 ## 1. Esforço
 
-| Bloco | d.p. | % | Observação |
+| Bloco | Sem IA | Com IA | Observação |
 |---|---|---|---|
-| Pré-requisitos (baseline, observabilidade, inventário) | 16 | 20% | **bloqueiam o gate**, não são paralelos |
-| A — Idempotência | 11 | 14% | núcleo provado; falta identidade e normalização |
-| B — Snapshot e cotação | 9,5 | 12% | falta cofre de chave e rotação |
-| C — Outbox e publicação | 16 | 20% | inclui adequação de consumidores |
-| D — Convivência e rollout | 11,5 | 15% | é o que `CTX-11` custa |
-| Transversal (review, segurança, runbook, rollout, cerimônias) | 15 | 19% | omitir isto é como nasce estimativa otimista |
-| **Total** | **79** | 100% | |
+| Pré-requisitos (baseline, observabilidade, inventário) | 16 | 14,5 | **bloqueiam o gate**, não são paralelos |
+| A — Idempotência | 11 | 7 | núcleo provado; falta identidade e normalização |
+| B — Snapshot e cotação | 9,5 | 5,5 | falta cofre de chave e rotação |
+| C — Outbox e publicação | 16 | 12 | inclui adequação de consumidores |
+| D — Convivência e rollout | 11,5 | 9 | é o que `CTX-11` custa |
+| Transversal (review, segurança, runbook, rollout, cerimônias) | 15 | 15 | omitir isto é como nasce estimativa otimista |
+| **Total** | **79** | **63** | |
+
+**A proposta é o cenário com IA.** A decomposição é medida sem IA porque é a base verificável; o ganho é aplicado depois, bloco a bloco, com a justificativa de cada percentual em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md). O transversal não ganha nada, de propósito.
 
 ---
 
 ## 2. Composição do time — derivada, não declarada
 
-| Perfil | d.p. | Alocação | Pessoas | Por que este perfil |
-|---|---|---|---|---|
-| **Arquiteto de Soluções** | 9,5 | 50% | 1 | Normalização de contrato, negociação com consumidores externos, revisão de segurança. Não é papel de tempo integral nesta fase |
-| **Dev Sênior** | 33 | 80% | 2 | Transação única, relay, rotação de chave HMAC, feature flag — tudo que **erra caro** e cujo erro só aparece em produção |
-| **Dev Pleno** | 16 | 80% | 1 | Expurgo, backfill, reconciliação, adequação de consumidores internos |
-| **SRE / DevOps** | 20,5 | 70% | 1,5 | Observabilidade, alertas, rollout progressivo, runbooks |
-| **Total** | **79** | | **5,5** | |
-
 ### O que a decomposição revelou
 
-**SRE consome 26% do esforço.** Mais que o dobro do arquiteto e quase igual a um dev sênior. Isso não foi planejado — saiu da soma. A causa é `CTX-11`: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de **operação**, não de desenvolvimento.
+| Perfil | Sem IA | Com IA |
+|---|---|---|
+| Arquiteto de Soluções | 9,5 | 9,5 |
+| Dev Sênior | 33 | 26 |
+| Dev Pleno | 16 | 9 |
+| SRE / DevOps | 20,5 | 18,5 |
+| **Total** | **79** | **63** |
+
+**SRE consome 26% do esforço sem IA** — mais que o dobro do arquiteto. Isso não foi planejado: saiu da soma. A causa é `CTX-11`: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de **operação**, não de desenvolvimento.
+
+**E é o perfil que a IA menos reduz: −10%.** Os degraus do rollout levam o tempo que levam. O ganho cai quase todo no código dos devs — o pleno perde quase metade do esforço.
 
 Uma proposta que dimensionasse esta fase com 4 devs e "apoio de infra" erraria por aí — e erraria justamente na parte que sustenta o critério mais duro do gate: zero janela de indisponibilidade.
+
+### O time proposto: um SRE
+
+Com 18,5 d.p., o SRE ainda pediria uma pessoa e meia. Fecha em **uma** com dois ajustes:
+
+1. **A instrumentação que mora no código vai para quem escreve o código.** `P1.3` (p95 por faixa de itens) e `A3.3` (métrica de `409` por divergência) passam ao Dev Sênior, que já faz `P1.1`, `P1.2` e `A3.1`. `P1.4` (consolidação do baseline) e `A11.1` (SLI de idade do outbox) passam ao Dev Pleno, que já faz o expurgo do outbox. São ~3,5 d.p. de métrica emitida pela aplicação.
+2. **Code review e cerimônias dividem-se por um SRE, não por um e meio.** ~1 d.p. volta para os devs.
+
+O SRE continua dono do que só ele faz: tracing, painel comparativo, alertas de divergência e de relay parado, rollback exercitado e rollout em degraus.
+
+**É a IA que torna isso possível.** Sem ela, os dois sêniores já estão no limite — 33 d.p. levam 20,6 dias úteis — e não há para onde mover trabalho.
+
+| Perfil | d.p. | Alocação | Pessoas | Termina em |
+|---|---|---|---|---|
+| **Arquiteto de Soluções** | 9,5 | 50% | 1, meio período | 19 dias úteis |
+| **Dev Sênior** | 28 | 80% | 2 | 17,5 dias úteis |
+| **Dev Pleno** | 11,5 | 80% | 1 | 14,5 dias úteis |
+| **SRE / DevOps** | **14** | 70% | **1** | **20 dias úteis** |
+| **Total** | **63** | | **5 pessoas** · 4,5 em tempo integral | |
+
+*"Termina em" = d.p. ÷ (pessoas × alocação). A alocação desconta reuniões, suporte e troca de contexto; a do SRE é menor porque ele absorve incidente.*
 
 **O arquiteto é parcial, e é correto que seja.** 9,5 dias em 20 úteis é meio período. As decisões estruturais já estão tomadas (7 ADRs); o que resta é normalização de contrato, negociação e revisão. Arquiteto em tempo integral nesta fase seria custo sem contrapartida.
 
@@ -63,17 +89,22 @@ Uma proposta que dimensionasse esta fase com 4 devs e "apoio de infra" erraria p
 ## 3. Prazo
 
 ```
-79 d.p. ÷ 5,5 pessoas ≈ 14,4 dias-pessoa/pessoa
-                      ÷ alocação média de 72%
-                      ≈ 20 dias úteis ≈ 4 semanas
+SRE        14   d.p. ÷ (1 × 70%)  =  20    dias úteis   ← define o prazo
+Arquiteto   9,5 d.p. ÷ (1 × 50%)  =  19
+Sênior     28   d.p. ÷ (2 × 80%)  =  17,5
+Pleno      11,5 d.p. ÷ (1 × 80%)  ≈  14,5
 ```
 
-**Cabe nos 30 dias corridos de `CTX-11` — com folga estreita.**
+**20 dias úteis ≈ 4 semanas. Cabe nos 30 dias corridos de `CTX-11`, que têm 21 dias úteis — com 1 dia de folga.**
+
+O prazo é o do SRE, e isso é aceitável: o trabalho dele é o que *tem* de terminar por último, porque o rollout da semana 4 só começa com o código pronto. A folga dos devs nas semanas 3 e 4 vai para acompanhamento de rollout e correção em produção (`T4`).
+
+**A IA vira time menor, não data mais cedo.** Mantendo 1,5 SRE, o prazo cairia para ~17,5 dias úteis — e não compraria nada: o gate G30 depende do inventário e da adequação de consumidores, que não aceleram. Uma pessoa a menos é ganho real; três dias antes de um gate que espera terceiros, não.
 
 | Semana | Foco | Marco |
 |---|---|---|
 | 1 | Pré-requisitos P1–P3 + migrações aditivas (A1.1, A4.1, A7.1) | baseline publicado |
-| 2 | Núcleo: idempotência, snapshot, cotação, outbox | caminho novo passando em homologação |
+| 2 | Núcleo: idempotência, snapshot, cotação, outbox | caminho novo passando em homologação · **recalibração** |
 | 3 | Observabilidade, feature flag, reconciliação, adequação de consumidores | flag pronta, consumidores avisados |
 | 4 | Rollout 1% → 100%, com comparação a cada degrau | **gate G30** |
 
@@ -90,18 +121,21 @@ O custo de pessoa depende de taxa por senioridade, que é **decisão comercial, 
 | Perfil | d.p. | Taxa/dia *(faturada)* | Subtotal |
 |---|---|---|---|
 | Arquiteto de Soluções Sr | 9,5 | R$ 3.051 | R$ 28.985 |
-| Dev Sênior | 33 | R$ 2.045 | R$ 67.485 |
-| Dev Pleno | 16 | R$ 1.198 | R$ 19.168 |
-| SRE / DevOps | 20,5 | R$ 1.668 | R$ 34.194 |
-| **Total** | **79** | média R$ 1.897 | **R$ 149.832** |
-| Contingência 15% | 12 | | R$ 22.475 |
-| **Com contingência** | **91** | | **R$ 172.306** |
+| Dev Sênior | 28 | R$ 2.045 | R$ 57.260 |
+| Dev Pleno | 11,5 | R$ 1.198 | R$ 13.777 |
+| SRE / DevOps | 14 | R$ 1.668 | R$ 23.352 |
+| **Total** | **63** | média R$ 1.958 | **R$ 123.374** |
+| Contingência 15% | 9,5 | | R$ 18.506 |
+| **Com contingência** | **72,5** | | **R$ 141.880** |
+| Licenças de IA | | | US$ 100–350/mês |
 
-As taxas vêm de **referência pública de mercado**, derivadas em quatro camadas explícitas — salário, encargos CLT, overhead e margem, e **tributos sobre o faturamento** — em [`taxas-de-mercado.md`](taxas-de-mercado.md). **Não são a estrutura de custo da empresa**: o comercial substitui cada camada pelos números reais, e o esforço em dias-pessoa não muda.
+Sem IA, o mesmo escopo custaria **R$ 149.832** — R$ 172.306 com contingência — e exigiria 1,5 SRE. A derivação está em [`taxas-de-mercado.md`](taxas-de-mercado.md).
 
-São valores **faturados**, no regime de **Lucro Presumido**: 19,53% do total são PIS, COFINS, ISS, IRPJ (com adicional) e CSLL. Do preço acima, R$ 80.384 são custo carregado de pessoal, R$ 29.262 são tributos e R$ 40.186 são overhead e margem.
+As taxas vêm de **referência pública de mercado**, derivadas em quatro camadas explícitas — salário, encargos CLT, overhead e margem, e **tributos sobre o faturamento**. **Não são a estrutura de custo da empresa**: o comercial substitui cada camada pelos números reais, e o esforço em dias-pessoa não muda.
 
-Duas camadas movem muito o total: a **tributária** — ISS a 2% em vez de 5% derruba o total para R$ 144.446, e o Simples Nacional exige recálculo, não ajuste — e o **fator comercial** de 1,5×, em que errar 0,2 move ~R$ 20 mil.
+São valores **faturados**, no regime de **Lucro Presumido**: 19,53% do total são PIS, COFINS, ISS, IRPJ (com adicional) e CSLL. Do preço, 53,6% é custo carregado de pessoal, 19,5% tributos e 26,8% overhead e margem — proporções que não dependem do mix de perfis, porque cada camada é um fator aplicado igualmente a todos.
+
+Duas camadas movem muito o total: a **tributária** — ISS a 2% em vez de 5% derruba o total para R$ 118.939, e o Simples Nacional exige recálculo, não ajuste — e o **fator comercial** de 1,5×, em que errar 0,2 move ~R$ 16 mil.
 
 ### 4.2 Infraestrutura — custo de *run*
 
@@ -123,7 +157,7 @@ Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`]
 
 **Custo por pedido: menos de meio centavo** — US$ 0,000051 a 0,000092 no escopo Pedidos, US$ 0,000099 a 0,000164 na plataforma completa. A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
 
-> **`V11` decide qual total vale.** O enunciado nomeia *"Pedidos e Catálogo"*, e a onda 60 mexe no Catálogo — por isso o número levado à proposta é o da plataforma completa. Se o cliente seguir hospedando o Catálogo, cai para US$ 925–1.649. **A hospedagem do Catálogo não está nas 79 dias-pessoa**: se entrar no escopo, muda custo e esforço.
+> **`V11` decide qual total vale.** O enunciado nomeia *"Pedidos e Catálogo"*, e a onda 60 mexe no Catálogo — por isso o número levado à proposta é o da plataforma completa. Se o cliente seguir hospedando o Catálogo, cai para US$ 925–1.649. **A hospedagem do Catálogo não está nas 63 dias-pessoa**: se entrar no escopo, muda custo e esforço.
 
 > **Duas escolhas respondem por ~US$ 700/mês de economia:** SQS FIFO no lugar de Kafka gerenciado (~US$ 500) e RDS Multi-AZ no lugar de Aurora (~US$ 200). Nos dois casos a opção mais cara entregava capacidade que o dimensionamento não pede — `AV-08` aplicado a custo.
 
@@ -139,7 +173,7 @@ Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`]
 | deploy único | feature flag + rollout em 4 degraus |
 | rollback por restore | rollback por flag, exercitado em produção |
 | — | observabilidade comparativa entre caminhos |
-| | **+11,5 d.p. ≈ 15% do total** |
+| | **+11,5 d.p. ≈ 15% do total**, medido sem IA |
 
 Isso não é desperdício — é o preço de uma restrição que o cliente impôs, e precisa estar **visível na proposta**. Um concorrente que não a respeitar parecerá 15% mais barato entregando outra coisa.
 
@@ -155,8 +189,9 @@ Isso não é desperdício — é o preço de uma restrição que o cliente impô
 | E4 | Não há integrações no caminho de criação além do Catálogo | +~4 d.p. **por integração**, e cada uma reintroduz o `CTX-17` |
 | E5 | O time conhece a stack de produção (`CTX-14` é `???`) | rampa não estimada: +10 a 20% |
 | E6 | Migrações aditivas rodam sem janela na base atual | +5 d.p. se exigir migração online |
-| E7 | Alocação média efetiva de 72% | a 50%, o prazo vai para 29 dias úteis — **estoura os 30 corridos** |
+| E7 | SRE dedicado, com alocação efetiva de 70% | a 60%, o prazo vai para 23 dias úteis — **estoura os 30 corridos** |
 | E8 | Fator de produção de 3,5× sobre o núcleo provado | é a premissa mais consequente do documento |
+| E9 | Ganho de IA de ~20% se confirma | o SRE estoura primeiro — ver o gatilho em §6 |
 
 ---
 
@@ -164,32 +199,19 @@ Isso não é desperdício — é o preço de uma restrição que o cliente impô
 
 | Cenário | d.p. | Prazo | Quando acontece |
 |---|---|---|---|
-| **Otimista** | 63 (−20%) | 16 dias úteis | Consumidores cooperam rápido; normalização canônica sem surpresa; ambiente pronto |
-| **Provável** | **79** | **20 dias úteis** | Cenário das premissas E1–E8 |
-| **Pessimista** | 111 (+40%) | 28 dias úteis | A3 dobra; consumidores externos lentos; rampa de stack; migração online necessária |
+| **Otimista** | 50 (−20%) | 16 dias úteis | Consumidores cooperam rápido; normalização canônica sem surpresa; ambiente pronto |
+| **Provável** | **63** | **20 dias úteis** | Cenário das premissas E1–E9 |
+| **Pessimista** | 88 (+40%) | 28 dias úteis | A3 dobra; consumidores externos lentos; rampa de stack; migração online necessária |
 
-**O pessimista ainda cabe em 30 dias corridos — por pouco.** É o que torna o prazo viável e apertado ao mesmo tempo, e o que justifica tratar `P1` e `P3` como caminho crítico desde o primeiro dia.
+**O pessimista não cabe nos 30 dias corridos**, que têm 21 dias úteis. E não cabe com nenhum time: a +40%, o SRE vai a 28 dias úteis e os sêniores a 24,5. Reforçar resolve um gargalo e expõe o outro.
+
+Por isso a **recalibração da semana 2** é marco, não formalidade: ela decide cedo, com dado real, entre reforçar o time e renegociar a data do gate — enquanto as duas opções ainda existem.
 
 ### Contingência
 
-**Reserva de 15% (12 d.p.), como linha separada.** Embutir contingência no esforço das tarefas esconde a incerteza e corrompe a base para a próxima estimativa. Declarada, ela pode ser negociada ou devolvida.
+**Reserva de 15% (9,5 d.p., R$ 18.506), como linha separada.** Embutir contingência no esforço das tarefas esconde a incerteza e corrompe a base para a próxima estimativa. Declarada, ela pode ser negociada ou devolvida.
 
-Total com contingência: **91 dias-pessoa**.
-
-### Cenário alternativo: desenvolvimento assistido por IA
-
-| | Conservador *(este documento)* | Com IA |
-|---|---|---|
-| Esforço | 79 d.p. | **63 d.p.** (−22%) |
-| Time | 5,5 pessoas | **4,5 pessoas** |
-| Prazo | 20 dias úteis | **16 dias úteis** (−20%) |
-| Licenças | — | US$ 90–320/mês |
-| **Preço de pessoas** | R$ 149.832 | **R$ 123.795** (−17,4%) |
-| *com contingência de 15%* | *R$ 172.306* | *R$ 142.364* |
-
-**O prazo cai menos que o esforço**, porque o caminho crítico — baseline, inventário de consumidores e adequação de terceiros — não acelera com IA.
-
-E o **transversal permanece em 15 d.p., inegociável**: revisão de código assistido por IA não é mais rápida, é diferente. Análise completa, com a evidência deste próprio repositório, em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md).
+**Com um SRE no limite, a contingência tem destino previsto.** Se a recalibração mostrar o SRE acima do plano, entra **meio SRE nas semanas 3 e 4** — ~5 dias de trabalho, ≈ R$ 8.300, menos da metade da reserva. O meio SRE que o cenário sem IA pagaria sempre vira gatilho, pago só se preciso.
 
 ---
 
@@ -199,24 +221,24 @@ E o **transversal permanece em 15 d.p., inegociável**: revisão de código assi
 |---|---|---|---|
 | R1 | **A9.2/A9.3 dependem de terceiros** | Alto — é prazo, não esforço | Começar o inventário (`P3`) no dia 1. Mais gente não acelera |
 | R2 | **A3 (normalização canônica) dobrar** | Médio — +2 d.p. | Especificar na OpenAPI antes de implementar |
-| R3 | **Alocação real abaixo de 72%** | Alto — E7 estoura o prazo | Confirmar dedicação **antes** de assumir a data |
+| R3 | **SRE único, sem folga** | Alto — define o prazo; férias ou doença param o rollout | Dedicação exclusiva confirmada **antes** de assumir a data; runbooks (`T3`) e sêniores no acompanhamento de rollout (`T4`) cobrem ausência curta; ausência longa aciona o gatilho de §6 |
 | R4 | **Fator de produção 3,5× subestimado** | Alto — erro sistemático em tudo | Recalibrar ao fim da semana 2, com dado real |
 | R5 | **`CTX-14` desconhecido** | Médio | Se o time não conhecer a stack, somar rampa explícita |
 | R6 | **Integração no caminho de criação não mapeada** | Alto | `V1` é a primeira pergunta ao Client Face |
+| R7 | **Ganho de IA abaixo do previsto** | Alto — o SRE estoura primeiro | Recalibrar na semana 2; gatilho de meio SRE, pago pela contingência |
 
 ---
 
 ## 8. O que **não** está nesta estimativa
 
 - **Ondas 60 e 90** — §2.5.3 limita o compromisso à fase 1. Estimá-las agora daria falsa precisão sobre escopo que o gate G30 pode redefinir.
-- **Custo de pessoa em moeda** — insumo pronto, preço é comercial.
-- **Licenças de software** — nenhuma de runtime ou banco identificada; a arquitetura usa serviços gerenciados AWS. Licenças de **ferramenta de desenvolvimento assistido por IA** estão em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md), no cenário alternativo.
+- **Licenças de software de runtime** — nenhuma identificada; a arquitetura usa serviços gerenciados AWS. As licenças de **ferramenta de desenvolvimento assistido por IA** estão em §4.1 e detalhadas em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md).
 - **Custo das ondas 60 e 90** — dimensionado em ordem de grandeza em `servicos-aws.md`, não orçado.
 - **Treinamento e rampa** — depende de `CTX-14`, que é `???`.
 - **Contingência de escopo** — a reserva de 15% cobre variação de esforço, não escopo novo.
 
 ## Pendências registradas
 
-- A taxa por senioridade precisa ser preenchida pelo comercial para fechar o custo total.
+- As taxas por senioridade são referência de mercado; o comercial substitui pelas da empresa antes de virar proposta.
 - `CTX-14` (conhecimento do time) permanece `???` e afeta E5.
-- O fator de produção de 3,5× deve ser recalibrado ao fim da semana 2 — e a recalibração vale mais que a estimativa inicial.
+- O fator de produção de 3,5× e o ganho de IA devem ser recalibrados ao fim da semana 2 — e a recalibração vale mais que a estimativa inicial.

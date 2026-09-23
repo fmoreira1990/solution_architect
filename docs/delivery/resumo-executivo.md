@@ -41,15 +41,18 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 
 | | |
 |---|---|
-| **Esforço** | **79 dias-pessoa**, decompostos em 47 tarefas |
-| **Time** | 5,5 pessoas — 1 arquiteto (50%), 2 dev sênior, 1 dev pleno, 1,5 SRE |
-| **Prazo** | 20 dias úteis · **cabe nos 30 corridos** |
-| **Contingência** | +15% (12 d.p.), como linha separada e negociável |
-| **Preço de pessoas** | **R$ 172.306** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
+| **Esforço** | **63 dias-pessoa** com desenvolvimento assistido por IA — 79 sem IA, decompostos em 47 tarefas |
+| **Time** | 5 pessoas — 1 arquiteto em meio período, 2 dev sênior, 1 dev pleno, **1 SRE** |
+| **Prazo** | 20 dias úteis · **cabe nos 30 corridos**, que têm 21 dias úteis |
+| **Contingência** | +15% (9,5 d.p.), como linha separada e negociável — com destino previsto: meio SRE nas semanas 3 e 4, se a recalibração da semana 2 pedir |
+| **Preço de pessoas** | **R$ 141.880** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
 | **Custo de infraestrutura** | **US$ 1.775–2.949/mês** para a plataforma nomeada (Pedidos **e** Catálogo) · **US$ 925–1.649** se o cliente seguir hospedando o Catálogo (`V11`) · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido nos dois casos** |
-| **Total da fase 1** | **≈ R$ 181.900 – 188.200** — pessoas com contingência + um mês de infraestrutura da plataforma completa, a R$ 5,40/US$ |
+| **Licenças de IA** | US$ 100–350/mês |
+| **Total da fase 1** | **≈ R$ 152.000 – 159.700** — pessoas com contingência + um mês de licenças e de infraestrutura da plataforma completa, a R$ 5,40/US$. Sem IA seriam ≈ R$ 181.900 – 188.200 |
 
-**A composição do time saiu do esforço, não o contrário.** E ela revelou algo contraintuitivo: **SRE consome 26% do esforço** — mais que o dobro do arquiteto. A causa é a exigência de *zero janela de indisponibilidade*: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de operação, não de desenvolvimento.
+**A composição do time saiu do esforço, não o contrário** — e revelou que quem define o prazo é o SRE, não o dev. A exigência de *zero janela de indisponibilidade* faz rollout progressivo, alertas de falha silenciosa e reversibilidade sem deploy pesarem **26% do esforço**, e a IA quase não os acelera: os degraus do rollout levam o tempo que levam.
+
+**A IA fecha o time em um SRE.** Ela desafoga os devs, que absorvem a instrumentação que mora no código; o SRE fica com alerta, painel comparativo, rollout e rollback — 14 d.p., exatos 20 dias úteis. O ganho vira uma pessoa a menos, não uma data mais cedo: o caminho crítico é baseline, inventário e adequação de consumidores, e nada disso acelera.
 
 Uma proposta dimensionada com "4 devs e apoio de infra" erraria exatamente na parte que sustenta o critério mais duro do gate.
 
@@ -81,7 +84,7 @@ Mais: queda do relay entre publicar e marcar **não perde evento**; consulta de 
 |---|---|---|---|
 | **1** | **Existirem integrações no caminho de criação além do Catálogo** | Alto — cada uma reintroduz o problema de disponibilidade composta e adiciona ~4 d.p. | **Primeira pergunta ao Client Face.** Mapear antes de assumir a data |
 | **2** | **Adequação dos consumidores depender de terceiros** | Alto — é prazo, não esforço; mais gente não acelera | Iniciar o inventário no dia 1 |
-| **3** | **Alocação real abaixo de 72%** | Alto — a 50%, o prazo vai a 29 dias úteis e estoura | Confirmar dedicação **antes** de assumir a data |
+| **3** | **SRE único, no limite** | Alto — ele define o prazo; a 60% de alocação efetiva, vai a 23 dias úteis e estoura | Dedicação exclusiva confirmada **antes** de assumir a data; gatilho de meio SRE na semana 2, pago pela contingência |
 | **4** | **Pico de demanda muito acima de 3×** | Alto — varejo tem Black Friday | Teste de carga com cenário de campanha, não de média |
 | **5** | **Ausência de baseline tornar o gate indecidível** | Alto | Medição é **pré-requisito** do gate, não tarefa paralela |
 
@@ -98,7 +101,7 @@ Nenhuma pode ser resolvida pela equipe técnica. As quatro em destaque afetam pr
 | **V1** | Existem integrações no caminho de criação além do Catálogo? | Client Face / arquitetura da conta | **Prazo da onda 30** |
 | **V3** | Baseline atual: duplicatas/mês, eventos perdidos, p95, disponibilidade | Operação | **Gate G30** — sem régua, indecidível |
 | **V7** | Teto de custo de infraestrutura | Negócio | A dimensão custo do objetivo fica sem régua de verificação |
-| **V11** | **A hospedagem do Catálogo entra no escopo?** | Client Face / negócio | **Quase dobra a conta de infraestrutura** (+79 a 92%) — e acrescenta esforço que não está nos 79 d.p. |
+| **V11** | **A hospedagem do Catálogo entra no escopo?** | Client Face / negócio | **Quase dobra a conta de infraestrutura** (+79 a 92%) — e acrescenta esforço que não está nos 63 d.p. |
 | V8 | Dono do endereço de entrega — Pedidos ou Logística? | Arquitetura da conta | Estratégia de pseudonimização (LGPD) |
 | V9 | Instrumento jurídico para transferência Brasil → EUA | Jurídico / DPO | Onda 90; nenhuma PII brasileira atravessa sem ele |
 | V10 | Em quais estados dos EUA a operação estará sujeita | Jurídico / negócio | Quais leis estaduais se aplicam |

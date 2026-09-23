@@ -161,6 +161,19 @@
 
 ---
 
+### 2026-09-23 · Time com um SRE — o cenário com IA passa a ser a proposta
+
+- **Prompt:** *"pode fechar em 1 SRE, organize o prazo pra que dê certo, com uso de IA"*.
+- **A decisão veio do usuário**, a partir de uma pergunta sobre o "1,5 SRE" do resumo.
+- **Achado próprio, antes de mexer:** o cenário com IA prometia **16 dias úteis com 4,5 pessoas**. A conta só fecha com 5,5 — com 4,5, dá ~19,5. E a estimativa afirmava que o cenário pessimista, de 28 dias úteis, *"cabe em 30 corridos"*, que têm 21.
+- **Derivação:** 1 SRE só fecha com IA. Sem ela, 20,5 d.p. levam 29 dias úteis. Com ela, o SRE cai só para 18,5 — rollout não acelera. O que fecha a conta é a folga que a IA abre nos devs: `P1.3`, `A3.3`, `P1.4` e `A11.1`, métricas emitidas pela aplicação, passam a quem escreve o código. O SRE fica com 14 d.p., exatos 20 dias úteis.
+- **Rejeitado:** usar o ganho da IA para encurtar o prazo mantendo 1,5 SRE (~17,5 dias úteis). **Motivo:** o gate G30 espera inventário e adequação de consumidores; entregar código três dias antes não o antecipa. Uma pessoa a menos é ganho que se realiza.
+- **Rejeitado:** subir a alocação do SRE de 70% para 80% para caber sem redistribuir. **Motivo:** mudaria uma premissa para fazer a conta fechar — o mesmo tipo de invenção que a regra Q7 proíbe.
+- **Consequência:** o meio SRE deixou de ser custo fixo e virou gatilho, acionado na recalibração da semana 2 e pago pela contingência. Preço com contingência: R$ 172.306 → R$ 141.880.
+- **Dados expostos:** nenhum.
+
+---
+
 ## Pendências registradas
 
 - A íntegra dos prompts ainda não foi extraída para `docs/ai-context/prompts/`. Fazer ao final de cada frente, não no fechamento.

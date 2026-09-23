@@ -272,7 +272,7 @@ De `constraints.md` §7, a carga do Catálogo:
 
 ### O que isto muda além do custo
 
-**A hospedagem do Catálogo não está nas 79 dias-pessoa.** A decomposição da onda 30 cobre idempotência, outbox e snapshot — tudo em Pedidos. Migrar ou assumir a operação do Catálogo é trabalho que não foi decomposto e, portanto, **não está estimado**. Se a resposta a `V11` for "sim", muda custo **e** esforço.
+**A hospedagem do Catálogo não está nas dias-pessoa estimadas** — 63 com IA, 79 sem. A decomposição da onda 30 cobre idempotência, outbox e snapshot — tudo em Pedidos. Migrar ou assumir a operação do Catálogo é trabalho que não foi decomposto e, portanto, **não está estimado**. Se a resposta a `V11` for "sim", muda custo **e** esforço.
 
 ---
 
