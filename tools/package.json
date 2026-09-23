@@ -1,0 +1,8 @@
+{
+  "name": "fitness-diagramas",
+  "private": true,
+  "type": "module",
+  "description": "Valida os blocos Mermaid dos documentos com o parser oficial.",
+  "scripts": { "validar": "node validar-mermaid.mjs" },
+  "dependencies": { "jsdom": "^26.0.0", "mermaid": "^11.0.0" }
+}

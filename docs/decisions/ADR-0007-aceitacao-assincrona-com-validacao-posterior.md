@@ -2,9 +2,11 @@
 
 **Status:** Aceita — 2026-09-22
 **Slug do PRD:** pedidos-catalogo
+**Escopo deste documento:** **em que momento do ciclo de vida** o pedido é validado. Não decide quem valida (estoque, pagamento, fraude) nem como — decide que a validação é posterior ao aceite.
 **Requisitos cobertos:** `CTX-03`, `CTX-04`, `CTX-08`, `CTX-17`, `P1-10`, `P1-13`, `P1-15`
 **Supersede:** `ADR-0003` seção (b) — caminho de leitura na criação
 **Fontes:** `docs/technical-context/constraints.md` (§8), `docs/decisions/ADR-0003-...md`, `docs/business-context/jornada.md`
+**Data:** 2026-09-22
 
 ---
 

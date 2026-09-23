@@ -2,8 +2,10 @@
 
 **Status:** Aceita — 2026-09-22
 **Slug do PRD:** pedidos-catalogo
+**Escopo deste documento:** a garantia de não-duplicação na **criação** de pedido. Não cobre idempotência de cancelamento, alteração ou de outras operações.
 **Requisitos cobertos:** `CTX-07`, `P1-12`, `P2-08`, `P2-11`
 **Fontes:** `docs/technical-context/constraints.md`, `ADR-0002` (transação comum), `ADR-0004` (compatibilidade), `ADR-0007` (aceite local)
+**Data:** 2026-09-22 *(revista em 2026-09-23 após o achado F1.5 do threat model)*
 
 ---
 

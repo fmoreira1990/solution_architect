@@ -2,8 +2,10 @@
 
 **Status:** Aceita — 2026-09-22 · **seção (b) superseded por `ADR-0007` em 2026-09-22**
 **Slug do PRD:** pedidos-catalogo
+**Escopo deste documento:** o **registro** dos termos acordados no pedido. A seção (b), sobre o caminho de leitura na criação, foi superseded pela `ADR-0007` e está mantida para preservar o raciocínio.
 **Requisitos cobertos:** `CTX-03`, `CTX-04`, `CTX-05`, `CTX-06`, `CTX-17`, `P1-11`
 **Fontes:** `docs/technical-context/constraints.md` (§7.2, §8), `docs/business-context/jornada.md`, `docs/prd/pedidos-catalogo.md`
+**Data:** 2026-09-22 *(seção (b) superseded em 2026-09-22)*
 **Nota de numeração:** a numeração segue o mapa de temas publicado em `ROTEIRO-EXECUCAO.md` §F2, não a ordem de criação. Esta é a primeira ADR escrita.
 
 ---

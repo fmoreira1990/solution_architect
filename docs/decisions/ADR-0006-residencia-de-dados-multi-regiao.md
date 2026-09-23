@@ -2,8 +2,10 @@
 
 **Status:** Aceita — 2026-09-23 *(substitui a versão "Proposta" de 2026-09-23, escrita sob premissa de regime LGPD-like)*
 **Slug do PRD:** pedidos-catalogo
+**Escopo deste documento:** onde vivem os dados pessoais entre Brasil e Estados Unidos. Não decide regiões de nuvem nem instrumento jurídico de transferência — decide o critério de segregação.
 **Requisitos cobertos:** `CTX-01`, `CTX-09a`, `CTX-09b`, `CTX-09c`, `CTX-09d`, `P2-03`
 **Fontes:** `docs/security-context/lgpd-residencia-dados.md`, `docs/security-context/threat-model.md` (F5), `PR-03`
+**Data:** 2026-09-23
 **Validação necessária:** o enquadramento regulatório desta ADR é leitura de arquiteto, **não parecer jurídico**. Precisa de validação pelo DPO antes de virar compromisso.
 
 ---

@@ -2,8 +2,10 @@
 
 **Status:** Aceita — 2026-09-22
 **Slug do PRD:** pedidos-catalogo
+**Escopo deste documento:** a garantia de que estado e evento nunca divergem. Não decide o broker nem o formato de serialização — decide o mecanismo de publicação.
 **Requisitos cobertos:** `CTX-07`, `CTX-08`, `P1-13`, `P1-14`, `P1-15`, `P2-08`
 **Fontes:** `docs/technical-context/architecture.md`, `ADR-0001` (transação comum), `ADR-0007` (o outbox vira espinha dorsal)
+**Data:** 2026-09-22
 
 ---
 
