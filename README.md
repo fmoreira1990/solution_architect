@@ -129,6 +129,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Atributos de qualidade](docs/technical-context/atributos-qualidade.md) | atributo → mecanismo → métrica → **onde é verificado** |
 | [Resiliência](docs/technical-context/resiliencia.md) | timeout, retry, breaker e bulkhead com **valor por dependência** |
 | [Serviços AWS](docs/technical-context/servicos-aws.md) | capacidade → serviço → tier → custo, com alternativa confrontada |
+| [Padrões de desenvolvimento](docs/technical-context/padroes-desenvolvimento.md) | Ports & Adapters, SOLID aplicado a decisões reais, revisão de código de IA |
 
 ### Decisões
 [ADR-0001](docs/decisions/ADR-0001-idempotencia-na-criacao-de-pedido.md) · [0002](docs/decisions/ADR-0002-publicacao-confiavel-de-eventos-via-outbox.md) · [0003](docs/decisions/ADR-0003-snapshot-de-termos-e-desacoplamento-do-catalogo.md) · [0004](docs/decisions/ADR-0004-versionamento-e-compatibilidade-semantica.md) · [0005](docs/decisions/ADR-0005-stack-da-fatia-executavel.md) · [0006](docs/decisions/ADR-0006-residencia-de-dados-multi-regiao.md) · [0007](docs/decisions/ADR-0007-aceitacao-assincrona-com-validacao-posterior.md)
@@ -153,6 +154,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Plano 30/60/90](docs/delivery/plano-30-60-90.md) | ondas, gates, convivência, descomissionamento |
 | [Decomposição da onda 30](docs/delivery/decomposicao-onda-30.md) | 47 tarefas estimáveis |
 | [Estimativa da fase 1](docs/delivery/estimativa-fase1.md) | 79 d.p., time derivado, custos, faixa de confiança |
+| [Impacto de IA no desenvolvimento](docs/delivery/impacto-ia-no-desenvolvimento.md) | −22% de esforço, −20% de prazo, e o que **não** acelera |
 | [Riscos e premissas](docs/delivery/riscos-premissas.md) | premissas, débitos aceitos, fora de escopo, decisões do cliente |
 | [Resumo executivo](docs/delivery/resumo-executivo.md) | **2 páginas** — recomendação, investimento, riscos |
 | [Rastreabilidade do enunciado](docs/requisitos/rastreabilidade-pdf.md) | cada tópico do PDF e o artefato que o responde |

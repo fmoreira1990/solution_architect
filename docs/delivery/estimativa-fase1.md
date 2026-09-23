@@ -183,7 +183,7 @@ Total com contingência: **91 dias-pessoa**.
 
 - **Ondas 60 e 90** — §2.5.3 limita o compromisso à fase 1. Estimá-las agora daria falsa precisão sobre escopo que o gate G30 pode redefinir.
 - **Custo de pessoa em moeda** — insumo pronto, preço é comercial.
-- **Licenças de software** — nenhuma identificada; a stack de produção ainda não foi decidida (`ADR-0005` decide a stack da **prova**).
+- **Licenças de software** — nenhuma de runtime ou banco identificada; a arquitetura usa serviços gerenciados AWS. Licenças de **ferramenta de desenvolvimento assistido por IA** estão em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md), no cenário alternativo.
 - **Custo das ondas 60 e 90** — dimensionado em ordem de grandeza em `servicos-aws.md`, não orçado.
 - **Treinamento e rampa** — depende de `CTX-14`, que é `???`.
 - **Contingência de escopo** — a reserva de 15% cobre variação de esforço, não escopo novo.

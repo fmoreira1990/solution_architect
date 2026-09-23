@@ -169,9 +169,9 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 
 | Exigência | Resposta | |
 |---|---|---|
-| **esforço** | 79 dias-pessoa, decompostos em 47 tarefas | ✅ |
+| **esforço** | 79 d.p. em 47 tarefas; cenário com IA em 63 d.p. | ✅ |
 | **composição de time** | 5,5 pessoas, **derivada** do esforço | ✅ |
-| **custos principais** | pessoas: tabela pronta, taxa é comercial · infra: `servicos-aws.md`, US$ 835–1.489/mês com serviço e tier | ✅ |
+| **custos principais** | pessoas: tabela pronta, taxa é comercial · infra: `servicos-aws.md`, US$ 835–1.489/mês · licenças de IA: US$ 90–320/mês | ✅ |
 | **premissas** | 8 premissas com efeito declarado se falsas | ✅ |
 | **riscos** | 6 riscos com impacto e resposta, mais faixa de confiança | ✅ |
 
