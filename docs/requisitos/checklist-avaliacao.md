@@ -71,11 +71,11 @@ E o glossário faz algo que raramente aparece: uma seção de **termos proibidos
 
 | Evidência | Onde |
 |---|---|
-| Três ondas com gate de saída observável | [`plano-30-60-90.md`](plano-30-60-90.md) |
-| **47 tarefas** decompostas, com perfil e dependência | [`decomposicao-onda-30.md`](decomposicao-onda-30.md) |
+| Três ondas com gate de saída observável | [`plano-30-60-90.md`](../delivery/plano-30-60-90.md) |
+| **47 tarefas** decompostas, com perfil e dependência | [`decomposicao-onda-30.md`](../delivery/decomposicao-onda-30.md) |
 | Convivência, rollback por flag, descomissionamento em 5 passos | `plano-30-60-90.md` |
 | Resiliência com **valor por dependência**, não padrão genérico | [`resiliencia.md`](../technical-context/resiliencia.md) |
-| Riscos, débitos aceitos, fora de escopo | [`riscos-premissas.md`](riscos-premissas.md) |
+| Riscos, débitos aceitos, fora de escopo | [`riscos-premissas.md`](../delivery/riscos-premissas.md) |
 
 **O argumento que sustenta este critério:** a ordem das ondas segue **natureza do dano**, não visibilidade. Três problemas corrompem dado (irreversível), três degradam experiência (reversível). Por isso a onda 30 **não** ataca o N+1, que é a dor mais visível.
 
@@ -150,7 +150,7 @@ Permanece: broker stub, não real — escopo declarado na `ADR-0005`.
 
 | Evidência | Onde |
 |---|---|
-| Log incremental, alimentado a cada comando | [`uso-de-ia.md`](../ai-context/uso-de-ia.md) |
+| Modelo de trabalho, validação em camadas e decisões rejeitadas | [`uso-de-ia.md`](../ai-context/uso-de-ia.md) |
 | **7 prompts que mudaram o rumo**, na forma literal | [`prompts/`](../ai-context/prompts/) |
 | Capacidade de IA para o produto | [`arquitetura-ia.md`](../ai-context/arquitetura-ia.md) |
 | Cuidados com dados | `uso-de-ia.md` §Cuidados |

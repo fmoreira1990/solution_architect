@@ -110,7 +110,42 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 
 ---
 
+## Estrutura
+
+`docs/` é organizado por contexto. Todo documento abre com escopo, fontes e data — regra de [`CONVENCOES.md`](docs/CONVENCOES.md).
+
+```
+docs/
+├── prd/                 problema, hipótese, escopo e gates
+├── business-context/    personas, jornada, domínios, glossário, métricas
+├── technical-context/   restrições, arquitetura, C4, qualidade, resiliência, serviços AWS
+├── decisions/           as sete ADRs
+├── security-context/    threat model, LGPD e regime dos EUA
+├── delivery/            a proposta: plano, decomposição, estimativa, preço, riscos, resumo, slides
+├── governance/          API pública, política de contratos, exceção técnica, fitness functions
+├── ai-context/          IA no produto e registro do uso de IA no projeto
+├── requisitos/          a entrega frente ao enunciado: rastreabilidade, matriz, checklist
+└── CONVENCOES.md        cabeçalho canônico e regras Q1–Q11
+
+contracts/               OpenAPI v1 e v2, AsyncAPI
+slice/                   a fatia executável — mapa de módulos em slice/README.md
+tools/                   conferência da entrega e validador de diagramas
+.github/workflows/       CI: prova, diagramas, confidencialidade
+.claude/commands/        comandos que produziram os artefatos
+```
+
+Mapa da fatia: [`slice/README.md`](slice/README.md) — cada módulo, a decisão que implementa e o teste que a prova.
+
+---
+
 ## Índice dos artefatos
+
+### A entrega frente ao enunciado
+| | |
+|---|---|
+| [Rastreabilidade do enunciado](docs/requisitos/rastreabilidade-pdf.md) | cada tópico do PDF e o artefato que o responde |
+| [Checklist de avaliação](docs/requisitos/checklist-avaliacao.md) | os 8 critérios, a evidência de cada um e **onde ainda é fraco** |
+| [Matriz de entregáveis](docs/requisitos/matriz-entregaveis.md) | inventário do que o desafio exige e do critério de pronto de cada item |
 
 ### Problema e domínio
 | | |
@@ -120,6 +155,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Jornada](docs/business-context/jornada.md) | ANTES / DURANTE / DEPOIS |
 | [Mapa de domínios](docs/business-context/mapa-dominios.md) | bounded contexts, ownership, context map |
 | [Glossário](docs/business-context/glossario.md) | linguagem ubíqua e termos proibidos |
+| [Métricas](docs/business-context/metricas.md) | SLIs, SLOs e cenários de qualidade, com critério de aceite por gate |
 
 ### Arquitetura
 | | |
@@ -162,8 +198,6 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Taxas de mercado](docs/delivery/taxas-de-mercado.md) | salário → encargos CLT → overhead → tributos, em camadas substituíveis |
 | [Riscos e premissas](docs/delivery/riscos-premissas.md) | premissas, débitos aceitos, fora de escopo, decisões do cliente |
 | [Resumo executivo](docs/delivery/resumo-executivo.md) | **2 páginas** — recomendação, investimento, riscos |
-| [Rastreabilidade do enunciado](docs/requisitos/rastreabilidade-pdf.md) | cada tópico do PDF e o artefato que o responde |
-| [Checklist de avaliação](docs/delivery/checklist-avaliacao.md) | os 8 critérios, a evidência de cada um e **onde ainda é fraco** |
 
 ### Governança e IA
 | | |
@@ -173,7 +207,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Exceção técnica](docs/governance/excecao-tecnica.md) | waiver com validade; vencido **quebra o build** |
 | [Fitness functions](docs/governance/fitness-functions.md) | as verificações e os testes de mutação que as validam |
 | [Arquitetura de IA](docs/ai-context/arquitetura-ia.md) | RAG + ferramenta, guardrails, avaliação |
-| [Uso de IA](docs/ai-context/uso-de-ia.md) | prompts, validações e **decisões rejeitadas** |
+| [Uso de IA](docs/ai-context/uso-de-ia.md) | modelo de trabalho, validação em camadas e **decisões rejeitadas** |
 | [Convenções](docs/CONVENCOES.md) | cabeçalho canônico e regras Q1–Q11 |
 
 ---
@@ -216,18 +250,6 @@ O que o CI quebra, e não apenas o que ele roda:
 | Exceção técnica vencida | waiver virar formulário morto |
 | Sintaxe Mermaid pelo parser oficial | diagrama em branco no GitHub |
 | Varredura de confidencialidade | material de referência versionado |
+| Números citados, links e narrativa de edição | documento desatualizado ou contraditório |
 
 As três primeiras foram validadas por **teste de mutação** — quebra-se o que protegem e confirma-se o build vermelho. Detalhe em [fitness-functions.md](docs/governance/fitness-functions.md).
-
----
-
-## Estrutura
-
-```
-docs/            46 documentos, por contexto
-contracts/       OpenAPI v1/v2 + AsyncAPI
-slice/           fatia executável — 128 testes
-tools/           validador de diagramas
-.github/         CI: prova, diagramas, confidencialidade
-.claude/         comandos que produziram os artefatos
-```

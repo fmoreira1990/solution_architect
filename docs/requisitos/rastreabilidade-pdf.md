@@ -148,7 +148,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | Bullet do PDF | Resposta | |
 |---|---|---|
 | *"capacidade de IA para suporte operacional ou consulta de pedidos, descrevendo isolamento, minimização de dados, guardrails, observabilidade e avaliação"* | `arquitetura-ia.md` — os 5 itens em seções próprias, mais a alternativa não-IA avaliada primeiro | ✅ |
-| *"Documentar o uso de IA na elaboração do desafio, incluindo prompts, validações e decisões rejeitadas"* | `uso-de-ia.md` (log por sessão) + `prompts/` (7 prompts literais) | ✅ |
+| *"Documentar o uso de IA na elaboração do desafio, incluindo prompts, validações e decisões rejeitadas"* | `uso-de-ia.md` (método, validação e decisões rejeitadas) + `prompts/` (7 prompts literais) | ✅ |
 
 ---
 
@@ -181,7 +181,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 
 ## §3 · Critérios de avaliação
 
-Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../delivery/checklist-avaliacao.md)**.
+Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](checklist-avaliacao.md)**.
 
 ---
 

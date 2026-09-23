@@ -99,7 +99,7 @@ Destino final: `docs/technical-context/constraints.md` (via `/constraints`).
 | ID | Requisito | Destino | Comando | Critério de aceite |
 |---|---|---|---|---|
 | D-01 | Capacidade de IA: isolamento, minimização, guardrails, observabilidade, avaliação | `docs/ai-context/arquitetura-ia.md` | `/ia capacidade` | Fronteira de dados, redação de PII, eval set com limiar |
-| D-02 | Uso de IA **na elaboração**: prompts, validações, decisões rejeitadas | `docs/ai-context/uso-de-ia.md` + `prompts/` | `/ia log` | Log incremental; ≥3 sugestões rejeitadas com motivo |
+| D-02 | Uso de IA **na elaboração**: prompts, validações, decisões rejeitadas | `docs/ai-context/uso-de-ia.md` + `prompts/` | `/ia log` | Método documentado; ≥3 sugestões rejeitadas com motivo |
 | D-03 | Fitness functions no CI (OpenAPI/AsyncAPI, ADRs, regras arquiteturais) | `docs/governance/fitness-functions.md`, `.github/workflows/ci.yml` | `/contratos` | Pipeline falha ao quebrar contrato ou ADR malformado |
 | D-04 | Política de evolução de contratos + processo leve de exceção técnica | `docs/governance/politica-contratos.md`, `excecao-tecnica.md` | `/contratos` | Lista fechada do que é breaking; waiver com prazo de validade |
 | D-05 | Estimativa: esforço, time, custos, premissas e riscos da fase 1 | `docs/delivery/estimativa-fase1.md` | `/estimativa` | Esforço por perfil, custo de run, faixa de confiança |

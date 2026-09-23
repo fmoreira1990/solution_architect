@@ -41,14 +41,13 @@ fronteira de dados em Mermaid, e o bloco de decisão do `@docs/CONVENCOES.md` §
 
 ## (b) Registrar o uso de IA na elaboração
 
-Acrescente uma entrada em `docs/ai-context/uso-de-ia.md` **a cada sessão de trabalho**,
-com a íntegra dos prompts relevantes em `docs/ai-context/prompts/<slug>.md`.
+Atualize `docs/ai-context/uso-de-ia.md` ao fim de cada frente de trabalho. O documento
+descreve o método — não narra sessões. Os prompts que mudaram o resultado vão na íntegra
+para `docs/ai-context/prompts/`.
 
-Formato definido em `@docs/CONVENCOES.md` §7. O campo **Rejeitado** é obrigatório:
-o critério de avaliação mede a capacidade de recusar saída de IA, não de aceitá-la.
-
-O documento precisa responder, no topo: qual ferramenta, por que ela, como as saídas
-foram validadas e quais cuidados com dados foram tomados.
+Formato e partes obrigatórias em `@docs/CONVENCOES.md` §7. A tabela de **decisões
+rejeitadas** é obrigatória: o critério de avaliação mede a capacidade de recusar saída
+de IA, não de aceitá-la.
 
 ## Argumentos
 

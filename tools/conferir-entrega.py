@@ -214,7 +214,7 @@ try:
         a.strip() for a in todos
         if a.strip() and (
             a.startswith("contexto/") or a.lower().endswith(".pdf")
-            or a.startswith(("RETOMAR-AQUI", "ROTEIRO-EXECUCAO", "TESTE-MERMAID", "diagramas.html"))
+            or a.startswith(("RETOMAR-AQUI", "DIARIO-IA", "ROTEIRO-EXECUCAO", "TESTE-MERMAID", "diagramas.html"))
         )
     }
     if suspeitos:

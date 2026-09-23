@@ -147,17 +147,12 @@ Cada comando em `.claude/commands/` conduz **uma entrevista, uma pergunta por ve
 
 ## 7. Log de uso de IA
 
-`docs/ai-context/uso-de-ia.md` é alimentado **a cada comando executado**, não no final. Registro mínimo por entrada:
+`docs/ai-context/uso-de-ia.md` documenta **o método**, não as sessões: ferramenta, modelo de trabalho, onde a IA atuou, como a saída foi validada, decisões rejeitadas, prompts relevantes, cuidados com dados e limites observados.
 
-```markdown
-### <data> · <comando ou tarefa>
-- **Prompt:** <o que foi pedido> (íntegra em `prompts/<slug>.md`)
-- **Saída aceita:** <o que foi aproveitado>
-- **Validação:** <como foi conferido — leitura crítica, teste, checagem contra CTX>
-- **Rejeitado:** <o que a IA sugeriu e foi descartado> — **motivo:** <por quê>
-- **Dados expostos:** <nenhum dado real / sintético / pseudonimizado>
-```
+É revisado ao fim de cada frente de trabalho. Três partes exigem atualização sempre que algo muda:
 
-O campo **Rejeitado** é obrigatório e não pode ficar vazio em todas as entradas — o critério `AV-07` avalia justamente a capacidade de recusar saída de IA, não de aceitá-la.
+- **Decisões rejeitadas** — toda sugestão da IA recusada por motivo relevante entra na tabela, com o motivo. O critério `AV-07` avalia a capacidade de recusar saída de IA, não de aceitá-la.
+- **Defeitos que só a validação encontrou** — o que passou pelos testes e foi pego por outra camada.
+- **Prompts relevantes** — os que mudaram o resultado, na íntegra em `prompts/`.
 
 ---
