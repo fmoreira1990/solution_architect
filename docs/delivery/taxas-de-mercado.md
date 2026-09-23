@@ -88,6 +88,22 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
 **Taxa média ponderada: R$ 1.526 por dia-pessoa.**
 
+### Onde vai cada real — o que está e o que não está na taxa
+
+A taxa é **preço ao cliente**, não custo interno. Ela já contém salário, encargos, overhead e margem:
+
+| Camada | Valor | % do faturado |
+|---|---|---|
+| Salário bruto | R$ 44.658 | 37% |
+| **Encargos e provisões CLT** | **R$ 35.726** | **30%** |
+| *Subtotal: custo carregado para a empresa* | *R$ 80.384* | *67%* |
+| Overhead + margem | R$ 40.192 | **33%** |
+| **Total faturado ao cliente** | **R$ 120.576** | 100% |
+
+**Os encargos sozinhos são 30% do preço final.** É por isso que o regime tributário (`T1`) move tanto: em Simples Nacional o INSS patronal não é recolhido em separado, o fator da camada 2 cai de 1,8 para ~1,4, e o total desce para **~R$ 94 mil** — 22% a menos sem alterar uma linha de escopo.
+
+> **O que NÃO está na taxa:** infraestrutura AWS, licenças de ferramenta, deslocamento, e qualquer custo de ambiente do cliente. Estão orçados em separado, de propósito — misturá-los na taxa/hora esconde o que é recorrente e o que é do projeto.
+
 ### Infraestrutura, no mesmo período
 
 | | |
