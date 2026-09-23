@@ -115,20 +115,24 @@ Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e hí
 | Prazo | 20 dias úteis | **16 dias úteis** |
 | Licenças de IA | — | **US$ 90–320/mês** |
 | Infraestrutura AWS | US$ 835–1.489/mês | igual |
-| Custo de pessoas | R$ 120.576 | **R$ 99.622** |
+| Preço de pessoas *(faturado)* | R$ 149.832 | **R$ 123.795** |
 
-**A licença é irrelevante diante da economia.** ~R$ 21 mil economizados em pessoas contra R$ 490–1.730/mês de licença. O ponto de atenção não é o custo — é o **teto de consumo**, para que ferramenta cobrada por uso não vire surpresa.
+*Valores faturados, já com encargos CLT e com os tributos do Lucro Presumido — ver [taxas-de-mercado.md](taxas-de-mercado.md).*
 
-### A economia em custo é menor que a economia em esforço
+**A licença é irrelevante diante da economia.** ~R$ 26 mil economizados em pessoas contra R$ 490–1.730/mês de licença. O ponto de atenção não é o custo — é o **teto de consumo**, para que ferramenta cobrada por uso não vire surpresa.
+
+### A economia em preço é menor que a economia em esforço
 
 | | Sem IA | Com IA | Variação |
 |---|---|---|---|
 | Esforço | 79 d.p. | 63 d.p. | **−20,3%** |
-| Custo de pessoas | R$ 120.576 | R$ 99.622 | **−17,4%** |
+| Preço de pessoas | R$ 149.832 | R$ 123.795 | **−17,4%** |
 
 Os quase 3 pontos de diferença não são arredondamento: a IA reduz proporcionalmente mais o trabalho de **pleno** (−44%), o perfil mais barato, e **nada** do arquiteto, o mais caro.
 
-> **Quanto mais sênior o time, menor o retorno financeiro da ferramenta** — ainda que o ganho de prazo permaneça. A taxa média ponderada sobe de R$ 1.526 para R$ 1.581 por dia-pessoa: o time fica menor e mais caro por cabeça.
+> **Quanto mais sênior o time, menor o retorno financeiro da ferramenta** — ainda que o ganho de prazo permaneça. A taxa média ponderada sobe de R$ 1.897 para R$ 1.965 por dia-pessoa: o time fica menor e mais caro por cabeça.
+
+> A economia **em margem** é menor ainda que a economia em preço. Cerca de 19,5% dos R$ 26 mil são tributos que deixam de ser recolhidos — dinheiro que nunca foi da empresa. O ganho líquido real para quem presta é da ordem de **R$ 21 mil**, e é esse o número a levar para discussão comercial.
 
 > Outras licenças de software: **nenhuma identificada**. A stack de produção ainda não foi decidida (`CTX-13`/`CTX-14`), e a arquitetura usa serviços gerenciados AWS, sem licença própria. Se a escolha cair em runtime ou banco comercial, entra aqui.
 

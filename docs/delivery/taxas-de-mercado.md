@@ -1,25 +1,32 @@
 # Taxas de mercado por senioridade
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** referência de mercado para converter esforço em custo. **Não é a estrutura de custo da empresa** — é um modelo transparente, camada por camada, para que o comercial substitua cada uma pelos números reais.
+**Escopo deste documento:** referência de mercado para converter esforço em preço. **Não é a estrutura de custo da empresa** — é um modelo transparente, camada por camada, para que o comercial substitua cada uma pelos números reais.
 **Requisitos cobertos:** `D-05`
-**Fontes:** Glassdoor Brasil (junho de 2026), Cálculo Jurídico (encargos CLT 2026), `docs/delivery/estimativa-fase1.md`
-**Data:** 2026-09-24
+**Fontes:** Glassdoor Brasil (junho de 2026), Cálculo Jurídico (encargos CLT 2026), Contabilizei e Contabilidade.com (Lucro Presumido 2026), `docs/delivery/estimativa-fase1.md`
+**Data:** 2026-09-24 *(revisado: camada tributária acrescentada)*
 
 ---
 
-## Por que o modelo é apresentado em camadas
+## O modelo, em camadas substituíveis
 
-Um número fechado de taxa/hora esconde as premissas que o produziram e envelhece mal. Aqui cada camada é explícita, e **trocar uma não invalida as outras**:
+Um número fechado de taxa/hora esconde as premissas que o produziram. Aqui cada camada é explícita, e **trocar uma não invalida as outras**:
 
 ```
 salário de mercado
-   × 1,8   encargos e provisões CLT          → custo para a empresa
-   ÷ 21    dias úteis por mês                → custo por dia-pessoa
-   × 1,5   overhead + margem + ociosidade    → taxa de faturamento
+   × 1,8              encargos e provisões CLT        → custo para a empresa
+   ÷ 21               dias úteis por mês              → custo por dia-pessoa
+   × 1,5              overhead + margem + ociosidade  → preço líquido
+   ÷ (1 − 19,53%)     tributos sobre o faturamento    → PREÇO FATURADO
 ```
 
-Se a empresa opera em Simples Nacional, a primeira camada cai. Se a margem-alvo é outra, muda só a terceira. **O esforço em dias-pessoa não muda em nenhum caso** — é isso que torna a estimativa reutilizável.
+**O esforço em dias-pessoa não muda em nenhuma hipótese** — é isso que torna a estimativa reutilizável quando as premissas comerciais mudarem.
+
+> ### Correção registrada
+>
+> Uma versão anterior deste documento **omitia a quarta camada**. O resultado era um preço de R$ 120.576 que parecia ter 33% de margem e, na prática, tinha **13,8%** — porque os tributos sobre faturamento saíam dela, e o overhead ainda teria de sair do que restasse.
+>
+> Não é ajuste de arredondamento: é a diferença entre uma proposta com margem e uma proposta que financia o cliente.
 
 ---
 
@@ -31,14 +38,12 @@ Glassdoor Brasil, junho de 2026. Média nacional; São Paulo fica acima.
 |---|---|---|
 | **Arquiteto de Soluções Sênior** | **R$ 19.097** | R$ 9.833 – 18.854 *(cargo geral: média R$ 14.667)* |
 | **Desenvolvedor Sênior** | **R$ 12.800** | R$ 10.667 – 16.083 |
-| **Desenvolvedor Pleno** | **R$ 7.500** | R$ 5.560 – 8.242 *(varia por stack e praça; SP no topo)* |
+| **Desenvolvedor Pleno** | **R$ 7.500** | R$ 5.560 – 8.242 *(varia por stack e praça)* |
 | **SRE / DevOps** | **R$ 10.438** | R$ 8.191 – 16.250 *(p90: R$ 20.750)* |
 
-> **Duas observações sobre a dispersão.** A faixa do arquiteto é larga porque o título cobre desde arquiteto de aplicação até arquiteto de soluções corporativas — a estimativa usa a média do **sênior**, que é o perfil que a onda 30 exige. E a do SRE tem cauda longa: o p90 (R$ 20.750) supera a média do dev sênior, refletindo escassez do perfil.
+> A faixa do arquiteto é larga porque o título cobre desde arquiteto de aplicação até arquiteto corporativo — a estimativa usa a média do **sênior**, que é o perfil que a onda 30 exige. A do SRE tem cauda longa: o p90 supera a média do dev sênior, refletindo escassez.
 
-## Camada 2 — Encargos CLT
-
-Regime de Lucro Presumido, que é o caso de consultoria de porte:
+## Camada 2 — Encargos e provisões CLT
 
 | Componente | % sobre o salário |
 |---|---|
@@ -47,108 +52,128 @@ Regime de Lucro Presumido, que é o caso de consultoria de porte:
 | 13º salário (provisão) | 8,33% |
 | Férias + 1/3 (provisão) | 11,1% |
 | FGTS e INSS sobre provisões | ~7,3% |
-| **Fator total** | **≈ 1,8×** |
+| **Fator** | **≈ 1,8×** |
 
-Empresa em **Simples Nacional** não recolhe INSS patronal em separado, e o fator cai para ~1,4×.
+## Camada 3 — Overhead, margem e ociosidade
 
-## Camada 3 — Overhead e margem
+Fator de **1,5×** sobre o custo carregado. Cobre gestão e coordenação, estrutura, comercial e pré-venda, treinamento, banco de horas e ociosidade entre alocações, e a margem operacional.
 
-O fator de **1,5×** sobre o custo carregado cobre gestão e coordenação, estrutura (ferramentas, ambiente, espaço), comercial e pré-venda, treinamento e certificação, banco de horas e ociosidade entre alocações, e a margem operacional.
+> É a camada **menos ancorada** do documento — varia por contrato, porte e modelo de alocação.
 
-> Este é o número **menos ancorado** deste documento — varia por contrato, por porte e por modelo de alocação. Consultoria de valor hora de mercado para TI costuma ficar entre R$ 70 e R$ 200 para perfis gerais, e acima disso para especialistas; o modelo abaixo produz valores coerentes com essa faixa nos perfis mais sêniores.
+## Camada 4 — Tributos sobre o faturamento
+
+Regime de **Lucro Presumido**, atividade de prestação de serviços.
+
+| Tributo | Base | Alíquota | % do faturamento |
+|---|---|---|---|
+| PIS | faturamento | 0,65% | **0,65%** |
+| COFINS | faturamento | 3,00% | **3,00%** |
+| ISS | faturamento | 2% a 5% *(município e serviço)* | **5,00%** ¹ |
+| IRPJ | presunção de **32%** | 15% | **4,80%** |
+| IRPJ — adicional | presunção de 32% | 10% sobre o excedente ² | **3,20%** |
+| CSLL | presunção de **32%** | 9% | **2,88%** |
+| | | **Total** | **19,53%** |
+
+¹ **5% é o teto e a hipótese conservadora.** Serviços de TI costumam ser enquadrados entre 2% e 3% em vários municípios. Com ISS a 2%, a carga total cai para **16,53%**.
+
+² O adicional incide sobre o lucro presumido que exceder R$ 60 mil no trimestre. Para uma consultoria já acima desse patamar, **a alíquota marginal de um projeto novo inclui o adicional integralmente** — que é a hipótese usada aqui.
+
+### Por que o gross-up, e não a soma
+
+Tributo sobre faturamento incide sobre o **preço final**, não sobre o custo. Somar 19,53% ao preço líquido subestima: o correto é dividir por `(1 − 0,1953)`, o que equivale a multiplicar por **1,2427**.
 
 ---
 
 ## Taxas resultantes
 
-| Perfil | Salário | Custo CLT | Custo/dia | **Taxa/dia** | **Taxa/hora** |
-|---|---|---|---|---|---|
-| Arquiteto de Soluções Sr | R$ 19.097 | R$ 34.375 | R$ 1.637 | **R$ 2.455** | **R$ 307** |
-| Desenvolvedor Sênior | R$ 12.800 | R$ 23.040 | R$ 1.097 | **R$ 1.646** | **R$ 206** |
-| Desenvolvedor Pleno | R$ 7.500 | R$ 13.500 | R$ 643 | **R$ 964** | **R$ 121** |
-| SRE / DevOps | R$ 10.438 | R$ 18.788 | R$ 895 | **R$ 1.342** | **R$ 168** |
+| Perfil | Salário | Custo CLT | Custo/dia | Preço líquido | **Preço faturado/dia** | **/hora** |
+|---|---|---|---|---|---|---|
+| Arquiteto de Soluções Sr | R$ 19.097 | R$ 34.375 | R$ 1.637 | R$ 2.455 | **R$ 3.051** | **R$ 381** |
+| Desenvolvedor Sênior | R$ 12.800 | R$ 23.040 | R$ 1.097 | R$ 1.646 | **R$ 2.045** | **R$ 256** |
+| SRE / DevOps | R$ 10.438 | R$ 18.788 | R$ 895 | R$ 1.342 | **R$ 1.668** | **R$ 209** |
+| Desenvolvedor Pleno | R$ 7.500 | R$ 13.500 | R$ 643 | R$ 964 | **R$ 1.198** | **R$ 150** |
 
 *Dia-pessoa de 8 horas, 21 dias úteis por mês.*
 
 ---
 
-## Custo da fase 1
+## Preço da fase 1
 
 Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
-| Perfil | d.p. | Taxa/dia | Subtotal |
+| Perfil | d.p. | Preço/dia | Subtotal |
 |---|---|---|---|
-| Arquiteto de Soluções Sr | 9,5 | R$ 2.455 | R$ 23.323 |
-| Desenvolvedor Sênior | 33 | R$ 1.646 | R$ 54.318 |
-| Desenvolvedor Pleno | 16 | R$ 964 | R$ 15.424 |
-| SRE / DevOps | 20,5 | R$ 1.342 | R$ 27.511 |
-| **Total — 79 d.p.** | | | **R$ 120.576** |
-| Contingência 15% (12 d.p.) | | | R$ 18.316 |
-| **Total com contingência** | | | **R$ 138.892** |
+| Arquiteto de Soluções Sr | 9,5 | R$ 3.051 | R$ 28.985 |
+| Desenvolvedor Sênior | 33 | R$ 2.045 | R$ 67.485 |
+| SRE / DevOps | 20,5 | R$ 1.668 | R$ 34.194 |
+| Desenvolvedor Pleno | 16 | R$ 1.198 | R$ 19.168 |
+| **Total — 79 d.p.** | | | **R$ 149.832** |
+| Contingência 15% (12 d.p.) | | | R$ 22.475 |
+| **Total com contingência** | | | **R$ 172.306** |
 
-**Taxa média ponderada: R$ 1.526 por dia-pessoa.**
+**Preço médio ponderado: R$ 1.897 por dia-pessoa.**
 
-### Onde vai cada real — o que está e o que não está na taxa
-
-A taxa é **preço ao cliente**, não custo interno. Ela já contém salário, encargos, overhead e margem:
+### Onde vai cada real
 
 | Camada | Valor | % do faturado |
 |---|---|---|
-| Salário bruto | R$ 44.658 | 37% |
-| **Encargos e provisões CLT** | **R$ 35.726** | **30%** |
-| *Subtotal: custo carregado para a empresa* | *R$ 80.384* | *67%* |
-| Overhead + margem | R$ 40.192 | **33%** |
-| **Total faturado ao cliente** | **R$ 120.576** | 100% |
+| Salário bruto | R$ 44.658 | 29,8% |
+| Encargos e provisões CLT | R$ 35.726 | 23,8% |
+| *Subtotal: custo carregado* | *R$ 80.384* | *53,6%* |
+| **Tributos sobre faturamento** | **R$ 29.262** | **19,5%** |
+| Overhead + margem | R$ 40.186 | 26,8% |
+| **Total faturado** | **R$ 149.832** | 100% |
 
-**Os encargos sozinhos são 30% do preço final.** É por isso que o regime tributário (`T1`) move tanto: em Simples Nacional o INSS patronal não é recolhido em separado, o fator da camada 2 cai de 1,8 para ~1,4, e o total desce para **~R$ 94 mil** — 22% a menos sem alterar uma linha de escopo.
+**Encargos e tributos somados são 43,4% do preço** — mais que o salário bruto. É o dado que costuma surpreender em discussão comercial. Como cada camada é independente, dá para ver quanto cada premissa move o total:
 
-> **O que NÃO está na taxa:** infraestrutura AWS, licenças de ferramenta, deslocamento, e qualquer custo de ambiente do cliente. Estão orçados em separado, de propósito — misturá-los na taxa/hora esconde o que é recorrente e o que é do projeto.
+| Variação | Efeito no total |
+|---|---|
+| ISS a 2% em vez de 5% | **R$ 144.446** *(−3,6%)* |
+| Simples Nacional | encargos caem e o regime substitui os tributos da camada 4 — **exige recálculo, não ajuste** |
+| Fator comercial a 1,3× em vez de 1,5× | ≈ **R$ 129.854** *(−13%)* |
+
+> **O que NÃO está no preço:** infraestrutura AWS, licenças de ferramenta, deslocamento e custos de ambiente do cliente. Orçados em separado, de propósito — misturá-los na taxa/hora esconde o que é recorrente e o que é do projeto. Se forem repassados com faturamento próprio, também sofrem o gross-up da camada 4.
 
 ### Infraestrutura, no mesmo período
 
 | | |
 |---|---|
 | AWS em regime | US$ 835–1.489/mês → **R$ 4.509–8.041/mês** |
-| Fase 1 (1 mês) | **R$ 4.509–8.041** |
 
-*Câmbio de R$ 5,40/US$ como premissa declarada.*
+*Câmbio de R$ 5,40/US$, premissa declarada. Normalmente contratada direto pelo cliente ou repassada a custo — neste caso não sofre o gross-up.*
 
 ### Total da fase 1
 
 | | |
 |---|---|
-| Pessoas, com contingência | R$ 138.892 |
+| Serviços, com contingência | R$ 172.306 |
 | Infraestrutura | R$ 4.509–8.041 |
-| **Total** | **≈ R$ 143.400 – 146.900** |
+| **Total** | **≈ R$ 176.800 – 180.300** |
 
 ---
 
 ## Cenário com desenvolvimento assistido por IA
 
-Aplicando a redistribuição de esforço de [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md):
-
 | Perfil | d.p. | Subtotal |
 |---|---|---|
-| Arquiteto de Soluções Sr | 9,5 | R$ 23.323 |
-| Desenvolvedor Sênior | 26 | R$ 42.796 |
-| Desenvolvedor Pleno | 9 | R$ 8.676 |
-| SRE / DevOps | 18,5 | R$ 24.827 |
-| **Total — 63 d.p.** | | **R$ 99.622** |
+| Arquiteto de Soluções Sr | 9,5 | R$ 28.985 |
+| Desenvolvedor Sênior | 26 | R$ 53.170 |
+| SRE / DevOps | 18,5 | R$ 30.858 |
+| Desenvolvedor Pleno | 9 | R$ 10.782 |
+| **Total — 63 d.p.** | | **R$ 123.795** |
 | Licenças de IA | | R$ 490–1.730/mês |
-| **Total de pessoas + licenças** | | **≈ R$ 100.100 – 101.400** |
+| **Total** | | **≈ R$ 124.300 – 125.500** |
 
-### O achado: a economia em custo é **menor** que a economia em esforço
+### A economia em preço é **menor** que a economia em esforço
 
 | | Sem IA | Com IA | Variação |
 |---|---|---|---|
 | Esforço | 79 d.p. | 63 d.p. | **−20,3%** |
-| Custo de pessoas | R$ 120.576 | R$ 99.622 | **−17,4%** |
+| Preço | R$ 149.832 | R$ 123.795 | **−17,4%** |
 
-**A diferença de quase 3 pontos não é arredondamento.** A IA reduz proporcionalmente mais o trabalho de **pleno** (−44%), que é o perfil mais barato, e não reduz nada do **arquiteto**, que é o mais caro.
+**A diferença de quase 3 pontos não é arredondamento.** A IA reduz proporcionalmente mais o trabalho de **pleno** (−44%), o perfil mais barato, e **não reduz nada** do arquiteto, o mais caro.
 
-> Quanto mais o time se concentra em perfis sêniores, **menor o retorno financeiro de ferramenta de produtividade** — ainda que o ganho de prazo permaneça. Isso contraria a intuição de que o ganho de esforço se converte linearmente em economia.
-
-A taxa média ponderada sobe de R$ 1.526 para **R$ 1.581** por dia-pessoa: o time fica menor e mais caro por cabeça.
+> Quanto mais o time se concentra em perfis sêniores, **menor o retorno financeiro de ferramenta de produtividade** — ainda que o ganho de prazo permaneça. O preço médio ponderado sobe de R$ 1.897 para **R$ 1.965** por dia-pessoa: time menor e mais caro por cabeça.
 
 ---
 
@@ -156,30 +181,32 @@ A taxa média ponderada sobe de R$ 1.526 para **R$ 1.581** por dia-pessoa: o tim
 
 | # | Premissa | Se falsa |
 |---|---|---|
-| T1 | Regime tributário de Lucro Presumido | Simples Nacional reduz o fator de 1,8 para ~1,4 — **−22% no custo total** |
-| T2 | Fator comercial de 1,5× sobre custo carregado | É a camada menos ancorada; varia por contrato e porte |
-| T3 | Salários na média nacional | São Paulo fica acima; contratação remota em outras praças, abaixo |
-| T4 | 21 dias úteis, 8 horas | — |
-| T5 | Alocação CLT, não PJ | PJ muda completamente a camada 2 |
-| T6 | Câmbio de R$ 5,40/US$ | Afeta só a infraestrutura |
+| T1 | Regime de **Lucro Presumido** | Simples Nacional muda as camadas 2 **e** 4 ao mesmo tempo — exige recálculo, não ajuste de fator |
+| T2 | ISS a **5%** (teto) | TI costuma ser 2–3%; a 2%, o total cai 3,6% |
+| T3 | Adicional de IRPJ **aplicável** | Empresa abaixo de R$ 60 mil de lucro presumido trimestral não o recolhe — total cai para 16,33% |
+| T4 | Fator comercial de **1,5×** | Camada menos ancorada; a 1,3× o total cai 13% |
+| T5 | Salários na média nacional | São Paulo acima; contratação remota em outras praças, abaixo |
+| T6 | 21 dias úteis, 8 horas, alocação CLT | PJ muda completamente a camada 2 |
+| T7 | Câmbio de R$ 5,40/US$ | Afeta só a infraestrutura |
 
 ---
 
 ## O que este documento **não** é
 
-**Não é a estrutura de custo da empresa.** É referência pública de mercado, útil para ordem de grandeza e para dar forma à proposta — não para fechar preço.
+**Não é a estrutura de custo nem a política de preço da empresa.** É referência pública de mercado, útil para ordem de grandeza e para dar forma à proposta.
 
 **Não substitui a decisão comercial.** Preço envolve relacionamento com a conta, volume, prazo contratual e posicionamento competitivo — nenhum deles é decisão de arquitetura.
 
-**O que o arquiteto entrega é o esforço por perfil.** As 79 dias-pessoa da decomposição são o número que sustenta discussão técnica. As taxas acima só o traduzem para a linguagem de quem decide.
+**O que o arquiteto entrega é o esforço por perfil.** As 79 dias-pessoa da decomposição sustentam discussão técnica; as camadas acima apenas as traduzem para a linguagem de quem decide.
 
 ## Riscos
 
-1. **T2 é o maior risco do documento.** Errar o fator comercial em 0,2 move o total em ~R$ 16 mil.
-2. **Dados de salário têm dispersão alta** — as faixas p25–p75 chegam a variar 2×. Usar a média esconde isso.
-3. **O mercado de SRE está aquecido** e a cauda longa sugere que contratar na média pode ser difícil.
+1. **`T1` é o maior risco.** Trocar o regime tributário não é mexer num fator — muda duas camadas simultaneamente, com sinais opostos, e exige refazer a conta.
+2. **`T4` é o menos ancorado.** Errar 0,2 no fator comercial move ~R$ 20 mil.
+3. **Dados salariais têm dispersão alta** — faixas p25–p75 chegam a variar 2×. A média esconde isso.
+4. **O mercado de SRE está aquecido**, e a cauda longa sugere que contratar na média pode não ser realista.
 
 ## Pendências registradas
 
-- Substituir as camadas 2 e 3 pelos números reais da empresa antes de virar proposta.
-- Confirmar o regime tributário aplicável (`T1`), que sozinho move o total em 22%.
+- Confirmar o regime tributário e a alíquota de ISS do município de prestação — juntos movem até 8% do total.
+- Substituir as camadas 2, 3 e 4 pelos números reais da empresa antes de virar proposta.

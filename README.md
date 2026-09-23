@@ -157,7 +157,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Decomposição da onda 30](docs/delivery/decomposicao-onda-30.md) | 47 tarefas estimáveis |
 | [Estimativa da fase 1](docs/delivery/estimativa-fase1.md) | 79 d.p., time derivado, custos, faixa de confiança |
 | [Impacto de IA no desenvolvimento](docs/delivery/impacto-ia-no-desenvolvimento.md) | −22% de esforço, −20% de prazo, e o que **não** acelera |
-| [Taxas de mercado](docs/delivery/taxas-de-mercado.md) | salário → encargos → overhead → taxa, em camadas substituíveis |
+| [Taxas de mercado](docs/delivery/taxas-de-mercado.md) | salário → encargos CLT → overhead → tributos, em camadas substituíveis |
 | [Riscos e premissas](docs/delivery/riscos-premissas.md) | premissas, débitos aceitos, fora de escopo, decisões do cliente |
 | [Resumo executivo](docs/delivery/resumo-executivo.md) | **2 páginas** — recomendação, investimento, riscos |
 | [Rastreabilidade do enunciado](docs/requisitos/rastreabilidade-pdf.md) | cada tópico do PDF e o artefato que o responde |

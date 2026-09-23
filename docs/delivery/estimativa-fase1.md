@@ -87,19 +87,21 @@ Uma proposta que dimensionasse esta fase com 4 devs e "apoio de infra" erraria p
 
 O custo de pessoa depende de taxa por senioridade, que é **decisão comercial, não técnica**. A tabela entrega o insumo pronto:
 
-| Perfil | d.p. | Taxa/dia *(mercado)* | Subtotal |
+| Perfil | d.p. | Taxa/dia *(faturada)* | Subtotal |
 |---|---|---|---|
-| Arquiteto de Soluções Sr | 9,5 | R$ 2.455 | R$ 23.323 |
-| Dev Sênior | 33 | R$ 1.646 | R$ 54.318 |
-| Dev Pleno | 16 | R$ 964 | R$ 15.424 |
-| SRE / DevOps | 20,5 | R$ 1.342 | R$ 27.511 |
-| **Total** | **79** | média R$ 1.526 | **R$ 120.576** |
-| Contingência 15% | 12 | | R$ 18.316 |
-| **Com contingência** | **91** | | **R$ 138.892** |
+| Arquiteto de Soluções Sr | 9,5 | R$ 3.051 | R$ 28.985 |
+| Dev Sênior | 33 | R$ 2.045 | R$ 67.485 |
+| Dev Pleno | 16 | R$ 1.198 | R$ 19.168 |
+| SRE / DevOps | 20,5 | R$ 1.668 | R$ 34.194 |
+| **Total** | **79** | média R$ 1.897 | **R$ 149.832** |
+| Contingência 15% | 12 | | R$ 22.475 |
+| **Com contingência** | **91** | | **R$ 172.306** |
 
-As taxas vêm de **referência pública de mercado**, derivadas em camadas explícitas — salário, encargos CLT, overhead e margem — em [`taxas-de-mercado.md`](taxas-de-mercado.md). **Não são a estrutura de custo da empresa**: o comercial substitui cada camada pelos números reais, e o esforço em dias-pessoa não muda.
+As taxas vêm de **referência pública de mercado**, derivadas em quatro camadas explícitas — salário, encargos CLT, overhead e margem, e **tributos sobre o faturamento** — em [`taxas-de-mercado.md`](taxas-de-mercado.md). **Não são a estrutura de custo da empresa**: o comercial substitui cada camada pelos números reais, e o esforço em dias-pessoa não muda.
 
-Duas camadas movem muito o total: o **regime tributário** (Simples Nacional reduz 22%) e o **fator comercial** de 1,5× (errar 0,2 move ~R$ 16 mil).
+São valores **faturados**, no regime de **Lucro Presumido**: 19,53% do total são PIS, COFINS, ISS, IRPJ (com adicional) e CSLL. Do preço acima, R$ 80.384 são custo carregado de pessoal, R$ 29.262 são tributos e R$ 40.186 são overhead e margem.
+
+Duas camadas movem muito o total: a **tributária** — ISS a 2% em vez de 5% derruba o total para R$ 144.446, e o Simples Nacional exige recálculo, não ajuste — e o **fator comercial** de 1,5×, em que errar 0,2 move ~R$ 20 mil.
 
 ### 4.2 Infraestrutura — custo de *run*
 
@@ -176,7 +178,8 @@ Total com contingência: **91 dias-pessoa**.
 | Time | 5,5 pessoas | **4,5 pessoas** |
 | Prazo | 20 dias úteis | **16 dias úteis** (−20%) |
 | Licenças | — | US$ 90–320/mês |
-| **Custo de pessoas** | R$ 138.892 | **R$ 99.622** (−17,4%) |
+| **Preço de pessoas** | R$ 149.832 | **R$ 123.795** (−17,4%) |
+| *com contingência de 15%* | *R$ 172.306* | *R$ 142.364* |
 
 **O prazo cai menos que o esforço**, porque o caminho crítico — baseline, inventário de consumidores e adequação de terceiros — não acelera com IA.
 

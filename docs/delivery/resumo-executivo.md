@@ -45,7 +45,7 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | **Time** | 5,5 pessoas — 1 arquiteto (30%), 2 dev sênior, 1 dev pleno, 1,5 SRE |
 | **Prazo** | 20 dias úteis · **cabe nos 30 corridos** |
 | **Contingência** | +15% (12 d.p.), como linha separada e negociável |
-| **Custo de pessoas** | **R$ 138.892** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — substituir pelas taxas reais da empresa |
+| **Preço de pessoas** | **R$ 172.306** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
 | **Custo de infraestrutura** | **US$ 835–1.489/mês** · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
 
 **A composição do time saiu do esforço, não o contrário.** E ela revelou algo contraintuitivo: **SRE consome 26%** — mais que o dobro do arquiteto. A causa é a exigência de *zero janela de indisponibilidade*: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de operação, não de desenvolvimento.
