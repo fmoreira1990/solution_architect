@@ -25,7 +25,7 @@
 
 - **Nenhum dado real foi usado.** A plataforma de Pedidos e Catálogo é o cenário fictício do enunciado; volumetria e perfil de pedido são premissas declaradas (`PR-01` a `PR-03`), marcadas como premissa e nunca apresentadas como fato.
 - **Dados sintéticos na fatia executável.** `slice/seed/` usará dados gerados, sem PII real — exigência de `P2-10` e coerente com `CTX-09`.
-- **O PDF do desafio é marcado "Confidencial · Stefanini Group".** Ele **não** deve ser versionado no repositório público. Varredura obrigatória na frente F7 antes de publicar.
+- **O enunciado do desafio não é versionado neste repositório.** Ele permanece apenas como referência local, e uma varredura confirma sua ausência antes de cada publicação.
 - Nenhuma credencial, endpoint interno ou identificador de cliente real entrou em prompt.
 
 ---
