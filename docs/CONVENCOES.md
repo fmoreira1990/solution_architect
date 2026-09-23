@@ -15,7 +15,7 @@ docs/
 ├─ prd/                    # o problema: tese, hipótese, escopo IN/OUT, critério de pronto
 ├─ requisitos/             # matriz de entregáveis e rastreabilidade do desafio
 ├─ business-context/       # personas.md · jornada.md · metricas.md
-├─ technical-context/      # constraints.md · stack.md · architecture.md · c4/ · consistencia.md · resiliencia.md
+├─ technical-context/      # constraints.md · architecture.md · c4/ · resiliencia.md · padroes-desenvolvimento.md · servicos-aws.md
 ├─ features/               # decomposição em ondas 30/60/90
 ├─ decisions/              # ADR-NNN-<slug>.md
 ├─ security-context/       # threat-model.md · lgpd-residencia-dados.md
@@ -78,7 +78,7 @@ O campo **Fontes** é obrigatório. Ele é o que torna a cadeia auditável: nenh
 
 ## 4. Padrão de decisão (blocos reutilizáveis)
 
-Em `stack.md`, `architecture.md` e ADRs, toda decisão usa este bloco:
+Em `architecture.md` e nas ADRs, toda decisão usa este bloco:
 
 ```markdown
 *Escolha:* <o que foi decidido>
@@ -136,7 +136,7 @@ Cada comando em `.claude/commands/` conduz **uma entrevista, uma pergunta por ve
 | Arquitetura | `/arquitetura` | `docs/technical-context/architecture.md` |
 | Diagramas C4 e sequência | `/c4` | `docs/technical-context/c4/*.md` |
 | ADR | `/adr` | `docs/decisions/ADR-NNN-<slug>.md` |
-| Stack | `/stack` | `docs/technical-context/stack.md` |
+| Stack | `/stack` | `docs/decisions/ADR-0005-stack-da-fatia-executavel.md` |
 | Features / ondas | `/feature-breakdown` | `docs/features/<slug>.md` |
 | Contratos | `/contratos` | `contracts/` + `docs/governance/politica-contratos.md` |
 | Threat model | `/threat-model` | `docs/security-context/threat-model.md` |

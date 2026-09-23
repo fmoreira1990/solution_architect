@@ -22,7 +22,7 @@ A estimativa é **por decomposição**, não por analogia nem por palpite calibr
 
 **A composição do time é consequência do esforço, não premissa dele.** Declarar "squad de 5" antes de saber o que precisa ser feito produz um time que cabe no orçamento e não na tarefa.
 
-Há uma âncora de calibração incomum: a fatia executável em `slice/` **já implementa** o núcleo de idempotência, outbox, snapshot, cotação e contract test, com 102 testes. Não estamos estimando algo nunca construído — estamos estimando **a distância entre a prova e a produção**, e essa distância está decomposta item a item.
+Há uma âncora de calibração incomum: a fatia executável em `slice/` **já implementa** o núcleo de idempotência, outbox, snapshot, cotação e contract test, com 127 testes. Não estamos estimando algo nunca construído — estamos estimando **a distância entre a prova e a produção**, e essa distância está decomposta item a item.
 
 ---
 

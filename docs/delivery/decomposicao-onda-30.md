@@ -18,7 +18,7 @@ Aqui cada entrega vira tarefas de 0,5 a 3 dias-pessoa, com perfil e dependência
 
 ## O que a fatia executável já responde
 
-A prova em `slice/` implementa o **núcleo** de `A1`–`A8`: idempotência com `PRIMARY KEY`, outbox transacional, relay com `SKIP LOCKED`, snapshot imutável, cotação assinada e contract test. Ela roda, com 102 testes.
+A prova em `slice/` implementa o **núcleo** de `A1`–`A8`: idempotência com `PRIMARY KEY`, outbox transacional, relay com `SKIP LOCKED`, snapshot imutável, cotação assinada e contract test. Ela roda, com 127 testes.
 
 Isso é uma âncora de calibração incomum: não estamos estimando algo nunca construído. Estamos estimando **a distância entre a prova e a produção**.
 
@@ -114,7 +114,7 @@ Isso é uma âncora de calibração incomum: não estamos estimando algo nunca c
 
 | # | Tarefa | d.p. | Perfil | Notas |
 |---|---|---|---|---|
-| A12.1 | Feature flag por percentual de tráfego | 2 | Dev Sênior | **não existe na fatia** |
+| A12.1 | Feature flag por percentual de tráfego | 2 | Dev Sênior | mecanismo provado na fatia; falta serviço de configuração |
 | A12.2 | Rollback sem deploy, exercitado em produção | 1,5 | SRE | critério do gate G30 |
 | A12.3 | Rollout 1% → 10% → 50% → 100% com comparação a cada degrau | 2 | SRE | `CTX-11` |
 | A13.1 | Job de reconciliação: presos, outbox parado, cotações órfãs | 2,5 | Dev Pleno | — |

@@ -98,6 +98,6 @@ Onde houve escolha real, ela foi feita por mérito: **Postgres em vez de SQLite*
 
 ## Pendências registradas
 
-- ~~O caminho de erro não foi testado em máquina limpa.~~ **Testado em 2026-09-23**, e estava quebrado: dois dos três cenários mais prováveis terminavam em `UnicodeEncodeError`, porque o PostgreSQL responde em português com acento e o console do Windows usa cp1252 — a mensagem de ajuda **nunca chegava a ser impressa**, e o avaliador veria um traceback. Corrigido com saída em UTF-8 tolerante e diagnóstico por tipo de falha. Ciclo completo validado: banco e usuário destruídos, prova executada, instruções seguidas, 111 testes verdes.
+- ~~O caminho de erro não foi testado em máquina limpa.~~ **Testado em 2026-09-23**, e estava quebrado: dois dos três cenários mais prováveis terminavam em `UnicodeEncodeError`, porque o PostgreSQL responde em português com acento e o console do Windows usa cp1252 — a mensagem de ajuda **nunca chegava a ser impressa**, e o avaliador veria um traceback. Corrigido com saída em UTF-8 tolerante e diagnóstico por tipo de falha. Ciclo completo validado: banco e usuário destruídos, prova executada, instruções seguidas, 127 testes verdes.
 - A stack de produção continua indefinida e **depende de `CTX-13`/`CTX-14`**.
 - Node.js foi instalado depois do gate, para validar diagramas Mermaid. Vale registrar que isso **não** reabre a decisão: trocar a stack da prova depois dos testes verdes seria refazer trabalho sem ganho.

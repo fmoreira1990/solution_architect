@@ -5,7 +5,7 @@
 **Escopo deste documento:** **em que momento do ciclo de vida** o pedido é validado contra o Catálogo. Não decide as regras de validação em si — decide que ela é posterior ao aceite.
 **Requisitos cobertos:** `CTX-03`, `CTX-04`, `CTX-08`, `CTX-17`, `P1-10`, `P1-13`, `P1-15`
 **Supersede:** `ADR-0003` seção (b) — caminho de leitura na criação
-**Fontes:** `docs/technical-context/constraints.md` (§8), `docs/decisions/ADR-0003-...md`, `docs/business-context/jornada.md`
+**Fontes:** `docs/technical-context/constraints.md` (§8), `ADR-0003`, `docs/business-context/jornada.md`
 **Data:** 2026-09-22
 
 ---

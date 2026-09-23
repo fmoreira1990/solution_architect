@@ -127,7 +127,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | *"Versionar uma especificação OpenAPI para criação/consulta de pedidos e uma AsyncAPI ou schema para mudança de status"* | `orders-v1.yaml`, `orders-v2.yaml`, `order-status.yaml` | ✅ |
 | *"Implementar uma prova mínima de uma decisão crítica: idempotência, outbox, contract test ou compatibilidade de versão"* | **as quatro**, não uma | ✅ |
-| *"Incluir testes positivos e negativos reproduzíveis e execução automatizada no pipeline"* | 116 testes, positivos e negativos; **CI verde em 5 execuções** | ✅ |
+| *"Incluir testes positivos e negativos reproduzíveis e execução automatizada no pipeline"* | 127 testes, positivos e negativos; **CI verde em 5 execuções** | ✅ |
 | *"Disponibilizar dados sintéticos e um único comando documentado"* | `slice/seed/` + `python prova.py`; caminho de erro testado em máquina limpa | ✅ |
 
 ### Critério crítico
@@ -192,7 +192,7 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 | *"Repositório no GitHub com README, premissas, instruções de execução e índice dos artefatos"* | `README.md` — os 4 itens, mais roteiro de leitura por tempo disponível | ✅ |
 | *"Diagramas C4 e de sequência em formato versionável, como Mermaid, PlantUML ou Structurizr DSL"* | 16 blocos Mermaid, validados pelo parser oficial no CI | ✅ |
 | *"Mapa de domínios, no mínimo quatro ADRs, threat model e plano incremental de 30/60/90 dias"* | os 4, com 7 ADRs | ✅ |
-| *"Especificações OpenAPI e AsyncAPI/schema, acompanhadas da fatia executável e seus testes"* | os 3 contratos + `slice/` com 111 testes | ✅ |
+| *"Especificações OpenAPI e AsyncAPI/schema, acompanhadas da fatia executável e seus testes"* | os 3 contratos + `slice/` com 127 testes | ✅ |
 | *"Documento explicativo da ferramenta de IA utilizada, motivo da escolha, prompts relevantes, validações e cuidados com dados"* | `uso-de-ia.md` — os 5 itens em seções próprias | ✅ |
 | *"Resumo executivo de até duas páginas com recomendação, investimento, riscos e decisões que precisam de validação"* | `resumo-executivo.md` — os 4 itens | ✅ |
 | *(desejável)* *"breve apresentação em vídeo ou slides"* | `apresentacao/slides.md` — 10 slides | ✅ |

@@ -1,7 +1,7 @@
 # Resumo executivo — Evolução da Plataforma de Pedidos e Catálogo
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** recomendação, investimento, riscos e decisões que dependem do cliente. Duas páginas, para quem decide — a profundidade está nos 38 documentos indexados no `README.md`.
+**Escopo deste documento:** recomendação, investimento, riscos e decisões que dependem do cliente. Duas páginas, para quem decide — a profundidade está nos 45 documentos indexados no `README.md`.
 **Fontes:** `docs/delivery/estimativa-fase1.md`, `docs/delivery/riscos-premissas.md`, ADRs 0001 a 0007
 **Data:** 2026-09-23
 
@@ -65,7 +65,7 @@ Não é desperdício — é o preço de uma restrição que o cliente impôs. Pr
 
 ## O que já está provado
 
-A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **111 testes**, e demonstra os dois critérios críticos do edital:
+A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **127 testes**, e demonstra os dois critérios críticos do edital:
 
 - **20 requisições concorrentes com a mesma chave criam exatamente um pedido.** As 19 respostas de replay só são alcançadas por violação da `PRIMARY KEY` — as threads competiram de verdade, e foi a constraint que segurou.
 - **O consumidor legado não quebra com a versão nova no ar.** Um consumidor de referência que emite nota fiscal na resposta do POST continua passando.

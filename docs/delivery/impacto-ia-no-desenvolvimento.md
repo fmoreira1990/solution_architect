@@ -12,7 +12,7 @@
 
 Quase toda proposta que promete ganho com IA estima por analogia ou por material de fornecedor. Aqui há algo melhor: **a fatia executável foi construída com assistência de IA, e o processo está registrado.**
 
-O que ela produziu: 126 testes em PostgreSQL real, 7 ADRs, 16 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
+O que ela produziu: 127 testes em PostgreSQL real, 7 ADRs, 16 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
 
 E, mais importante para estimar: o registro em `uso-de-ia.md` mostra **onde a IA acelerou e onde ela errou**. É isso que permite projetar em vez de torcer.
 

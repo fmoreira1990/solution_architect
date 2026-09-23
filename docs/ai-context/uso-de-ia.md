@@ -90,7 +90,7 @@
 ### 2026-09-22 · `/adr` — ADR-0003, snapshot e desacoplamento do Catálogo
 
 - **Prompt:** diálogo sobre o que é N+1 e o que é snapshot, culminando na proposta do usuário: *"então dá pra fazer o snapshot de coisas que sempre vão mudar na negociação, e o cache pro catálogo no serviço de pedidos, pra reduzir a dependência, certo?"*
-- **Saída aceita:** `docs/decisions/ADR-0003-...md` — decisão em duas partes (registro e caminho de leitura), seis alternativas confrontadas, enforcement executável.
+- **Saída aceita:** `ADR-0003` — decisão em duas partes (registro e caminho de leitura), seis alternativas confrontadas, enforcement executável.
 - **Validação:** cada alternativa rejeitada recebeu o motivo quantitativo, não retórico. A conta de hit rate composto (0,9⁸) foi refeita à mão.
 - **Correção gerada pela conversa:** a proposta do usuário estava certa na direção, mas tratava snapshot e cache como partes de uma mesma solução de acoplamento. São coisas distintas — **cache é otimização** (some, você busca de novo, mesmo resultado); **snapshot é registro** (some, a informação se perde, porque a fonte mudou). O snapshot não elimina a leitura da criação, elimina todas as futuras. Essa distinção virou o eixo da ADR.
 - **Achado próprio da análise:** hit rate por SKU **não se traduz** em hit rate por pedido, porque o pedido precisa de todos os itens. Com 90% por SKU, só 43% dos pedidos de 8 itens ficam totalmente em cache (0,9⁸), e 21% nos de 15 itens. Como `CTX-04` cobra o **p95**, e o p95 é governado pelos misses, cache melhora a média e quase não move a métrica do SLA. Isso derrubou "apenas cache" como alternativa.
@@ -140,7 +140,7 @@
 - **Rejeitado:** a IA propôs, como alternativa barata, alterar só o mapa de domínios e deixar arquitetura, ADRs e código citando Estoque e Pagamento. **Motivo:** criaria inconsistência visível entre artefatos — exatamente o que `AV-01` avalia. O recorte foi aplicado aos 27 arquivos afetados.
 - **Consequência de projeto:** a `ADR-0007` precisou ser reancorada. O argumento central dela — dependência síncrona no caminho crítico torna `CTX-03` inatingível — **não dependia do Estoque**. Depende de haver dependência síncrona, e o Catálogo cumpre o papel: conferir os termos submetidos contra o Catálogo de forma síncrona reintroduz a mesma aritmética. A decisão sobreviveu à remoção da premissa que a originou.
 - **Ganho:** `PR-07` deixou de ser risco administrado e passou a **não existir**. O risco foi eliminado, não mitigado.
-- **Validação:** 102 testes passando, incluindo três novos que provam a assimetria entre canais — cotação assinada é honrada mesmo com o Catálogo mudando; parceiro sem cotação com preço divergente é rejeitado **após** o aceite.
+- **Validação:** 127 testes passando, incluindo três novos que provam a assimetria entre canais — cotação assinada é honrada mesmo com o Catálogo mudando; parceiro sem cotação com preço divergente é rejeitado **após** o aceite.
 - **Achado próprio, durante a validação:** o validador de Mermaid **deixou de encontrar metade dos diagramas e continuou verde**. Os scripts de varredura regravaram arquivos com CRLF, e a regex procurava `
 `. Uma fitness function que silenciosamente para de verificar é pior que nenhuma — foi adicionada uma guarda de contagem mínima que quebra o build se a varredura encolher.
 - **Dados expostos:** nenhum.

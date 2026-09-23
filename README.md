@@ -1,7 +1,7 @@
 # Evolução da Plataforma de Pedidos e Catálogo
 
 > Desafio técnico — Arquitetura de Soluções
-> **Prova executável:** `cd slice && python prova.py` · 126 testes
+> **Prova executável:** `cd slice && python prova.py` · 127 testes
 
 [![CI](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml/badge.svg)](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml)
 
@@ -73,7 +73,7 @@ Variável opcional: `PROVA_DATABASE_URL` (padrão `postgresql://prova:prova@127.
 
 Dados são **sintéticos** — nenhum dado real, nenhuma PII.
 
-O ciclo foi validado do zero: banco e usuário destruídos, prova executada, instruções da própria saída seguidas, 126 testes verdes.
+O ciclo foi validado do zero: banco e usuário destruídos, prova executada, instruções da própria saída seguidas, 127 testes verdes.
 
 ---
 
@@ -142,7 +142,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [OpenAPI v1](contracts/openapi/orders-v1.yaml) | fachada síncrona, deprecada, com `Sunset` |
 | [OpenAPI v2](contracts/openapi/orders-v2.yaml) | aceite assíncrono, `Idempotency-Key` obrigatória |
 | [AsyncAPI](contracts/asyncapi/order-status.yaml) | eventos, at-least-once, dedup **obrigatória no contrato** |
-| [`slice/`](slice/) | 126 testes em PostgreSQL real |
+| [`slice/`](slice/) | 127 testes em PostgreSQL real |
 
 ### Segurança
 | | |
@@ -205,7 +205,7 @@ O que o CI quebra, e não apenas o que ele roda:
 
 | Verificação | Protege |
 |---|---|
-| 126 testes da fatia, **em CI** | os dois critérios críticos |
+| 127 testes da fatia, **em CI** | os dois critérios críticos |
 | Contrato **×** implementação rodando | spec drift |
 | `RECEBIDO` ausente do enum da v1 | a fachada síncrona |
 | Toda ADR com ≥ 2 alternativas rejeitadas | regra Q2 |
@@ -221,9 +221,9 @@ As três primeiras foram validadas por **teste de mutação** — quebra-se o qu
 ## Estrutura
 
 ```
-docs/            38 documentos, por contexto
+docs/            45 documentos, por contexto
 contracts/       OpenAPI v1/v2 + AsyncAPI
-slice/           fatia executável — 126 testes
+slice/           fatia executável — 127 testes
 tools/           validador de diagramas
 .github/         CI: prova, diagramas, confidencialidade
 .claude/         comandos que produziram os artefatos

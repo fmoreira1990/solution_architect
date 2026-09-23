@@ -52,6 +52,12 @@ jobs:
         working-directory: slice
         run: python -m pytest tests -v --tb=short -p no:cacheprovider
 
+      - name: Conferência de consistência da entrega
+        # Números citados nos documentos, links, referências a testes e
+        # arquivos, cabeçalho canônico, codificação, formato das ADRs e
+        # confidencialidade em todo o histórico.
+        run: python tools/conferir-entrega.py
+
       - name: Resumo
         if: always()
         working-directory: slice
