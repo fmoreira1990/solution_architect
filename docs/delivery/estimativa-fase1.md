@@ -164,6 +164,19 @@ Isso não é desperdício — é o preço de uma restrição que o cliente impô
 
 Total com contingência: **91 dias-pessoa**.
 
+### Cenário alternativo: desenvolvimento assistido por IA
+
+| | Conservador *(este documento)* | Com IA |
+|---|---|---|
+| Esforço | 79 d.p. | **63 d.p.** (−22%) |
+| Time | 5,5 pessoas | **4,5 pessoas** |
+| Prazo | 20 dias úteis | **16 dias úteis** (−20%) |
+| Licenças | — | US$ 90–320/mês |
+
+**O prazo cai menos que o esforço**, porque o caminho crítico — baseline, inventário de consumidores e adequação de terceiros — não acelera com IA.
+
+E o **transversal permanece em 15 d.p., inegociável**: revisão de código assistido por IA não é mais rápida, é diferente. Análise completa, com a evidência deste próprio repositório, em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md).
+
 ---
 
 ## 7. Riscos da estimativa
