@@ -90,7 +90,7 @@ Onde houve escolha real, ela foi feita por mérito: **Postgres em vez de SQLite*
 
 ## Enforcement
 
-1. **A prova é o enforcement.** `python prova.py` executa os 37 testes; CI vermelho barra o merge.
+1. **A prova é o enforcement.** `python prova.py` executa a suíte inteira, e o CI a repete a cada push. Para o build vermelho barrar o merge, falta uma regra de proteção de branch no GitHub.
 2. **Postgres é verificado, não presumido.** `db.ping()` falha com mensagem acionável se o banco não responder.
 3. **Sem ORM por convenção**, não por regra automatizada — é acordo de legibilidade, e está aqui para não ser desfeito sem discussão.
 

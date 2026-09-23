@@ -1,7 +1,8 @@
 name: CI
 
 # P2-09 — a prova e as fitness functions rodam a cada push.
-# Build vermelho barra o merge.
+# Build vermelho sinaliza a quebra; barrar o merge depende de regra de
+# proteção de branch no GitHub, que não está neste arquivo.
 
 on:
   push:
@@ -49,8 +50,12 @@ jobs:
         # Inclui os dois critérios críticos do §2.4.2:
         #  - 20 requisições concorrentes com a mesma chave -> 1 pedido
         #  - consumidor v1 não quebra com a v2 no ar
+        # A saída vai também para arquivo, para o Resumo não rodar a suíte
+        # de novo; pipefail mantém visível a falha do pytest.
         working-directory: slice
-        run: python -m pytest tests -v --tb=short -p no:cacheprovider
+        run: |
+          set -o pipefail
+          python -m pytest tests -v --tb=short -p no:cacheprovider | tee "$RUNNER_TEMP/pytest.log"
 
       - name: Conferência de consistência da entrega
         # Números citados nos documentos, links, referências a testes e
@@ -60,10 +65,10 @@ jobs:
 
       - name: Resumo
         if: always()
-        working-directory: slice
         run: |
           echo "### Prova executável" >> "$GITHUB_STEP_SUMMARY"
-          python -m pytest tests -q -p no:cacheprovider 2>&1 | tail -3 >> "$GITHUB_STEP_SUMMARY" || true
+          tail -1 "$RUNNER_TEMP/pytest.log" >> "$GITHUB_STEP_SUMMARY" 2>/dev/null \
+            || echo "a suíte não chegou a rodar" >> "$GITHUB_STEP_SUMMARY"
 
   diagramas:
     name: Sintaxe dos diagramas
@@ -75,11 +80,13 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: tools/package.json
+          cache-dependency-path: tools/package-lock.json
 
       - name: Instalar mermaid
+        # npm ci instala exatamente o que o lock fixa — o mesmo validador
+        # que roda localmente.
         working-directory: tools
-        run: npm install --no-fund --no-audit
+        run: npm ci --no-fund --no-audit
 
       - name: Validar blocos Mermaid
         # Mermaid falha em silêncio: diagrama com erro não avisa, só não
