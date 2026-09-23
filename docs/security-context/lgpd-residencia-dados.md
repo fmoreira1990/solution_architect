@@ -4,7 +4,7 @@
 **Escopo deste documento:** classificação de dados pessoais, base legal, minimização, retenção e residência. O **padrão** de segregação regional é decidido na `ADR-0006`; aqui está o inventário que a sustenta.
 **Requisitos cobertos:** `CTX-09`, `P2-03`
 **Fontes:** `docs/technical-context/architecture.md`, `docs/security-context/threat-model.md` (F4, F5), `ADR-0003`
-**Data:** 2026-09-23
+**Data:** 2026-09-23 *(seção 4 revista após `PR-03` fechar como Estados Unidos)*
 
 ---
 
@@ -64,21 +64,45 @@ Isso exige que Pedidos **não** contenha PII direta — o que é exatamente a de
 
 ---
 
-## 4. Residência de dados
+## 4. Regime do segundo país: Estados Unidos
 
-`CTX-09` exige atender requisitos de residência do segundo país. **`PR-03` — qual é o país — permanece `???`**, e o regime aplicável depende dele.
+`PR-03` fechou em 2026-09-23. E a resposta **muda a natureza da restrição**.
 
-O que é possível afirmar sem saber o país:
+O enunciado fala em *"requisitos de residência de dados do novo país"*. Essa formulação pressupõe um regime que obrigue o dado a permanecer no território. **Os Estados Unidos não têm isso** para dado comercial de varejo: não existe lei federal abrangente de privacidade nem exigência geral de localização.
 
-| Categoria | Pode cruzar fronteira? |
+> ⚠️ Esta é leitura de arquiteto, **não parecer jurídico**. Precisa de confirmação do DPO.
+
+### O que existe no lugar
+
+| Aspecto | Consequência para a arquitetura |
 |---|---|
-| PII direta (nome, documento, endereço) | ❌ presumir que **não** |
-| `cliente_id` pseudônimo | ⚠️ depende do regime |
-| Snapshot de itens (SKU, preço) | ✅ não é dado pessoal |
-| Telemetria e métricas agregadas | ✅ desde que sem identificador |
-| Backup | ❌ segue a regra do dado que contém |
+| **Mosaico estadual** — CCPA/CPRA, Virginia, Colorado, Texas, Connecticut e outros | A regra aplicável depende do **estado de residência** do consumidor, não do país |
+| **Opt-out de venda/compartilhamento** + sinal GPC na Califórnia | Requisito **novo**, sem equivalente direto na LGPD: a preferência precisa propagar a todo consumidor de dado, inclusive parceiros |
+| **Sem mandato de residência** | Segregação regional deixa de ser obrigação e vira **escolha justificada** |
+| **Notificação de incidente** por lei estadual | Processo de resposta precisa mapear jurisdições |
+| **PCI DSS** para dados de cartão | Contratual, não legal; já atendido por tokenização em Pagamento |
 
-**Regra de projeto adotada enquanto `PR-03` estiver aberto:** desenhar para o regime **mais restritivo** (silo regional completo de PII). Relaxar depois é barato; apertar depois exige migração de dados em produção.
+### A restrição que de fato aparece: a transferência
+
+O fluxo que importa **inverte de direção**. Não é "o dado americano precisa ficar nos EUA" — é:
+
+> **Dado pessoal brasileiro que vai para os EUA é transferência internacional sob a LGPD** (art. 33), e exige instrumento jurídico: cláusulas-padrão contratuais da ANPD ou equivalente (`CTX-09c`, decisão `V9`).
+
+Isso torna a minimização de PII brasileira atravessando a fronteira um objetivo **arquitetural**, não apenas higiene.
+
+### O que pode cruzar
+
+| Categoria | Cruza? |
+|---|---|
+| PII brasileira (nome, documento, endereço) | ❌ **não**, enquanto `V9` não existir |
+| PII americana | ⚠️ pode, mas não há motivo para trazer |
+| `cliente_id` pseudônimo | ✅ sim — é o identificador, não o significado |
+| Snapshot de itens (SKU, preço, moeda) | ✅ não é dado pessoal |
+| **Preferências de privacidade** | ✅ **precisa** cruzar — é sinal que todos honram |
+| Telemetria e métricas | ✅ desde que sem identificador |
+| Backup | segue a regra do dado que contém |
+
+**A linha das preferências é a única que precisa atravessar por obrigação**, não por conveniência: um opt-out registrado nos EUA tem de ser honrado por qualquer consumidor do dado, onde quer que esteja.
 
 O padrão de segregação é decidido na `ADR-0006`.
 
@@ -100,14 +124,18 @@ O padrão de segregação é decidido na `ADR-0006`.
 
 ## Riscos abertos
 
-1. **`PR-03` bloqueia tudo da seção 4.** Sem saber o país, o regime é desconhecido e a `ADR-0006` não fecha. É o bloqueio mais consequente em aberto.
+1. **O enquadramento da seção 4 é leitura de arquiteto, não parecer jurídico.** A afirmação central — EUA sem mandato de residência para dado comercial de varejo — precisa de confirmação do DPO. Se estiver errada, a `ADR-0006` não muda de decisão, mas muda de justificativa.
 2. **Endereço de entrega sem dono.** Se cair em Pedidos, a estratégia de pseudonimização da seção 3 deixa de ser suficiente.
 3. **Nenhum dos controles da seção 5 está verificado por teste**, exceto dados sintéticos e ausência de PII no evento. Redação de log e telemetria sem PII são débito.
 4. **Retenção de log em 90 dias é `???`.** Foi escrito como proposta, não como política aprovada.
+5. **Sem instrumento de transferência BR → EUA (`V9`), nenhuma PII brasileira deveria atravessar.** É pré-requisito da onda 90, não formalidade posterior.
+6. **Não se sabe em quais estados americanos a operação estará sujeita (`V10`).** Os limiares da CCPA/CPRA dependem de receita e de volume de consumidores.
+7. **O serviço de preferências de privacidade é escopo novo**, exigido por `CTX-09d`, e não estava no plano 30/60/90 original.
 
 ## Pendências registradas
 
 - Definir o dono do endereço de entrega (`V8`).
-- Fechar `PR-03` para destravar a `ADR-0006`.
+- ~~Fechar `PR-03`~~ ✅ resolvido: Estados Unidos, em 2026-09-23.
+- Acrescentar o serviço de preferências de privacidade ao plano da onda 90.
 - Aprovar prazos de retenção com jurídico — os desta página são propostas.
 - Inventário de quem referencia `cliente_id` precisa existir antes do primeiro pedido de acesso do titular.

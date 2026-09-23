@@ -48,9 +48,11 @@ Sem teto de custo declarado, a decisão arquitetural fica sem uma das cinco dime
 | ID | Restrição | Critério verificável | Origem | Consequência arquitetural |
 |---|---|---|---|---|
 | CTX-09a | LGPD — dados pessoais de clientes | minimização, base legal, retenção definida | §2.2.1 | Classificação de PII, criptografia, expurgo |
-| CTX-09b | Residência de dados do segundo país | PII do país B **não** sai do país B | §2.2.1 | Silo regional ou PII regional + transacional global |
+| CTX-09b | Regime de dados do segundo país | **EUA: sem exigência de residência.** Mosaico estadual (CCPA/CPRA e congêneres) + opt-out de venda/compartilhamento | §2.2.1 + `PR-03` | Segregação por **domicílio do titular**, não por território |
+| CTX-09c | Transferência internacional BR → EUA | LGPD art. 33: exige instrumento jurídico (cláusulas-padrão da ANPD ou equivalente) | derivado de `PR-03` | Minimizar dado brasileiro que atravessa |
+| CTX-09d | Direito de opt-out de venda/compartilhamento | Preferência do titular precisa **propagar** a todos os consumidores de dado | CCPA/CPRA | Serviço de preferências; sinal honrado em toda a cadeia |
 | CTX-06 | Auditabilidade de preço | provar **qual preço o cliente viu** no momento da compra | §2.2.1 | Snapshot imutável no item do pedido |
-| PR-03 | Qual é o segundo país | **`???`** | premissa em aberto | **Bloqueia a ADR-0006 de residência** |
+| PR-03 | Qual é o segundo país | **Estados Unidos** | ✅ decidido em 2026-09-23 | Destrava a `ADR-0006`; muda o regime de residência para mosaico estadual |
 
 ## 6. Prazo e compatibilidade
 

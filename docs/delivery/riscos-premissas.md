@@ -16,7 +16,7 @@ Se qualquer uma for falsa, algo muda. A coluna da direita diz **o quê**.
 |---|---|---|---|
 | PR-01 | 60k pedidos/dia hoje → 600k no alvo | declarada | Redimensiona particionamento, cache e custo. Abaixo de ~20k/dia, parte da arquitetura vira overengineering |
 | PR-02 | 8 itens em média, 15 no p95 | declarada | Muda o peso do N+1 e o orçamento de latência por hop |
-| PR-03 | Segundo país na América Latina | declarada | Define região, regime de dados e moeda. **Bloqueia a `ADR-0006`** |
+| PR-03 | ~~Segundo país na América Latina~~ → **Estados Unidos** | ✅ **decidida** | Fechada em 2026-09-23. Mudou o regime de "residência obrigatória" para "mosaico estadual + transferência internacional" |
 | PR-04 | Cloud AWS | decidida | Muda serviços, não a arquitetura lógica |
 | PR-05 | Entrega ao parceiro por webhook assinado + polling | declarada | Muda o contrato de notificação |
 | PR-06 | 60% do volume em 8h comerciais, pico de 3× | **inventada** | **Varejo tem Black Friday.** Se o pico real for 10× ou 20×, o dimensionamento inteiro muda |
@@ -90,7 +90,9 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 |---|---|---|---|
 | V1 | Estoque e Pagamento existem? (PR-07) | Client Face / arquitetura da conta | Prazo da onda 30 |
 | V2 | Consumidores atuais são internos ou externos? | Client Face | `ADR-0004`, janela de deprecação |
-| V3 | Qual é o segundo país? (PR-03) | Negócio | `ADR-0006`, onda 90 |
+| V3 | ~~Qual é o segundo país?~~ **Resolvido: EUA** | — | ✅ fechado |
+| V9 | **Instrumento jurídico para transferência BR → EUA** (`CTX-09c`) | Jurídico / DPO | `ADR-0006`; nenhuma PII brasileira cruza sem ele |
+| V10 | **Em quais estados dos EUA a operação estará sujeita** | Jurídico / negócio | Define quais leis estaduais se aplicam |
 | V4 | Limite aceitável de rejeição pós-aceite | Negócio | Gatilho da `ADR-0007` |
 | V5 | Limite de defasagem tolerável em preço sob falha | Negócio | Regra de fallback da `ADR-0003` |
 | V6 | Política de desfecho para pedido preso em validação | Negócio / operação | Reconciliação |
