@@ -86,14 +86,37 @@ esperado = {
     r"\*\*(\d+) documentos\*\*": n_docs,
     r"os (\d+) documentos": n_docs,
 }
+# --corrigir atualiza os números em vez de só apontar. Existe porque o
+# total de testes muda a cada documento novo — as fitness functions de
+# governança são parametrizadas por documento —, e corrigir à mão em dez
+# arquivos é como a inconsistência nasce.
+CORRIGIR = "--corrigir" in sys.argv
+corrigidos = 0
+
 for p in docs_md():
     texto = ler(p)
+    original = texto
     rel = p.relative_to(RAIZ)
     for padrao, valor in esperado.items():
         for achado in re.findall(padrao, texto):
-            if int(achado) != valor:
+            if int(achado) == valor:
+                continue
+            if CORRIGIR:
+                texto = re.sub(
+                    padrao,
+                    lambda m: m.group(0).replace(m.group(1), str(valor), 1),
+                    texto,
+                )
+                corrigidos += 1
+            else:
                 problemas.append(f"{rel}: cita {achado} onde a realidade é {valor} ({padrao})")
-print(f"  {'inconsistências: ' + str(len(problemas)) if problemas else 'todos conferem'}")
+    if CORRIGIR and texto != original:
+        io.open(p, "w", encoding="utf-8", newline="\n").write(texto)
+
+if CORRIGIR:
+    print(f"  {corrigidos} número(s) corrigido(s)")
+else:
+    print(f"  {'inconsistências: ' + str(len(problemas)) if problemas else 'todos conferem'}")
 
 
 # ───────────────────────────────── 3. links internos resolvem

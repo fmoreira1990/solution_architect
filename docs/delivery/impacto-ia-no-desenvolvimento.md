@@ -12,7 +12,7 @@
 
 Quase toda proposta que promete ganho com IA estima por analogia ou por material de fornecedor. Aqui há algo melhor: **a fatia executável foi construída com assistência de IA, e o processo está registrado.**
 
-O que ela produziu: 127 testes em PostgreSQL real, 7 ADRs, 16 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
+O que ela produziu: 128 testes em PostgreSQL real, 7 ADRs, 16 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
 
 E, mais importante para estimar: o registro em `uso-de-ia.md` mostra **onde a IA acelerou e onde ela errou**. É isso que permite projetar em vez de torcer.
 
@@ -115,9 +115,20 @@ Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e hí
 | Prazo | 20 dias úteis | **16 dias úteis** |
 | Licenças de IA | — | **US$ 90–320/mês** |
 | Infraestrutura AWS | US$ 835–1.489/mês | igual |
-| Custo de pessoas | 79 × taxa | **63 × taxa** |
+| Custo de pessoas | R$ 120.576 | **R$ 99.622** |
 
-**A licença é irrelevante diante da economia.** 16 dias-pessoa economizados pagam a licença dezenas de vezes. O ponto de atenção não é o custo — é o **teto de consumo**, para que ferramenta cobrada por uso não vire surpresa.
+**A licença é irrelevante diante da economia.** ~R$ 21 mil economizados em pessoas contra R$ 490–1.730/mês de licença. O ponto de atenção não é o custo — é o **teto de consumo**, para que ferramenta cobrada por uso não vire surpresa.
+
+### A economia em custo é menor que a economia em esforço
+
+| | Sem IA | Com IA | Variação |
+|---|---|---|---|
+| Esforço | 79 d.p. | 63 d.p. | **−20,3%** |
+| Custo de pessoas | R$ 120.576 | R$ 99.622 | **−17,4%** |
+
+Os quase 3 pontos de diferença não são arredondamento: a IA reduz proporcionalmente mais o trabalho de **pleno** (−44%), o perfil mais barato, e **nada** do arquiteto, o mais caro.
+
+> **Quanto mais sênior o time, menor o retorno financeiro da ferramenta** — ainda que o ganho de prazo permaneça. A taxa média ponderada sobe de R$ 1.526 para R$ 1.581 por dia-pessoa: o time fica menor e mais caro por cabeça.
 
 > Outras licenças de software: **nenhuma identificada**. A stack de produção ainda não foi decidida (`CTX-13`/`CTX-14`), e a arquitetura usa serviços gerenciados AWS, sem licença própria. Se a escolha cair em runtime ou banco comercial, entra aqui.
 

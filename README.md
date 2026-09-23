@@ -1,7 +1,7 @@
 # Evolução da Plataforma de Pedidos e Catálogo
 
 > Desafio técnico — Arquitetura de Soluções
-> **Prova executável:** `cd slice && python prova.py` · 127 testes
+> **Prova executável:** `cd slice && python prova.py` · 128 testes
 
 [![CI](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml/badge.svg)](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml)
 
@@ -142,7 +142,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [OpenAPI v1](contracts/openapi/orders-v1.yaml) | fachada síncrona, deprecada, com `Sunset` |
 | [OpenAPI v2](contracts/openapi/orders-v2.yaml) | aceite assíncrono, `Idempotency-Key` obrigatória |
 | [AsyncAPI](contracts/asyncapi/order-status.yaml) | eventos, at-least-once, dedup **obrigatória no contrato** |
-| [`slice/`](slice/) | 127 testes em PostgreSQL real |
+| [`slice/`](slice/) | 128 testes em PostgreSQL real |
 
 ### Segurança
 | | |
@@ -157,6 +157,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Decomposição da onda 30](docs/delivery/decomposicao-onda-30.md) | 47 tarefas estimáveis |
 | [Estimativa da fase 1](docs/delivery/estimativa-fase1.md) | 79 d.p., time derivado, custos, faixa de confiança |
 | [Impacto de IA no desenvolvimento](docs/delivery/impacto-ia-no-desenvolvimento.md) | −22% de esforço, −20% de prazo, e o que **não** acelera |
+| [Taxas de mercado](docs/delivery/taxas-de-mercado.md) | salário → encargos → overhead → taxa, em camadas substituíveis |
 | [Riscos e premissas](docs/delivery/riscos-premissas.md) | premissas, débitos aceitos, fora de escopo, decisões do cliente |
 | [Resumo executivo](docs/delivery/resumo-executivo.md) | **2 páginas** — recomendação, investimento, riscos |
 | [Rastreabilidade do enunciado](docs/requisitos/rastreabilidade-pdf.md) | cada tópico do PDF e o artefato que o responde |

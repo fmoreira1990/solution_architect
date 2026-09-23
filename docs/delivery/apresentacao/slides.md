@@ -134,11 +134,11 @@ Por isso a onda 30 **não** ataca o N+1, que é a dor mais visível.
 
 ---
 
-## 7 · A prova — 127 testes em PostgreSQL real
+## 7 · A prova — 128 testes em PostgreSQL real
 
 ```
 $ cd slice && python prova.py
-127 passed
+128 passed
 ```
 
 | ⭐ | Teste | Prova |

@@ -119,7 +119,7 @@ O teste mais valioso é o **contraste**: `test_legado_duplica_pedido_em_retry_co
 | Evidência | Onde |
 |---|---|
 | OpenAPI v1 e v2, AsyncAPI, versionados | [`contracts/`](../../contracts/) |
-| **127 testes** em PostgreSQL real | [`slice/`](../../slice/) |
+| **128 testes** em PostgreSQL real | [`slice/`](../../slice/) |
 | Um comando documentado | `python prova.py` |
 | Dados sintéticos, sem PII | `slice/seed/` |
 | CI com Postgres, diagramas e varredura de confidencialidade | `.github/workflows/ci.yml` — **verde em 5 execuções** |
@@ -182,7 +182,7 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 
 **Autonomia com limite declarado:** 8 decisões estão listadas como dependentes do cliente, e nenhuma foi decidida por conta própria.
 
-**Onde ainda é fraco — e é justo perguntar:** são **45 documentos**. O enunciado pede um conjunto específico de artefatos, e este repositório entrega mais que o mínimo. A defesa é que cada documento tem destinatário e nenhum repete outro — mas *"menos documento, mais denso"* é uma crítica legítima, e o roteiro de leitura existe justamente porque o volume é real.
+**Onde ainda é fraco — e é justo perguntar:** são **46 documentos**. O enunciado pede um conjunto específico de artefatos, e este repositório entrega mais que o mínimo. A defesa é que cada documento tem destinatário e nenhum repete outro — mas *"menos documento, mais denso"* é uma crítica legítima, e o roteiro de leitura existe justamente porque o volume é real.
 
 ---
 

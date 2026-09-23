@@ -87,15 +87,19 @@ Uma proposta que dimensionasse esta fase com 4 devs e "apoio de infra" erraria p
 
 O custo de pessoa depende de taxa por senioridade, que é **decisão comercial, não técnica**. A tabela entrega o insumo pronto:
 
-| Perfil | d.p. | Taxa/dia | Subtotal |
+| Perfil | d.p. | Taxa/dia *(mercado)* | Subtotal |
 |---|---|---|---|
-| Arquiteto de Soluções | 9,5 | `a definir` | — |
-| Dev Sênior | 33 | `a definir` | — |
-| Dev Pleno | 16 | `a definir` | — |
-| SRE / DevOps | 20,5 | `a definir` | — |
-| **Total** | **79** | | **79 × taxa média ponderada** |
+| Arquiteto de Soluções Sr | 9,5 | R$ 2.455 | R$ 23.323 |
+| Dev Sênior | 33 | R$ 1.646 | R$ 54.318 |
+| Dev Pleno | 16 | R$ 964 | R$ 15.424 |
+| SRE / DevOps | 20,5 | R$ 1.342 | R$ 27.511 |
+| **Total** | **79** | média R$ 1.526 | **R$ 120.576** |
+| Contingência 15% | 12 | | R$ 18.316 |
+| **Com contingência** | **91** | | **R$ 138.892** |
 
-Preencher isto com faixa de mercado daria um número fechado e **enganoso** — taxa varia por praça, por contrato e por modelo de alocação. O que o arquiteto entrega é o esforço por perfil; o preço é do comercial.
+As taxas vêm de **referência pública de mercado**, derivadas em camadas explícitas — salário, encargos CLT, overhead e margem — em [`taxas-de-mercado.md`](taxas-de-mercado.md). **Não são a estrutura de custo da empresa**: o comercial substitui cada camada pelos números reais, e o esforço em dias-pessoa não muda.
+
+Duas camadas movem muito o total: o **regime tributário** (Simples Nacional reduz 22%) e o **fator comercial** de 1,5× (errar 0,2 move ~R$ 16 mil).
 
 ### 4.2 Infraestrutura — custo de *run*
 
@@ -172,6 +176,7 @@ Total com contingência: **91 dias-pessoa**.
 | Time | 5,5 pessoas | **4,5 pessoas** |
 | Prazo | 20 dias úteis | **16 dias úteis** (−20%) |
 | Licenças | — | US$ 90–320/mês |
+| **Custo de pessoas** | R$ 138.892 | **R$ 99.622** (−17,4%) |
 
 **O prazo cai menos que o esforço**, porque o caminho crítico — baseline, inventário de consumidores e adequação de terceiros — não acelera com IA.
 

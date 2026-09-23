@@ -1,7 +1,7 @@
 # Resumo executivo — Evolução da Plataforma de Pedidos e Catálogo
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** recomendação, investimento, riscos e decisões que dependem do cliente. Duas páginas, para quem decide — a profundidade está nos 45 documentos indexados no `README.md`.
+**Escopo deste documento:** recomendação, investimento, riscos e decisões que dependem do cliente. Duas páginas, para quem decide — a profundidade está nos 46 documentos indexados no `README.md`.
 **Fontes:** `docs/delivery/estimativa-fase1.md`, `docs/delivery/riscos-premissas.md`, ADRs 0001 a 0007
 **Data:** 2026-09-23
 
@@ -45,7 +45,7 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | **Time** | 5,5 pessoas — 1 arquiteto (30%), 2 dev sênior, 1 dev pleno, 1,5 SRE |
 | **Prazo** | 20 dias úteis · **cabe nos 30 corridos** |
 | **Contingência** | +15% (12 d.p.), como linha separada e negociável |
-| **Custo de pessoas** | 79 d.p. × taxa por senioridade — *insumo pronto; preço é decisão comercial* |
+| **Custo de pessoas** | **R$ 138.892** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — substituir pelas taxas reais da empresa |
 | **Custo de infraestrutura** | **US$ 835–1.489/mês** · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
 
 **A composição do time saiu do esforço, não o contrário.** E ela revelou algo contraintuitivo: **SRE consome 26%** — mais que o dobro do arquiteto. A causa é a exigência de *zero janela de indisponibilidade*: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de operação, não de desenvolvimento.
@@ -65,7 +65,7 @@ Não é desperdício — é o preço de uma restrição que o cliente impôs. Pr
 
 ## O que já está provado
 
-A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **127 testes**, e demonstra os dois critérios críticos do edital:
+A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **128 testes**, e demonstra os dois critérios críticos do edital:
 
 - **20 requisições concorrentes com a mesma chave criam exatamente um pedido.** As 19 respostas de replay só são alcançadas por violação da `PRIMARY KEY` — as threads competiram de verdade, e foi a constraint que segurou.
 - **O consumidor legado não quebra com a versão nova no ar.** Um consumidor de referência que emite nota fiscal na resposta do POST continua passando.
