@@ -199,6 +199,7 @@ Mapa da fatia: [`slice/README.md`](slice/README.md) — cada módulo, a decisão
 | [Taxas de mercado](docs/delivery/taxas-de-mercado.md) | salário → encargos CLT → overhead → tributos, em camadas substituíveis |
 | [Riscos e premissas](docs/delivery/riscos-premissas.md) | premissas, débitos aceitos, fora de escopo, decisões do cliente |
 | [Resumo executivo](docs/delivery/resumo-executivo.md) | **2 páginas** — recomendação, investimento, riscos |
+| [Apresentação](docs/delivery/apresentacao/slides.md) | 12 slides para leitura sem narração. Versão para apresentar: [`slides.html`](docs/delivery/apresentacao/slides.html) — baixe e abra no navegador; funciona sem internet |
 
 ### Governança e IA
 | | |

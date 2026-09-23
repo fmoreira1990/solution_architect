@@ -3,8 +3,9 @@
 
     python tools/gerar-slides.py
 
-O Markdown continua sendo a única fonte: o HTML é derivado, não versionado,
-e deve ser gerado de novo sempre que os slides mudarem. Mermaid e marked vêm
+O Markdown continua sendo a única fonte. O HTML é derivado, mas versionado
+para quem avalia poder baixar e abrir: gere de novo sempre que os slides
+mudarem — o conferir-entrega.py quebra se os dois divergirem. Mermaid e marked vêm
 de tools/node_modules (npm ci em tools/) e são embutidos no arquivo — a
 apresentação abre sem internet, que é o que se quer na hora de gravar.
 """

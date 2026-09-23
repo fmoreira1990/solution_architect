@@ -275,6 +275,28 @@ for p in docs_md():
 print(f"  {'ocorrências: ' + str(narrativa) if narrativa else 'nenhuma'}")
 
 
+# ───────────────────────────────── 10. slides.html em dia com slides.md
+secao("10. Apresentação em HTML")
+
+# O HTML embute os slides como JSON; basta comparar com o Markdown — não
+# precisa do Mermaid nem do marked, que no CI só existem no job de diagramas.
+import json
+md_slides = RAIZ / "docs/delivery/apresentacao/slides.md"
+html_slides = RAIZ / "docs/delivery/apresentacao/slides.html"
+if html_slides.exists():
+    blocos = re.split(r"^---[ \t]*$", ler(md_slides), flags=re.M)
+    esperado_slides = [b.strip() for b in blocos[1:] if b.strip()]
+    achado = re.search(r"const SLIDES = (\[.*?\]);\n", ler(html_slides), re.S)
+    embutido = json.loads(achado.group(1).replace("<\\/", "</")) if achado else None
+    if embutido != esperado_slides:
+        problemas.append("slides.html desatualizado — rode: python tools/gerar-slides.py")
+        print("  desatualizado")
+    else:
+        print(f"  em dia com slides.md ({len(esperado_slides)} slides)")
+else:
+    print("  slides.html ausente — nada a conferir")
+
+
 # ───────────────────────────────── resultado
 print("\n" + "=" * 62)
 if problemas:

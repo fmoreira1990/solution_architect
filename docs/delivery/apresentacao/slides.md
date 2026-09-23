@@ -47,7 +47,7 @@ Estouro de 2×, com tudo o mais funcionando.
 
 > Isso transforma *"desacoplar é boa prática"* em **restrição dura**.
 
-Detalhe: `docs/technical-context/constraints.md` §8
+Detalhe: `docs/technical-context/constraints.md` §8 — e §8.1, a mesma conta aplicada aos serviços da AWS
 
 ---
 
@@ -55,12 +55,12 @@ Detalhe: `docs/technical-context/constraints.md` §8
 
 ```mermaid
 flowchart LR
-    cliente(["Cliente"]) --> web["Web<br/><i>canal único</i>"]
-    web --> pedidos["<b>Pedidos</b>"]
-    pedidos ==>|"🔴 9 chamadas<br/>por pedido de 8 itens"| catalogo["Catálogo"]
-    pedidos -->|"🔴 grava só o SKU<br/>sem snapshot"| db[("Pedidos")]
-    pedidos -.->|"🔴 publica APÓS o commit"| broker{{"Broker"}}
-    parceiro(["Parceiro"]) -.->|"❌ sem caminho"| pedidos
+    cliente(["Cliente"]) --> web["Site<br/><i>único canal</i>"]
+    web --> pedidos["<b>Serviço de Pedidos</b>"]
+    pedidos ==>|"🔴 pergunta o preço item a item<br/>9 chamadas num pedido de 8 itens"| catalogo["Serviço de Catálogo"]
+    pedidos -->|"🔴 grava só o código do produto<br/>sem o preço pago"| db[("Banco de Pedidos")]
+    pedidos -.->|"🔴 avisa os outros sistemas<br/>depois de gravar — pode se perder"| broker{{"Fila de eventos"}}
+    parceiro(["Parceiro"]) -.->|"❌ não tem API"| pedidos
 
     style pedidos stroke-width:3px
     linkStyle 2 stroke:#c00,stroke-width:3px
@@ -68,7 +68,7 @@ flowchart LR
     linkStyle 4 stroke:#c00,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
-No alvo, o Catálogo receberia **~338 req/s** contra 37,5 de Pedidos. **Satura primeiro e derruba a criação junto.**
+**Criar um pedido depende do Catálogo responder, item a item.** Com 10× o volume, o Catálogo passa a receber **~338 requisições por segundo** para 37,5 pedidos por segundo — satura primeiro e derruba a criação de pedidos junto.
 
 Detalhe: `docs/technical-context/c4/containers-as-is.md`
 
@@ -78,50 +78,55 @@ Detalhe: `docs/technical-context/c4/containers-as-is.md`
 
 ```mermaid
 flowchart TB
-    cliente(["Cliente<br/>web · app"]) --> pedidos
+    cliente(["Cliente<br/>site · app"]) --> pedidos
     parceiro(["Parceiro"]) --> pedidos
-    legado(["Consumidor v1"]) -->|"fachada síncrona<br/>6 meses"| pedidos
+    legado(["Sistemas que usam<br/>a API atual"]) -->|"versão atual mantida<br/>por 6 meses"| pedidos
 
-    pedidos["<b>PEDIDOS</b><br/><i>aceite LOCAL</i><br/>snapshot · outbox · cotação"]
+    pedidos["<b>Serviço de Pedidos</b><br/><i>cria o pedido sem depender<br/>de outro sistema</i>"]
 
-    pedidos -->|"1. cotação<br/><i>em lote, antes</i>"| catalogo["Catálogo"]
-    pedidos -.->|"3. validação<br/><i>assíncrona, depois</i>"| catalogo
-    pedidos ==>|"2. aceite<br/><b>zero chamada de saída</b>"| db[("Pedidos<br/>1 transação")]
-    pedidos -->|"evento"| notif["Notificação<br/>webhook assinado"]
+    pedidos -->|"1. cotação — ANTES<br/>preços em lote"| catalogo["Serviço de Catálogo"]
+    pedidos -.->|"3. conferência — DEPOIS<br/>sem o cliente esperar"| catalogo
+    pedidos ==>|"2. pedido — só grava<br/>nenhuma chamada externa"| db[("Banco de Pedidos<br/>1 transação")]
+    pedidos -->|"evento"| notif["Notificação<br/>ao parceiro"]
     notif --> parceiro
 
     style pedidos stroke-width:4px
     linkStyle 5 stroke:#080,stroke-width:4px
 ```
 
-Tudo que exige resposta externa foi para **antes** ou para **depois**.
+**O que depende de outro sistema acontece antes de criar o pedido (a cotação, que traz os preços assinados) ou depois (a conferência) — nunca durante.** Os sistemas que já usam a API continuam funcionando por 6 meses, sem mudar nada.
 
 Detalhe: `docs/technical-context/c4/containers-to-be.md` · `architecture.md`
 
 ---
 
-## 5 · O aceite é local
+## 5 · Criar o pedido não depende de ninguém
 
 ```mermaid
 sequenceDiagram
-    participant B as Canal
-    participant P as Pedidos
-    participant DB as Banco
+    participant B as App ou parceiro
+    participant P as Serviço de Pedidos
+    participant DB as Banco de Pedidos
 
     rect rgb(232, 245, 233)
-    note over B,DB: p95 ≤ 500 ms · ZERO chamada de saída
-    B->>P: POST /v2/orders + Idempotency-Key + cotação
-    P->>P: valida assinatura — LOCAL
+    note over B,DB: p95 ≤ 500 ms · nenhuma chamada a outro sistema
+    B->>P: cria pedido + chave de idempotência + cotação assinada
+    P->>P: confere a assinatura da cotação (sem rede)
     P->>DB: BEGIN
-    P->>DB: idempotency_key · pedido · itens+snapshot · outbox
+    P->>DB: chave · pedido · itens com o preço · evento
     P->>DB: COMMIT
-    P-->>B: 201 RECEBIDO
+    P-->>B: 201 — pedido recebido
     end
 ```
 
-**Uma transação, quatro garantias.** Idempotência pela `PRIMARY KEY`, snapshot imutável, outbox no mesmo commit, nenhuma dependência externa.
+**Uma transação só, quatro garantias:**
 
-> **De seis componentes, apenas um derruba a criação de pedido** — o próprio banco, Multi-AZ.
+- **A mesma chave nunca cria dois pedidos** — o banco recusa a repetição (idempotência)
+- **O preço acordado fica gravado e não muda depois** (snapshot)
+- **O evento é gravado junto com o pedido**, então não se perde (outbox)
+- **Nenhum outro sistema é chamado**: com o Catálogo fora do ar, pedidos continuam sendo criados
+
+> **Só um componente pode impedir a criação de pedido: o próprio banco**, que roda em duas zonas de disponibilidade.
 
 Detalhe: `docs/technical-context/c4/seq-criacao-pedido.md` · ADRs 0001, 0002, 0003 e 0007
 
@@ -188,21 +193,23 @@ Detalhe: `docs/delivery/plano-30-60-90.md`
 
 ## 8 · A prova — 132 testes em PostgreSQL real
 
+**Como rodar:** com PostgreSQL local, um comando instala, cria o banco de teste, gera dados sintéticos e executa tudo. O mesmo roda a cada push, no CI.
+
 ```
 $ cd slice && python prova.py
 131 passed, 1 skipped
 ```
 
-| ⭐ | Teste | Prova |
+| | O teste | O que prova |
 |---|---|---|
-| ⭐ | 20 requisições concorrentes, mesma chave | **1 pedido** · 1× `201` + 19× `200` |
-| ⭐ | consumidor v1 com a v2 no ar | **não quebra** |
-| | relay derrubado entre publicar e marcar | evento duplica, **nunca se perde** |
-| | consulta com o Catálogo fora do ar | pedido é **autocontido** |
+| ⭐ | 20 requisições **simultâneas** com a mesma chave | cria **1 pedido**: uma resposta `201`, dezenove `200` |
+| ⭐ | um sistema que usa a **versão atual** da API, com a nova no ar | **continua funcionando** |
+| | o publicador de eventos **cai no meio do envio** | o evento pode sair duas vezes, mas **nunca se perde** |
+| | consulta de pedido com o **Catálogo fora do ar** | funciona — o pedido guarda o que precisa |
 
-⭐ = critérios críticos do enunciado · o teste pulado verifica exceção técnica vencida, e nenhuma está registrada
+⭐ = os dois critérios críticos do enunciado. O teste pulado verifica exceções técnicas vencidas, e nenhuma está registrada.
 
-> As 19 respostas de replay só existem por **violação da `PRIMARY KEY`**. As threads competiram de verdade — foi a constraint que segurou, não o código.
+> **Das 20 requisições, 19 foram barradas pelo próprio banco.** A garantia é da `PRIMARY KEY`, não de código que poderia falhar.
 
 Detalhe: `slice/README.md` — cada módulo, a decisão que implementa e o teste que a prova
 
@@ -220,7 +227,7 @@ Detalhe: `slice/README.md` — cada módulo, a decisão que implementa e o teste
 
 **Um diff de schema passa.** E todo consumidor que emite nota fiscal no `201` quebra em produção.
 
-**Solução:** fachada síncrona na v1 durante os 6 meses de compatibilidade. Débito **com data de vencimento**.
+**Solução:** durante os 6 meses de compatibilidade, a v1 só responde depois da confirmação, como hoje — uma fachada sobre o fluxo novo. Débito **com data de vencimento**.
 
 > Compatibilidade é **estrutural e semântica**. Validar só schema entrega falsa segurança — pior que nenhuma, porque o pipeline verde autoriza o merge.
 
