@@ -76,11 +76,11 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | 4 | *"Parceiros solicitam API pública versionada e notificações assíncronas de mudança de status"* | `CTX-08`; `contracts/openapi/` + `contracts/asyncapi/`; gateway de notificação | 🟡 |
 | 5 | *"Dados pessoais devem atender LGPD e requisitos de residência de dados do novo país"* | `CTX-09a–d`; `lgpd-residencia-dados.md`; `ADR-0006` | ✅ |
 | 6 | *"Os contratos atuais devem permanecer compatíveis por pelo menos seis meses"* | `CTX-10`; `politica-contratos.md` §4 | ✅ |
-| 7 | *"A primeira melhoria segura deve entrar em produção em 30 dias, sem janela de indisponibilidade"* | `CTX-11`; onda 30; feature flag na decomposição (`A12`) | 🟡 |
+| 7 | *"A primeira melhoria segura deve entrar em produção em 30 dias, sem janela de indisponibilidade"* | `CTX-11`; onda 30; **feature flag implementada e testada** — rollout por percentual, rollback sem deploy | ✅ |
 
 > **Bullet 4 é parcial:** os contratos existem e são versionados, mas o **gateway de notificação a parceiros não tem implementação nem teste** — é entrega da onda 60.
 >
-> **Bullet 7 é parcial:** o plano e a decomposição cobrem "sem janela", mas a **feature flag não existe no código**. É a lacuna que o `checklist-avaliacao.md` aponta como a próxima.
+> ~~Bullet 7 parcial: feature flag não existe no código.~~ **Fechado em 2026-09-24.** A flag roteia por percentual, o rollback é por desligamento sem deploy, e o **caminho legado foi implementado** para que a convivência seja demonstrável — sem ele não haveria o que comparar nem para onde reverter.
 
 ---
 
@@ -206,7 +206,7 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 | §1 Contextualização | 5 | 1 | 1 |
 | §2.1 Objetivo geral | 4 | — | — |
 | §2.2 Cenário | 5 | — | — |
-| §2.2.1 Restrições | 8 | 2 | — |
+| §2.2.1 Restrições | 9 | 1 | — |
 | §2.3.1 Visões | 4 | — | — |
 | §2.3.2 Domínios | 4 | 1 | — |
 | §2.4.1 Migração | 5 | — | — |
@@ -215,7 +215,7 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 | §2.5.2 Governança | 2 | — | — |
 | §2.5.3 Estimativa | 4 | 1 | — |
 | §4 Entrega | 7 | — | — |
-| **Total** | **56** | **3** | **1** |
+| **Total** | **57** | **2** | **1** |
 
 ---
 
@@ -226,8 +226,8 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 | ~~1~~ | ~~Serviços AWS não nomeados~~ | §2.5.3, §1 | ✅ **feito** |
 | ~~2~~ | ~~Estratégia de API pública não consolidada~~ | §2.3.2 | ✅ **feito** |
 | ~~3~~ | ~~CI nunca executou~~ | §2.4.2, §2.5.2 | ✅ **verde em 5 execuções** |
-| **4** | **Feature flag sem implementação** — sustenta "sem janela de indisponibilidade" | §2.2.1 b7 | ~1 h |
+| ~~4~~ | ~~Feature flag sem implementação~~ | §2.2.1 b7 | ✅ **feito** — 10 testes |
 | **5** | **Gateway de notificação a parceiros sem código** | §2.2.1 b4 | onda 60 — fora da fatia |
 | **6** | **SAI App 3.0 não endereçado** | §1 | sem informação disponível |
 
-Os itens 1 a 4 são endereçáveis hoje. O 5 é escopo declarado de onda futura. O 6 não tem como ser resolvido sem informação que o enunciado não fornece.
+**Os quatro itens endereçáveis foram fechados.** O 5 é escopo declarado de onda futura — implementá-lo agora seria construir a onda 60 numa prova que o enunciado pediu para cobrir **uma** decisão crítica. O 6 não tem como ser resolvido sem informação que o enunciado não fornece.

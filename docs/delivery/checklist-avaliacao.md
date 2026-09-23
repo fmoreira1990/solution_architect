@@ -81,7 +81,11 @@ E o glossário faz algo que raramente aparece: uma seção de **termos proibidos
 
 E a honestidade de dizer que **a fricção piora antes de melhorar**: reconciliar entre dois caminhos é trabalho novo, criado pela migração.
 
-**Onde ainda é fraco:** o rollback é critério de gate, não algo demonstrável na fatia. A feature flag não existe no código — está na decomposição (`A12`, 5,5 d.p.), mas não é provada.
+**A feature flag foi implementada e testada.** 10 testes cobrem rollout por percentual, roteamento determinístico pela chave, rollback sem deploy e preservação do outbox já gravado.
+
+O teste mais valioso é o **contraste**: `test_legado_duplica_pedido_em_retry_concorrente` roda o mesmo cenário do critério crítico — 20 requisições com a mesma chave — pelo caminho legado, e **cria 20 pedidos**. Sem ele, o teste do caminho novo prova que funciona; com ele, prova o que muda.
+
+**Onde ainda é fraco:** o rollout progressivo em produção (degraus de 1% → 100% com comparação a cada passo) não é simulável na fatia — depende de tráfego real.
 
 ---
 
@@ -189,7 +193,7 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 | AV-01 Arquitetura | derivação do `CTX-17` amarra tudo | 4 de 10 atributos sem verificação executável |
 | AV-02 Domínio | recorte ao que o enunciado nomeia | fronteira da cotação é lógica, não física |
 | AV-03 Decisões | 7 ADRs; rejeição por prazo declarada | `ADR-0006` depende de enquadramento não jurídico |
-| AV-04 Evolução | ordem por natureza do dano | feature flag não existe no código |
+| AV-04 Evolução | ordem por natureza do dano + **flag testada, com contraste legado** | rollout em produção não é simulável |
 | AV-05 Segurança | **3 defeitos próprios achados e corrigidos** | 19 de 26 ameaças sem verificação |
 | AV-06 Prova | 2 critérios críticos + mutação + ciclo do zero + **CI verde** | broker stub, não real — escopo declarado |
 | AV-07 IA | rejeições são o corpo do log | capacidade de IA sem teste |
@@ -197,4 +201,6 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 
 **A lacuna que era mais urgente — `AV-06` — está fechada.** O caminho de erro foi testado, estava quebrado, e foi corrigido.
 
-**A próxima é a feature flag do `AV-04`:** ela sustenta o critério mais duro do gate G30 (zero janela de indisponibilidade), está decomposta em 5,5 dias-pessoa, e é a única decisão da onda 30 sem nenhuma verificação executável. Não cabia na fatia — mas é justo apontá-la.
+**A feature flag do `AV-04` também foi fechada**, com 10 testes e o caminho legado implementado para dar o contraste.
+
+O que resta é **escopo declarado de onda futura** — gateway de notificação e segurança de borda, ambos da onda 60. Implementá-los agora seria construir a onda 60 numa prova que o enunciado pediu para cobrir **uma** decisão crítica.

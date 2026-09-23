@@ -189,7 +189,8 @@ A fatia **não segue** estes padrões, deliberadamente.
 | Ports & Adapters | Python procedural, SQL direto | o avaliador precisa **ver a transação** sem atravessar três camadas de abstração |
 | Sem ORM | `psycopg` cru | a garantia é a `PRIMARY KEY`; um ORM a esconderia |
 | Broker real | stub em memória | a decisão provada é transacional, não de transporte |
-| Injeção de dependência | import direto | quatro módulos não pagam o custo |
+| Injeção de dependência | import direto | poucos módulos não pagam o custo |
+| Estado global | `flag._percentual` em memória | em produção, a flag vem de serviço de configuração com propagação; na prova, o que importa é o **roteamento determinístico** |
 
 **Isto é decisão de escopo de prova, não descuido** — está registrado na `ADR-0005`.
 

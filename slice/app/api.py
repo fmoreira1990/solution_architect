@@ -11,7 +11,7 @@ import uuid
 
 from fastapi import FastAPI, Header, HTTPException, Response
 
-from . import catalogo, oferta, pedidos, relay
+from . import catalogo, flag, legado, oferta, pedidos, relay
 from .broker import BrokerStub
 from .validador import Validador
 
@@ -59,7 +59,16 @@ def criar_app(broker=None, validador=None) -> FastAPI:
         idempotency_key: str = Header(..., alias="Idempotency-Key"),
         chamador: str = Header("web", alias="X-Chamador"),
     ):
-        """Idempotency-Key é OBRIGATÓRIA em v2 (ADR-0001)."""
+        """Idempotency-Key é OBRIGATÓRIA em v2 (ADR-0001).
+
+        Durante a convivência (`CTX-11`), a feature flag roteia entre o
+        caminho legado e o novo. O roteamento é determinístico pela chave:
+        um retry nunca troca de caminho.
+        """
+        if not flag.usa_caminho_novo(idempotency_key):
+            # Caminho legado: sem idempotência, publica após o commit.
+            return legado.aceitar(corpo, app.state.broker)
+
         pedido, replay = _aceitar(chamador, idempotency_key, corpo)
         if replay:
             response.status_code = 200
@@ -127,6 +136,10 @@ def criar_app(broker=None, validador=None) -> FastAPI:
 
     @app.get("/saude")
     def saude():
-        return {"ok": True, "pendentes_no_outbox": relay.pendentes()}
+        return {
+            "ok": True,
+            "pendentes_no_outbox": relay.pendentes(),
+            "rollout_percentual": flag.percentual(),
+        }
 
     return app

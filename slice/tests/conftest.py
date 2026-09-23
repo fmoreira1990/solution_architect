@@ -10,7 +10,7 @@ import uvicorn
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app import api, catalogo, db  # noqa: E402
+from app import api, catalogo, db, flag  # noqa: E402
 from app.broker import BrokerStub  # noqa: E402
 from app.validador import Validador  # noqa: E402
 
@@ -30,8 +30,12 @@ def schema():
 def base_limpa(schema):
     db.limpar()
     catalogo.carregar()
+    # Estado-alvo da onda 30: rollout concluído. Os testes de convivência
+    # ajustam a flag explicitamente.
+    flag.definir(100)
     yield
     db.limpar()
+    flag.definir(100)
 
 
 @pytest.fixture
