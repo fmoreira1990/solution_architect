@@ -101,6 +101,6 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 
 ## O que este documento admite
 
-A proposta tem **três premissas inventadas** (PR-06, PR-07, PR-08), **nove débitos aceitos** e **sete decisões que dependem do cliente**. Isso não é fragilidade da análise — é o estado real de qualquer proposta feita sobre um enunciado, e declará-lo é o que permite ao cliente decidir com informação.
+A proposta tem **três premissas inventadas** (PR-06, PR-07, PR-08), **nove débitos aceitos** e **oito decisões que dependem do cliente**. Isso não é fragilidade da análise — é o estado real de qualquer proposta feita sobre um enunciado, e declará-lo é o que permite ao cliente decidir com informação.
 
 O maior risco isolado é **PR-07**: se Estoque e Pagamento não existirem, o prazo de 30 dias não fecha, e isso precisa ser verificado antes de qualquer compromisso comercial.
