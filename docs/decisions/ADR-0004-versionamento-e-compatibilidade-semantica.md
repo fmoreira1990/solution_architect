@@ -132,6 +132,6 @@ Qualquer "sim" exige nova versão e ADR.
 
 ## Pendências registradas
 
-- **Os consumidores atuais são mistos: internos e externos** (decidido em 2026-09-23). Isso obriga a política a operar em **dois regimes simultâneos**: para os internos a deprecação é negociada entre times e os 6 meses de `CTX-10` são teto confortável; para os externos é matéria contratual, e os 6 meses são **piso**. A comunicação de sunset precisa distinguir os dois públicos.
+- **Os consumidores atuais são mistos: internos e externos** (`V2`). Isso obriga a política a operar em **dois regimes simultâneos**: para os internos a deprecação é negociada entre times e os 6 meses de `CTX-10` são teto confortável; para os externos é matéria contratual, e os 6 meses são **piso**. A comunicação de sunset precisa distinguir os dois públicos.
 - **Timeout da fachada v1: 10 s.** Precisa ser menor que o timeout dos clientes que a consomem — 10 s é conservador frente ao padrão de 30 s da maioria dos clientes HTTP, e dá margem para a validação assíncrona concluir no caso comum. Estourado o prazo, a fachada devolve `504` e o pedido segue em validação: **o pedido existe**, apenas a resposta síncrona não chegou a tempo.
 - Não há inventário de quem consome o contrato hoje. Sem ele, "expand-and-contract" não tem como saber quando pode contrair — e o gatilho de revisão principal desta ADR fica sem sinal.

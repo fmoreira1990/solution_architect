@@ -165,7 +165,6 @@ fi
 
 ## Pendências registradas
 
-- ~~Limite de defasagem tolerável do fallback~~ — pendência extinta junto com a seção (b). O que resta no lugar é a **validade da cotação**, implementada em 30 minutos (`oferta.emitir`).
+- A validade da cotação é de 30 minutos (`oferta.emitir`) e precisa de confirmação do negócio.
 - A fronteira "congela / não congela" não foi validada com a operação nem com o financeiro. É a premissa mais frágil desta ADR.
-- O valor de ~40 ms por chamada ao Catálogo, usado no cálculo do orçamento de latência, é estimativa de ordem de grandeza. A medição entra em `/metricas`.
-- ADR-0001 (idempotência) e ADR-0002 (outbox) ainda não foram escritas e compõem a mesma onda 30. A sequência de gravação na transação — pedido, itens, snapshot e outbox — é fronteira comum entre esta ADR e a 0002.
+- O valor de ~40 ms por chamada ao Catálogo, usado no cálculo do orçamento de latência, é estimativa de ordem de grandeza, a medir no baseline `P1`.

@@ -134,11 +134,11 @@ Por isso a onda 30 **não** ataca o N+1, que é a dor mais visível.
 
 ---
 
-## 7 · A prova — 128 testes em PostgreSQL real
+## 7 · A prova — 132 testes em PostgreSQL real
 
 ```
 $ cd slice && python prova.py
-127 passed, 1 skipped
+131 passed, 1 skipped
 ```
 
 | ⭐ | Teste | Prova |
@@ -181,7 +181,7 @@ $ cd slice && python prova.py
 | **Prazo** | 20 dias úteis · cabe nos 30 corridos |
 | **Preço de pessoas** | **R$ 141.880** faturados, com contingência |
 | **Infraestrutura** | US$ 1.812–3.034/mês, Pedidos e Catálogo · **< meio centavo por pedido** |
-| **Total da fase 1** | **≈ R$ 152–160 mil** · com licenças de IA |
+| **Total da fase 1** | **≈ R$ 155–162 mil** · com licenças de IA e IDE |
 
 O preço é **faturado**: sobre o custo carregado de CLT incidem ainda **19,53%** de tributos do Lucro Presumido. Do preço, 53,6% é custo de pessoal, 19,5% tributo e 26,8% overhead e margem.
 

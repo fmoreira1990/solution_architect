@@ -30,7 +30,7 @@
 | ID | Restrição | Número verificável | Origem | Consequência arquitetural |
 |---|---|---|---|---|
 | CTX-13 | Tamanho e senioridade do time | **`???`** | não informado | **Derivado, não declarado:** o esforço por tarefa em `/estimativa` determina o perfil, e não o contrário |
-| CTX-14 | Conhecimento do time na stack-alvo | **`???`** | não informado | Afeta a rampa na estimativa. Não bloqueou o gate G2, que decidiu a stack da **prova** por disponibilidade de ambiente (`ADR-0005`) |
+| CTX-14 | Conhecimento do time na stack-alvo — **.NET 10** (`ADR-0008`) | **`???`** | não informado | Afeta a rampa na estimativa (`E5`). A stack foi escolhida por mérito técnico; o conhecimento do time continua não declarado |
 
 O desafio não informa nenhuma das duas. São a premissa mais consequente ainda em aberto: `D-05` exige composição de time e esforço por senioridade, e nenhum dos dois é derivável de §2.2.1. Serão declarados como premissa em `/estimativa`, com o efeito de cada uma explicitado caso seja falsa.
 
@@ -52,7 +52,7 @@ Sem teto de custo declarado, a decisão arquitetural fica sem uma das cinco dime
 | CTX-09c | Transferência internacional BR → EUA | LGPD art. 33: exige instrumento jurídico (cláusulas-padrão da ANPD ou equivalente) | derivado de `PR-03` | Minimizar dado brasileiro que atravessa |
 | CTX-09d | Direito de opt-out de venda/compartilhamento | Preferência do titular precisa **propagar** a todos os consumidores de dado | CCPA/CPRA | Serviço de preferências; sinal honrado em toda a cadeia |
 | CTX-06 | Auditabilidade de preço | provar **qual preço o cliente viu** no momento da compra | §2.2.1 | Snapshot imutável no item do pedido |
-| PR-03 | Qual é o segundo país | **Estados Unidos** | ✅ decidido em 2026-09-23 | Destrava a `ADR-0006`; muda o regime de residência para mosaico estadual |
+| PR-03 | Qual é o segundo país | **Estados Unidos** | ✅ decidido | Destrava a `ADR-0006`; muda o regime de residência para mosaico estadual |
 
 ## 6. Prazo e compatibilidade
 
@@ -144,6 +144,4 @@ A opção 2 resolve `CTX-03`, `CTX-04`, `CTX-05` e `CTX-06` de uma vez. Este é 
 
 ## Pendências registradas
 
-- Os `CTX-*` migraram de `docs/requisitos/matriz-entregaveis.md` para cá; a matriz continua valendo como checklist de entregáveis, e esta é agora a fonte das restrições.
-- `CTX-09a` precisa de classificação de PII item a item — feito em `/threat-model`, junto com `docs/security-context/lgpd-residencia-dados.md`.
-- O valor de 40 ms por chamada ao Catálogo (usado em §7.2) é estimativa de ordem de grandeza, não medição. Marcado como a medir em `/metricas`.
+- O valor de 40 ms por chamada ao Catálogo (usado em §7.2) é estimativa de ordem de grandeza, não medição — a medir no baseline `P1`.

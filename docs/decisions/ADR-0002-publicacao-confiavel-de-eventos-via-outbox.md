@@ -163,6 +163,6 @@ fi
 ## Pendências registradas
 
 - O intervalo de polling (200 ms a 1 s) é proposta; precisa ser calibrado contra o alvo de p95 de confirmação da `ADR-0007`.
-- A janela de retenção (90 dias) e o limiar de alerta (5 min) foram definidos em 2026-09-23 e precisam de validação com a operação. O alerta é **10× o p95 de confirmação** — folga suficiente para não gerar ruído, apertado o bastante para detectar relay parado antes do cliente.
+- A janela de retenção (90 dias) e o limiar de alerta (5 min) precisam de validação com a operação. O alerta é **10× o p95 de confirmação** — folga suficiente para não gerar ruído, apertado o bastante para detectar relay parado antes do cliente.
 - A janela de deduplicação exigida do consumidor não está definida e precisa entrar no AsyncAPI — sem ela, a obrigação é vaga demais para ser cobrada.
 - Não há inventário de consumidores atuais dos eventos (mesma pendência de `ADR-0004`). Sem ele, não se sabe quantos já deduplicam.

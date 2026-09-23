@@ -155,5 +155,5 @@ fi
 
 - O TTL de 24h é premissa. Confrontar com a política real de retry dos parceiros antes da onda 60.
 - A normalização canônica do payload não está especificada. Precisa entrar na OpenAPI (`P2-06`), não apenas no código.
-- O limite de `409` por divergência (0,5%) foi definido em 2026-09-23 por raciocínio, não por medição: conflito legítimo de chave é evento raro, e um patamar acima disso aponta para defeito nosso.
+- O limite de `409` por divergência (0,5%) vem de raciocínio, não de medição: conflito legítimo de chave é evento raro, e um patamar acima disso aponta para defeito nosso.
 - **Fronteira com `ADR-0002`:** a chave de idempotência e o registro do outbox são gravados na **mesma transação** do pedido. A ordem das operações dentro dela e o tratamento da violação de unicidade são contrato comum entre as duas ADRs e estão detalhados na `ADR-0002`.

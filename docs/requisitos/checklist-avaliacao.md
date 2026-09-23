@@ -49,7 +49,7 @@ E o glossário faz algo que raramente aparece: uma seção de **termos proibidos
 
 | Evidência | Onde |
 |---|---|
-| **7 ADRs** (mínimo exigido: 4) | [`decisions/`](../decisions/) |
+| **8 ADRs** (mínimo exigido: 4) | [`decisions/`](../decisions/) |
 | Cada uma com ≥ 2 alternativas rejeitadas, **com motivo** | verificado por `test_adr_rejeita_ao_menos_duas_alternativas` |
 | Trade-offs, gatilho de revisão e **enforcement** em todas | `test_adr_tem_as_secoes_obrigatorias` |
 | Distinção entre *rejeitada* e *rejeitada — indisponível* | `ADR-0005`, `ADR-0004` |
@@ -119,7 +119,7 @@ O teste mais valioso é o **contraste**: `test_legado_duplica_pedido_em_retry_co
 | Evidência | Onde |
 |---|---|
 | OpenAPI v1 e v2, AsyncAPI, versionados | [`contracts/`](../../contracts/) |
-| **128 testes** em PostgreSQL real | [`slice/`](../../slice/) |
+| **132 testes** em PostgreSQL real | [`slice/`](../../slice/) |
 | Um comando documentado | `python prova.py` |
 | Dados sintéticos, sem PII | `slice/seed/` |
 | CI com Postgres, diagramas e varredura de confidencialidade | `.github/workflows/ci.yml` — **verde em 5 execuções** |
@@ -137,7 +137,7 @@ O teste mais valioso é o **contraste**: `test_legado_duplica_pedido_em_retry_co
 
 **O caminho de erro foi testado — e estava quebrado.** Dois dos três cenários mais prováveis (banco inexistente, usuário inexistente) terminavam em `UnicodeEncodeError` antes de imprimir qualquer ajuda: o PostgreSQL responde em português com acento e o console do Windows usa cp1252. O avaliador veria um traceback e concluiria que a prova não funciona.
 
-Corrigido com saída UTF-8 tolerante e **diagnóstico por tipo de falha** — banco ausente, usuário ausente ou serviço parado geram instruções diferentes, com o comando exato. Ciclo completo validado: banco e usuário destruídos, prova executada, instruções seguidas ao pé da letra, **127 testes verdes do zero**.
+Corrigido com saída UTF-8 tolerante e **diagnóstico por tipo de falha** — banco ausente, usuário ausente ou serviço parado geram instruções diferentes, com o comando exato. Ciclo completo validado: banco e usuário destruídos, prova executada, instruções seguidas ao pé da letra, **a suíte inteira verde, do zero**.
 
 **O CI está verde em 5 execuções**, com os três jobs. A prova roda em Linux sem ajuste — o que também demonstra que ela não depende do ambiente onde foi escrita.
 
@@ -182,7 +182,7 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 
 **Autonomia com limite declarado:** 8 decisões estão listadas como dependentes do cliente, e nenhuma foi decidida por conta própria.
 
-**Onde ainda é fraco — e é justo perguntar:** são **46 documentos**. O enunciado pede um conjunto específico de artefatos, e este repositório entrega mais que o mínimo. A defesa é que cada documento tem destinatário e nenhum repete outro — mas *"menos documento, mais denso"* é uma crítica legítima, e o roteiro de leitura existe justamente porque o volume é real.
+**Onde ainda é fraco — e é justo perguntar:** são **47 documentos**. O enunciado pede um conjunto específico de artefatos, e este repositório entrega mais que o mínimo. A defesa é que cada documento tem destinatário e nenhum repete outro — mas *"menos documento, mais denso"* é uma crítica legítima, e o roteiro de leitura existe justamente porque o volume é real.
 
 ---
 
@@ -192,12 +192,12 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 |---|---|---|
 | AV-01 Arquitetura | derivação do `CTX-17` amarra tudo | 4 de 10 atributos sem verificação executável |
 | AV-02 Domínio | recorte ao que o enunciado nomeia | fronteira da cotação é lógica, não física |
-| AV-03 Decisões | 7 ADRs; rejeição por prazo declarada | `ADR-0006` depende de enquadramento não jurídico |
+| AV-03 Decisões | 8 ADRs; rejeição por prazo declarada | `ADR-0006` depende de enquadramento não jurídico |
 | AV-04 Evolução | ordem por natureza do dano + **flag testada, com contraste legado** | rollout em produção não é simulável |
 | AV-05 Segurança | **3 defeitos próprios achados e corrigidos** | 19 de 26 ameaças sem verificação |
 | AV-06 Prova | 2 critérios críticos + mutação + ciclo do zero + **CI verde** | broker stub, não real — escopo declarado |
 | AV-07 IA | método documentado, com 10 rejeições e o motivo de cada | capacidade de IA sem teste |
-| AV-08 Sênior | ausências com gatilho numérico | 46 documentos é muito |
+| AV-08 Sênior | ausências com gatilho numérico | 47 documentos é muito |
 
 **`AV-06` e `AV-04` não têm lacuna aberta.** O caminho de erro do `prova.py` é testado em máquina limpa, e a feature flag tem testes próprios e o caminho legado implementado para dar o contraste.
 

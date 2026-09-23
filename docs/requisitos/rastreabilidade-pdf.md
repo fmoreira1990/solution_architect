@@ -20,7 +20,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | *"microsserviços, event-driven, DDD, integração e APIs"* | `mapa-dominios.md` (bounded contexts, context map), `ADR-0002` e `ADR-0007` (event-driven), `contracts/` | ✅ |
 | *"Cloud (AWS/Azure/GCP)"* | `PR-04` fixa AWS; serviços nomeados com tier e alternativa em `servicos-aws.md` | ✅ |
-| *"governança de arquitetura, reference architectures e ADRs"* | 7 ADRs, `politica-contratos.md`, `excecao-tecnica.md`, `fitness-functions.md` | ✅ |
+| *"governança de arquitetura, reference architectures e ADRs"* | 8 ADRs, `politica-contratos.md`, `excecao-tecnica.md`, `fitness-functions.md` | ✅ |
 | *"modernização de legados"* | `plano-30-60-90.md` — Strangler Fig, convivência, descomissionamento | ✅ |
 | *"precificação e construção de propostas"* | `decomposicao-onda-30.md` + `estimativa-fase1.md` | ✅ |
 | *"IA aplicada à arquitetura"* | `arquitetura-ia.md` + `uso-de-ia.md` + `prompts/` | ✅ |
@@ -103,7 +103,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | *"Decidir onde usar integração síncrona ou assíncrona e justificar consistência, latência e acoplamento"* | `mapa-dominios.md` §4 — tabela por integração com o critério declarado | ✅ |
 | *"Tratar snapshot de preço, idempotência, publicação confiável, deduplicação e reconciliação"* | 5 de 5: `ADR-0003`, `ADR-0001`, `ADR-0002`, dedup no AsyncAPI, reconciliação em `architecture.md` | ✅ |
 | *"Definir estratégia para APIs públicas, autenticação, autorização, quotas e versionamento"* | `estrategia-api-publica.md` — os 4 itens consolidados, com estado de implementação por item | ✅ |
-| *"Registrar no mínimo quatro ADRs com contexto, alternativas, decisão e consequências"* | **7 ADRs**, formato verificado por fitness function | ✅ |
+| *"Registrar no mínimo quatro ADRs com contexto, alternativas, decisão e consequências"* | **8 ADRs**, formato verificado por fitness function | ✅ |
 
 > `estrategia-api-publica.md` consolida autenticação, autorização, quotas e versionamento num só lugar, e declara item a item o que está implementado e o que é desenho da onda 60. Quatro de nove itens têm verificação executável.
 
@@ -127,7 +127,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | *"Versionar uma especificação OpenAPI para criação/consulta de pedidos e uma AsyncAPI ou schema para mudança de status"* | `orders-v1.yaml`, `orders-v2.yaml`, `order-status.yaml` | ✅ |
 | *"Implementar uma prova mínima de uma decisão crítica: idempotência, outbox, contract test ou compatibilidade de versão"* | **as quatro**, não uma | ✅ |
-| *"Incluir testes positivos e negativos reproduzíveis e execução automatizada no pipeline"* | 127 testes, positivos e negativos; **CI verde em 5 execuções** | ✅ |
+| *"Incluir testes positivos e negativos reproduzíveis e execução automatizada no pipeline"* | 132 testes, positivos e negativos; **CI verde em 5 execuções** | ✅ |
 | *"Disponibilizar dados sintéticos e um único comando documentado"* | `slice/seed/` + `python prova.py`; caminho de erro testado em máquina limpa | ✅ |
 
 ### Critério crítico
@@ -171,7 +171,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | **esforço** | 63 d.p. com IA, derivados de 79 d.p. em 47 tarefas | ✅ |
 | **composição de time** | 5 pessoas, 1 SRE, **derivada** do esforço | ✅ |
-| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.812–3.034/mês** para Pedidos **e** Catálogo, na mesma infraestrutura · licenças de IA: US$ 100–350/mês | ✅ |
+| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.812–3.034/mês** para Pedidos **e** Catálogo, na mesma infraestrutura · licenças de IA e IDE .NET: US$ 705/mês | ✅ |
 | **premissas** | 8 premissas com efeito declarado se falsas | ✅ |
 | **riscos** | 6 riscos com impacto e resposta, mais faixa de confiança | ✅ |
 
@@ -192,7 +192,7 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](chec
 | *"Repositório no GitHub com README, premissas, instruções de execução e índice dos artefatos"* | `README.md` — os 4 itens, mais roteiro de leitura por tempo disponível | ✅ |
 | *"Diagramas C4 e de sequência em formato versionável, como Mermaid, PlantUML ou Structurizr DSL"* | 17 diagramas validados pelo parser oficial no CI | ✅ |
 | *"Mapa de domínios, no mínimo quatro ADRs, threat model e plano incremental de 30/60/90 dias"* | os 4, com 7 ADRs | ✅ |
-| *"Especificações OpenAPI e AsyncAPI/schema, acompanhadas da fatia executável e seus testes"* | os 3 contratos + `slice/` com 128 testes | ✅ |
+| *"Especificações OpenAPI e AsyncAPI/schema, acompanhadas da fatia executável e seus testes"* | os 3 contratos + `slice/` com 132 testes | ✅ |
 | *"Documento explicativo da ferramenta de IA utilizada, motivo da escolha, prompts relevantes, validações e cuidados com dados"* | `uso-de-ia.md` — os 5 itens em seções próprias | ✅ |
 | *"Resumo executivo de até duas páginas com recomendação, investimento, riscos e decisões que precisam de validação"* | `resumo-executivo.md` — os 4 itens | ✅ |
 | *(desejável)* *"breve apresentação em vídeo ou slides"* | `apresentacao/slides.md` — 10 slides | ✅ |

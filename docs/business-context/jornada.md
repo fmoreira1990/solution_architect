@@ -133,5 +133,4 @@ Pré-requisito do gate G30, não tarefa paralela:
 ## Pendências registradas
 
 - Os cinco itens de "o que medir" precisam virar backlog real antes da onda 30.
-- `/metricas` vai instrumentar estas fricções como SLIs; a camada de valor depende dos baselines desta tabela.
 - O passo 2 do ANTES ("reconcilia manualmente") está sem detalhe de processo — confirmar com a operação antes de estimar o ganho da onda 30.

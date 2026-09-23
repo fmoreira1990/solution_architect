@@ -137,6 +137,4 @@ Agrava o problema o fato de `X-Chamador` ser um **header controlado pelo cliente
 
 ## Pendências registradas
 
-- Classificação de PII item a item e política de retenção: `lgpd-residencia-dados.md`.
-- A regra de F2.7 — conteúdo de parceiro é dado, nunca instrução — precisa ser reafirmada em `arquitetura-ia.md`.
-- A correção do achado F1.5 está aplicada na fatia e registrada na `ADR-0001`.
+- 19 das 26 ameaças dependem das ondas 60 e 90 para ter verificação executável.

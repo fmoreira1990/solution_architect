@@ -39,7 +39,7 @@ O critério 1 domina, porque `P2-10` exige *"um único comando documentado"* e a
 
 ### O que a decisão **não** é
 
-Isto **não** recomenda Python para a plataforma de Pedidos. A stack de produção depende de `CTX-13` e `CTX-14` — tamanho e senioridade do time —, que só serão conhecidos depois da estimativa por tarefa. Decidir a stack de produção antes disso repetiria o erro que o gate G2 existe para evitar.
+Isto **não** recomenda Python para a plataforma de Pedidos. A stack de produção é **.NET 10**, decidida por outros critérios na `ADR-0008`. A fatia não evolui para produção: ela **especifica** o comportamento que o código .NET reproduz.
 
 ---
 
@@ -80,7 +80,7 @@ Onde houve escolha real, ela foi feita por mérito: **Postgres em vez de SQLite*
 
 ## Gatilho de revisão
 
-**Se a plataforma de produção for definida.** Aí a pergunta muda: `CTX-13`/`CTX-14` entram, e o critério 3 (aderência ao time) passa a dominar o critério 1 (velocidade até rodar). Esta ADR **não** deve ser citada como precedente para essa decisão.
+**Se a fatia precisar virar código de produção.** Não deve: a produção é .NET (`ADR-0008`), e esta ADR **não** serve de precedente para ela.
 
 **Se a latência de publicação virar requisito da prova.** O stub não mede nada de transporte; medir exigiria broker real.
 
@@ -98,5 +98,4 @@ Onde houve escolha real, ela foi feita por mérito: **Postgres em vez de SQLite*
 
 ## Pendências registradas
 
-- A stack de produção continua indefinida e **depende de `CTX-13`/`CTX-14`**.
 - Node.js foi instalado depois do gate, para validar diagramas Mermaid. Vale registrar que isso **não** reabre a decisão: trocar a stack da prova depois dos testes verdes seria refazer trabalho sem ganho.

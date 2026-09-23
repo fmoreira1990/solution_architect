@@ -98,6 +98,4 @@ Registrado para não ser preenchido por invenção (regra Q7 de `docs/CONVENCOES
 
 ## Pendências registradas
 
-- Confirmar as três personas com o Client Face antes de `/jornada` sustentar números.
-- O item "se os consumidores atuais são internos ou externos" precisa ser respondido antes de `/contratos` — define se a política de deprecação é negociável ou contratual.
-- A persona primária foi presumida no PRD como "operação de pedidos"; esta derivação a corrige para **liderança técnica da plataforma**. Atualizar a referência no PRD.
+- Confirmar as três personas com o Client Face.

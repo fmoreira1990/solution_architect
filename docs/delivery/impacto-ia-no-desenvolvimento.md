@@ -12,7 +12,7 @@
 
 Quase toda proposta que promete ganho com IA estima por analogia ou por material de fornecedor. Aqui há algo melhor: **a fatia executável foi construída com assistência de IA, e o processo está registrado.**
 
-O que ela produziu: 128 testes em PostgreSQL real, 7 ADRs, 17 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
+O que ela produziu: 132 testes em PostgreSQL real, 8 ADRs, 17 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
 
 E, mais importante para estimar: o registro em `uso-de-ia.md` mostra **onde a IA acelerou e onde ela errou**. É isso que permite projetar em vez de torcer.
 
@@ -103,15 +103,24 @@ A coluna do meio é o efeito da IA; a última, a redistribuição que ele permit
 
 ## Licenças e custo
 
-### Ferramentas de desenvolvimento assistido
+### Licenças de ferramenta
 
-| Item | Assentos | US$/mês |
-|---|---|---|
-| Assistente de código com contexto de repositório | 5 | **US$ 100–300** |
-| Ambiente de execução para agentes *(opcional)* | — | US$ 0–50 |
-| **Total** | | **US$ 100–350/mês** |
+Preços de tabela, cobrança mensal — a fase 1 dura um mês, e as ondas seguintes ainda não estão contratadas.
 
-Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e híbrido. Ferramentas de assento cobram ~US$ 20–60/mês; as de consumo dependem de volume e podem passar disso num mês intenso — **é custo variável, não fixo, e precisa de teto**.
+| Ferramenta | Assento | Quem | Qtd. | US$/mês |
+|---|---|---|---|---|
+| **Claude Team** — inclui Claude Code | premium, US$ 125 | quem escreve código: 2 sênior, 1 pleno, 1 SRE | 4 | 500 |
+| **Claude Team** | standard, US$ 25 | arquiteto — revisão e redação, uso menor | 1 | 25 |
+| **Visual Studio Professional** — IDE .NET (`ADR-0008`) | mensal, US$ 45 | 2 sênior, 1 pleno, 1 SRE | 4 | 180 |
+| **Total** | | | | **US$ 705** |
+
+**Por que assento premium para quem escreve código.** O assento standard tem o limite de uso de um plano individual; um desenvolvedor que trabalha o dia inteiro com o assistente o esgota. O premium tem 6,25 vezes esse limite.
+
+**Por que a IDE é paga.** O Visual Studio Community é gratuito, mas não pode ser usado por organização com mais de 250 PCs ou mais de US$ 1 milhão de faturamento anual — e a extensão C# Dev Kit do VS Code segue a mesma licença. JetBrains Rider é alternativa equivalente; a escolha entre os dois é preferência do time, não de arquitetura.
+
+**Cobrança anual reduz a linha da IA para US$ 420/mês** (US$ 100 o premium, US$ 20 o standard), mas compromete doze meses. Vale a partir da contratação das ondas 60 e 90. No Visual Studio o anual sai mais caro no primeiro ano e não compensa.
+
+**O custo é fixo por assento.** Uso além do limite do plano só é cobrado se for habilitado — fica desabilitado, e o teto de gasto é o número de assentos.
 
 ### Efeito no custo total da fase 1
 
@@ -120,14 +129,15 @@ Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e hí
 | Esforço | 79 d.p. | **63 d.p.** |
 | Pessoas | 5,5 · 1,5 SRE | **4,5 · 1 SRE** |
 | Prazo | 20 dias úteis | 20 dias úteis |
-| Licenças de IA | — | **US$ 100–350/mês** |
+| Licenças — IA | — | **US$ 525/mês** |
+| Licenças — IDE .NET | US$ 180/mês | US$ 180/mês |
 | Infraestrutura AWS | US$ 1.812–3.034/mês | igual |
 | Preço de pessoas *(faturado)* | R$ 149.832 | **R$ 123.374** |
 | *com contingência de 15%* | *R$ 172.306* | ***R$ 141.880*** |
 
 *Valores faturados, já com encargos CLT e com os tributos do Lucro Presumido — ver [taxas-de-mercado.md](taxas-de-mercado.md).*
 
-**A licença é irrelevante diante da economia.** ~R$ 26,5 mil economizados em pessoas contra R$ 540–1.890/mês de licença. O ponto de atenção não é o custo — é o **teto de consumo**, para que ferramenta cobrada por uso não vire surpresa.
+**A licença é irrelevante diante da economia.** ~R$ 26,5 mil economizados em pessoas contra R$ 2.835/mês de licença de IA. A licença de IDE existe nos dois cenários.
 
 ### A economia em preço é menor que a economia em esforço
 
@@ -142,7 +152,7 @@ Os quase 3 pontos de diferença não são arredondamento: a IA reduz proporciona
 
 > A economia **em margem** é menor ainda que a economia em preço. Cerca de 19,5% dos R$ 26,5 mil são tributos que deixam de ser recolhidos — dinheiro que nunca foi da empresa. O ganho líquido real para quem presta é da ordem de **R$ 21 mil**, e é esse o número a levar para discussão comercial.
 
-> Outras licenças de software: **nenhuma identificada**. A stack de produção ainda não foi decidida (`CTX-13`/`CTX-14`), e a arquitetura usa serviços gerenciados AWS, sem licença própria. Se a escolha cair em runtime ou banco comercial, entra aqui.
+> Licenças de runtime: **nenhuma**. .NET e EF Core são MIT (`ADR-0008`), PostgreSQL é livre, e a infraestrutura são serviços gerenciados AWS, cobrados na conta de infraestrutura.
 
 ---
 
@@ -197,5 +207,4 @@ Como o risco foi tratado:
 ## Pendências registradas
 
 - Recalibrar o ganho de IA ao fim da semana 2, com dado real — é o que decide o gatilho de meio SRE.
-- Definir teto de consumo se a ferramenta for cobrada por uso.
 - Confirmar que a política do cliente permite código assistido por IA e sob quais condições.

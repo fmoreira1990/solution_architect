@@ -80,6 +80,9 @@ esperado = {
     r"(\d+) testes em PostgreSQL": n_testes,
     r"(\d+) testes no total": n_testes,
     r"`slice/` com (\d+) testes": n_testes,
+    r"com (\d+) testes\.": n_testes,
+    r"(\d+) testes da fatia": n_testes,
+    r"\| (\d+) testes, positivos": n_testes,
     r"(\d+) blocos Mermaid": n_diagramas,
     r"(\d+) documentos é": n_docs,
     r"\*\*(\d+) ADRs\*\*": n_adrs,
@@ -258,7 +261,7 @@ secao("9. Narrativa de edição")
 # história do sistema (a seção superseded da ADR-0003, prática de ADR) e o
 # registro de IA, que o §2.5.1 exige com as decisões rejeitadas.
 PERMITIDOS = ("docs/ai-context/", "docs/decisions/ADR-0003-")
-MARCA_DATADA = re.compile(r"(Fechad|Corrigid|Implementad|Removid|Resolvid|Testad)[oa]s? em 20\d\d-")
+MARCA_DATADA = re.compile(r"(fechad|corrigid|implementad|removid|resolvid|testad|definid|decidid)[oa]s? em 20\d\d-", re.I)
 VERSAO_ANTERIOR = re.compile(r"vers[ãa]o anterior de(ste|sta)|premissa anterior", re.I)
 narrativa = 0
 for p in docs_md():

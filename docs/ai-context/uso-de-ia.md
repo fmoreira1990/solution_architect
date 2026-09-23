@@ -56,7 +56,7 @@ Quatro regras de `CONVENCOES.md` limitam o que a IA pode produzir:
 | Requisitos | `requisitos/` | extração do enunciado em requisitos identificados | conferência item a item contra o enunciado |
 | Produto e domínio | `prd/`, `business-context/` | entrevista guiada e derivação de evidências | cada afirmação amarrada a um trecho do enunciado |
 | Arquitetura e decisões | `technical-context/`, `decisions/` | alternativas, contas e consequências | contas refeitas; toda ADR com ao menos duas alternativas rejeitadas |
-| Contratos e fatia executável | `contracts/`, `slice/` | código, testes e dados sintéticos | 128 testes em PostgreSQL real; contrato comparado à implementação rodando |
+| Contratos e fatia executável | `contracts/`, `slice/` | código, testes e dados sintéticos | 132 testes em PostgreSQL real; contrato comparado à implementação rodando |
 | Segurança | `security-context/` | STRIDE por fronteira de confiança | ameaças verificáveis na fatia convertidas em teste |
 | Estimativa e custo | `delivery/` | decomposição em tarefas e derivação de time, prazo e preço | conferência aritmética; premissas declaradas |
 | Revisão da entrega | README, resumo, slides | leitura com olho de avaliador | conferência automatizada da entrega |

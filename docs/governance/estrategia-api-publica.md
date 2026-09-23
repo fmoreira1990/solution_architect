@@ -162,4 +162,4 @@ Honesto, para não passar por cobertura que não existe:
 
 - Emitir `Deprecation` e `Sunset` no código, não apenas declará-los no contrato.
 - Definir quota por contrato, com o comercial.
-- `V2` fechou como **consumidores mistos** — a comunicação de sunset precisa distinguir interno de externo.
+- Os consumidores são **mistos** (`V2`) — a comunicação de sunset precisa distinguir interno de externo.

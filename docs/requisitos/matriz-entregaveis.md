@@ -155,5 +155,4 @@ A lista canônica de premissas é `docs/delivery/riscos-premissas.md` §1 — es
 
 ## Pendências registradas
 
-- `docs/technical-context/constraints.md` ainda não existe; os `CTX-*` vivem provisoriamente nesta matriz e devem migrar para lá na Frente F0, via `/constraints`.
-- PR-01 a PR-03 são premissas inventadas por falta de dado no desafio. Devem aparecer como premissa declarada no README, nunca como fato.
+- Nenhuma pendência própria. As restrições (`CTX-*`) têm fonte em `docs/technical-context/constraints.md`; as premissas estão declaradas no README e em `docs/delivery/riscos-premissas.md`.

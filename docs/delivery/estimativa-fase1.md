@@ -23,7 +23,7 @@ A estimativa é **por decomposição**, não por analogia nem por palpite calibr
 
 **A composição do time é consequência do esforço, não premissa dele.** Declarar "squad de 5" antes de saber o que precisa ser feito produz um time que cabe no orçamento e não na tarefa.
 
-Há uma âncora de calibração incomum: a fatia executável em `slice/` **já implementa** o núcleo de idempotência, outbox, snapshot, cotação e contract test, com 128 testes. Não estamos estimando algo nunca construído — estamos estimando **a distância entre a prova e a produção**, e essa distância está decomposta item a item.
+Há uma âncora de calibração incomum: a fatia executável em `slice/` **já implementa** o núcleo de idempotência, outbox, snapshot, cotação e contract test, com 132 testes. Não estamos estimando algo nunca construído — estamos estimando **a distância entre a prova e a produção**, e essa distância está decomposta item a item.
 
 ---
 
@@ -82,7 +82,7 @@ O SRE continua dono do que só ele faz: tracing, painel comparativo, alertas de 
 
 *"Termina em" = d.p. ÷ (pessoas × alocação). A alocação desconta reuniões, suporte e troca de contexto; a do SRE é menor porque ele absorve incidente.*
 
-**O arquiteto é parcial, e é correto que seja.** 9,5 dias em 20 úteis é meio período. As decisões estruturais já estão tomadas (7 ADRs); o que resta é normalização de contrato, negociação e revisão. Arquiteto em tempo integral nesta fase seria custo sem contrapartida.
+**O arquiteto é parcial, e é correto que seja.** 9,5 dias em 20 úteis é meio período. As decisões estruturais já estão tomadas (8 ADRs); o que resta é normalização de contrato, negociação e revisão. Arquiteto em tempo integral nesta fase seria custo sem contrapartida.
 
 ---
 
@@ -127,7 +127,7 @@ O custo de pessoa depende de taxa por senioridade, que é **decisão comercial, 
 | **Total** | **63** | média R$ 1.958 | **R$ 123.374** |
 | Contingência 15% | 9,5 | | R$ 18.506 |
 | **Com contingência** | **72,5** | | **R$ 141.880** |
-| Licenças de IA | | | US$ 100–350/mês |
+| Licenças — IA e IDE .NET | | | US$ 705/mês |
 
 Sem IA, o mesmo escopo custaria **R$ 149.832** — R$ 172.306 com contingência — e exigiria 1,5 SRE. A derivação está em [`taxas-de-mercado.md`](taxas-de-mercado.md).
 
@@ -187,7 +187,7 @@ Isso não é desperdício — é o preço de uma restrição que o cliente impô
 | E2 | Broker gerenciado disponível | +3 a 5 d.p. |
 | E3 | Consumidores internos cooperam dentro da onda | **gate G30 não fecha** — é prazo, não esforço |
 | E4 | Não há integrações no caminho de criação além do Catálogo | +~4 d.p. **por integração**, e cada uma reintroduz o `CTX-17` |
-| E5 | O time conhece a stack de produção (`CTX-14` é `???`) | rampa não estimada: +10 a 20% |
+| E5 | O time conhece .NET 10, a stack de produção (`ADR-0008`; `CTX-14` é `???`) | rampa não estimada: +10 a 20% |
 | E6 | Migrações aditivas rodam sem janela na base atual | +5 d.p. se exigir migração online |
 | E7 | SRE dedicado, com alocação efetiva de 70% | a 60%, o prazo vai para 23 dias úteis — **estoura os 30 corridos** |
 | E8 | Fator de produção de 3,5× sobre o núcleo provado | é a premissa mais consequente do documento |
@@ -232,7 +232,7 @@ Por isso a **recalibração da semana 2** é marco, não formalidade: ela decide
 ## 8. O que **não** está nesta estimativa
 
 - **Ondas 60 e 90** — §2.5.3 limita o compromisso à fase 1. Estimá-las agora daria falsa precisão sobre escopo que o gate G30 pode redefinir.
-- **Licenças de software de runtime** — nenhuma identificada; a arquitetura usa serviços gerenciados AWS. As licenças de **ferramenta de desenvolvimento assistido por IA** estão em §4.1 e detalhadas em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md).
+- **Licenças de software de runtime** — nenhuma: .NET e EF Core são MIT, PostgreSQL é livre. As licenças de **ferramenta** — assistente de IA e IDE .NET — estão em §4.1, detalhadas em [`impacto-ia-no-desenvolvimento.md`](impacto-ia-no-desenvolvimento.md).
 - **Custo das ondas 60 e 90** — dimensionado em ordem de grandeza em `servicos-aws.md`, não orçado.
 - **Treinamento e rampa** — depende de `CTX-14`, que é `???`.
 - **Contingência de escopo** — a reserva de 15% cobre variação de esforço, não escopo novo.

@@ -18,7 +18,7 @@ Aqui cada entrega vira tarefas de 0,5 a 3 dias-pessoa, com perfil e dependência
 
 ## O que a fatia executável já responde
 
-A prova em `slice/` implementa o **núcleo** de `A1`–`A8`: idempotência com `PRIMARY KEY`, outbox transacional, relay com `SKIP LOCKED`, snapshot imutável, cotação assinada e contract test. Ela roda, com 128 testes.
+A prova em `slice/` implementa o **núcleo** de `A1`–`A8`: idempotência com `PRIMARY KEY`, outbox transacional, relay com `SKIP LOCKED`, snapshot imutável, cotação assinada e contract test. Ela roda, com 132 testes.
 
 Isso é uma âncora de calibração incomum: não estamos estimando algo nunca construído. Estamos estimando **a distância entre a prova e a produção**.
 
@@ -178,7 +178,7 @@ O perfil **saiu da decomposição**, não foi declarado antes. A proporção de 
 | E2 | Broker gerenciado disponível, sem provisionamento novo | +3 a 5 d.p. |
 | E3 | Consumidores internos cooperam dentro da onda | A9.2 escorrega; gate G30 não fecha |
 | E4 | Não há integrações no caminho de criação além do Catálogo | cada uma adiciona ~4 d.p. e reintroduz o `CTX-17` |
-| E5 | O time conhece a stack de produção | rampa não estimada (`CTX-14` é `???`) |
+| E5 | O time conhece .NET 10, a stack de produção (`ADR-0008`) | rampa não estimada (`CTX-14` é `???`) |
 | E6 | Migrações aditivas rodam sem janela na base atual | pode exigir estratégia de migração online, +5 d.p. |
 
 ## Riscos da decomposição

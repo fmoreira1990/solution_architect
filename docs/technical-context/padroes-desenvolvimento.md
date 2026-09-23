@@ -3,7 +3,7 @@
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** os padrões que valem para a **plataforma de produção**. Não descrevem a fatia executável, que segue outras regras e por outro motivo — a seção final explica a diferença e por que ela é deliberada.
 **Requisitos cobertos:** `P1-17` *(enforcement das ADRs)*, `D-03`
-**Fontes:** `docs/technical-context/architecture.md`, `docs/business-context/glossario.md`, ADRs 0001 a 0007
+**Fontes:** `docs/technical-context/architecture.md`, `docs/business-context/glossario.md`, ADRs 0001 a 0008
 **Data:** 2026-09-24
 
 ---
@@ -27,14 +27,14 @@ aplicacao/        casos de uso: aceitar, confirmar, rejeitar, cotar
                   ↑ orquestra domínio e portas
 portas/           interfaces: RepositorioDePedidos, PublicadorDeEventos,
                   ConsultaDeCatalogo
-adaptadores/      psycopg, SQS, HTTP, Cognito — implementam as portas
+adaptadores/      EF Core, SQS, HTTP, Cognito — implementam as portas
 ```
 
 **Por que, aqui, não é dogma:**
 
 A `ADR-0002` rejeitou o CDC **por prazo, não por mérito**, e registrou gatilho para reabrir. Trocar polling por CDC deve ser trocar um adaptador — não reescrever o domínio. Mesma coisa com SQS → MSK, se alguém pedir replay histórico.
 
-**Verificação:** regra de dependência no CI. Nenhum arquivo em `dominio/` importa `psycopg`, `boto3`, `fastapi` ou equivalente. Falha o build.
+**Verificação:** teste de arquitetura com ArchUnitNET no CI. O projeto de domínio não referencia EF Core, AWS SDK nem ASP.NET Core. Falha o build. A stack está na `ADR-0008`.
 
 ---
 
@@ -105,6 +105,8 @@ A ordem importa: a chave de idempotência entra **primeiro**, para falhar rápid
 | retry de transação que pode ter commitado | **é como se duplica pedido** |
 | publicar no broker dentro da transação | é o problema de escrita dupla que o outbox resolve |
 | `UPDATE` em coluna de snapshot | o snapshot é imutável por contrato (`ADR-0003`) |
+| `SaveChanges()` fora da transação explícita do aceite | o EF Core abriria transações separadas, e a atomicidade some |
+| `EnableRetryOnFailure` sem a chave de idempotência inserida primeiro | o retry reexecutaria uma transação que pode ter commitado (`ADR-0008`) |
 
 **Verificação:** `test_falha_no_meio_da_transacao_nao_deixa_evento_orfao` e o *schema check* que exige `NOT NULL` nas colunas de snapshot.
 
@@ -186,8 +188,8 @@ A fatia **não segue** estes padrões, deliberadamente.
 
 | Padrão | Fatia | Motivo |
 |---|---|---|
-| Ports & Adapters | Python procedural, SQL direto | o avaliador precisa **ver a transação** sem atravessar três camadas de abstração |
-| Sem ORM | `psycopg` cru | a garantia é a `PRIMARY KEY`; um ORM a esconderia |
+| Ports & Adapters, em .NET | Python procedural, SQL direto | o avaliador precisa **ver a transação** sem atravessar três camadas de abstração |
+| EF Core, com SQL explícito nos pontos críticos | `psycopg` cru | na prova, nenhuma camada entre o leitor e a `PRIMARY KEY` |
 | Broker real | stub em memória | a decisão provada é transacional, não de transporte |
 | Injeção de dependência | import direto | poucos módulos não pagam o custo |
 | Estado global | `flag._percentual` em memória | em produção, a flag vem de serviço de configuração com propagação; na prova, o que importa é o **roteamento determinístico** |
@@ -214,10 +216,9 @@ A prova existe para demonstrar **uma garantia**, e abstração demais entre o le
 ## Riscos abertos
 
 1. **Estes padrões nunca foram exercitados em produção.** São derivados das decisões, não de operação — a primeira onda vai revelar onde atrapalham.
-2. **A regra de dependência do §1 precisa de ferramenta**, que depende da stack de produção — ainda indefinida (`CTX-13`/`CTX-14`).
+2. **A regra de dependência do §1 depende de disciplina de projeto.** O teste de arquitetura pega referência proibida; não pega domínio anêmico com a lógica escorrida para os adaptadores.
 3. **A proporção de testes do §6 é referência, não meta.** Transformá-la em gate produziria teste escrito para a estatística.
 
 ## Pendências registradas
 
-- A stack de produção não está decidida; §1 e §7 dependem dela para virar ferramenta.
 - O catálogo de códigos de erro de negócio (§5) não existe — precisa entrar na OpenAPI.

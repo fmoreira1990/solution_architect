@@ -159,5 +159,4 @@ Isso depende de disciplina, e a limitação está registrada: é governança lev
 ## Pendências registradas
 
 - O diff estrutural automatizado precisa de uma versão publicada como linha de base.
-- O processo de exceção está em [`excecao-tecnica.md`](excecao-tecnica.md).
-- A comunicação ativa a consumidores deprecados não tem dono nomeado — depende de `V2`.
+- A comunicação ativa a consumidores deprecados não tem dono nomeado — depende do inventário de consumidores (tarefa `P3`).

@@ -54,4 +54,4 @@ Além desses, `test_governanca.py` transforma as convenções da documentação 
 
 ## O que a fatia não é
 
-Não é a stack de produção — a [ADR-0005](../docs/decisions/ADR-0005-stack-da-fatia-executavel.md) decide a stack **da prova**, e a de produção depende do time. O broker é stub, o Catálogo é simulado e a chave HMAC é fixa: o que se prova é a **semântica da transação**, não transporte, escala nem gestão de segredo.
+Não é a stack de produção. A [ADR-0005](../docs/decisions/ADR-0005-stack-da-fatia-executavel.md) decide a stack **da prova**; a produção é **.NET 10** ([ADR-0008](../docs/decisions/ADR-0008-stack-de-producao.md)), e a fatia serve de especificação para ela: os testes críticos daqui são reescritos em xUnit contra PostgreSQL real. O broker é stub, o Catálogo é simulado e a chave HMAC é fixa: o que se prova é a **semântica da transação**, não transporte, escala nem gestão de segredo.

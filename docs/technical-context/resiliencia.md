@@ -133,5 +133,4 @@ Implementado em `relay.idade_do_mais_antigo_pendente()` e coberto por `test_sli_
 ## Pendências registradas
 
 - Calibrar todos os timeouts contra medição real na onda 30 (tarefa P1 do plano).
-- Definir o limiar de alerta do SLI de outbox junto com o alvo de p95 de confirmação.
 - Testes de injeção de falha (chaos leve) não estão no escopo das 3 ondas e ficam registrados como débito aceito em `riscos-premissas.md`.

@@ -139,6 +139,5 @@ flowchart TB
 
 ## Pendências registradas
 
-- O glossário da linguagem ubíqua está em `docs/business-context/glossario.md`.
 - Não há inventário dos consumidores atuais dos eventos de Pedidos — tarefa `P3` da onda 30, e bloqueio da `ADR-0004`.
 - A validade da cotação está implementada em 30 minutos e precisa de confirmação do negócio.

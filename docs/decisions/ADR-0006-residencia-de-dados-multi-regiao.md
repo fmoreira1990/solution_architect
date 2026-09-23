@@ -131,7 +131,6 @@ Nenhum existe hoje. Especificados para a onda 90:
 
 ## Pendências registradas
 
-- `V9` e `V10` são novas decisões para o cliente, registradas em `riscos-premissas.md`.
-- O serviço de preferências precisa entrar no plano da onda 90.
-- Escolha das regiões AWS (Brasil e EUA) não foi feita — é decisão de infraestrutura, não de arquitetura.
+- Escolha das regiões AWS (Brasil e EUA) não foi feita — é decisão de infraestrutura, não de arquitetura, e depende de `V10`.
 - `V8` (dono do endereço de entrega) continua aberto e continua sendo a premissa mais frágil.
+- `V9` (instrumento jurídico de transferência) é pré-requisito da onda 90.

@@ -49,5 +49,5 @@ Palavras que causaram confusão e não devem aparecer nos artefatos sem qualific
 
 ## Pendências registradas
 
-- **Consumidor** foi definido como **misto** em 2026-09-23. O que permanece `???` é **quantos são e quem são** — inventário é a tarefa `P3` da onda 30, e sem ele a política de contratos não sabe quando pode contrair.
+- **Consumidor** é **misto** — interno e externo (`V2`). O que permanece `???` é **quantos são e quem são** — inventário é a tarefa `P3` da onda 30, e sem ele a política de contratos não sabe quando pode contrair.
 - Termos de logística e fiscal não entraram por serem escopo OUT; entram se o escopo mudar.

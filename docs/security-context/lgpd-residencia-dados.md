@@ -127,7 +127,7 @@ O padrão de segregação é decidido na `ADR-0006`.
 1. **O enquadramento da seção 4 é leitura de arquiteto, não parecer jurídico.** A afirmação central — EUA sem mandato de residência para dado comercial de varejo — precisa de confirmação do DPO. Se estiver errada, a `ADR-0006` não muda de decisão, mas muda de justificativa.
 2. **Endereço de entrega sem dono.** Se cair em Pedidos, a estratégia de pseudonimização da seção 3 deixa de ser suficiente.
 3. **Nenhum dos controles da seção 5 está verificado por teste**, exceto dados sintéticos e ausência de PII no evento. Redação de log e telemetria sem PII são débito.
-4. **A retenção de 90 dias foi definida em 2026-09-23 e precisa de aprovação do jurídico.** Ela acompanha a retenção do outbox, para que auditoria de acesso e rastreio de evento cubram a mesma janela — mas o prazo legal aplicável pode ser outro.
+4. **A retenção de 90 dias precisa de aprovação do jurídico.** Ela acompanha a retenção do outbox, para que auditoria de acesso e rastreio de evento cubram a mesma janela — mas o prazo legal aplicável pode ser outro.
 5. **Sem instrumento de transferência BR → EUA (`V9`), nenhuma PII brasileira deveria atravessar.** É pré-requisito da onda 90, não formalidade posterior.
 6. **Não se sabe em quais estados americanos a operação estará sujeita (`V10`).** Os limiares da CCPA/CPRA dependem de receita e de volume de consumidores.
 7. **O serviço de preferências de privacidade é escopo novo**, exigido por `CTX-09d`, e não estava no plano 30/60/90 original.
@@ -135,6 +135,5 @@ O padrão de segregação é decidido na `ADR-0006`.
 ## Pendências registradas
 
 - Definir o dono do endereço de entrega (`V8`).
-- Acrescentar o serviço de preferências de privacidade ao plano da onda 90.
 - Aprovar prazos de retenção com jurídico — os desta página são propostas.
 - Inventário de quem referencia `cliente_id` precisa existir antes do primeiro pedido de acesso do titular.

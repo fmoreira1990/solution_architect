@@ -146,7 +146,7 @@ Formato: **estímulo → ambiente → resposta → medida**.
 
 ## Pendências registradas
 
-- Os `???` restantes são **exclusivamente baselines de produção** da camada 3. Todos os alvos, limiares e políticas foram definidos em 2026-09-23 e aguardam validação com o negócio — não definição.
+- Os `???` restantes são **exclusivamente baselines de produção** da camada 3. Todos os alvos, limiares e políticas estão definidos e aguardam validação com o negócio — não definição.
 - Levantar os baselines é a tarefa `P1` da onda 30 e **pré-requisito do gate G30**.
 - Os quatro primeiros são tarefa **P1 da onda 30**; o último é decisão de negócio.
 - Nenhum painel foi especificado. A escolha de ferramenta é de infraestrutura e não muda as métricas.

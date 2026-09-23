@@ -148,7 +148,7 @@ fi
 
 ## Pendências registradas
 
-- Os alvos de p95 de confirmação (30 s) e de taxa de rejeição (2% / 8%) foram definidos em 2026-09-23 e **precisam de validação com o negócio** antes da onda 60. São números defensáveis, não medidos.
-- **Política de desfecho para pedido preso:** após **24 h** em validação, o pedido é cancelado automaticamente e o cliente notificado. O prazo é largo de propósito — três ordens de grandeza acima do p95 de confirmação (30 s), então só alcança pedido genuinamente travado, nunca pedido lento. Definido em 2026-09-23; aguarda validação da operação.
+- Os alvos de p95 de confirmação (30 s) e de taxa de rejeição (2% / 8%) **precisam de validação com o negócio** antes da onda 60. São números defensáveis, não medidos.
+- **Política de desfecho para pedido preso:** após **24 h** em validação, o pedido é cancelado automaticamente e o cliente notificado. O prazo é largo de propósito — três ordens de grandeza acima do p95 de confirmação (30 s), então só alcança pedido genuinamente travado, nunca pedido lento. Aguarda validação da operação.
 - A validade da cotação está implementada em 30 minutos (`oferta.emitir`, `validade_segundos=1800`). Precisa de confirmação do negócio: validade curta aumenta recotação, validade longa aumenta o risco de honrar preço defasado.
 - A interação com a idempotência (ADR-0001) precisa ficar explícita: retry após o aceite deve devolver o mesmo pedido em seu estado **corrente**, não recriar nem reverter para `RECEBIDO`.

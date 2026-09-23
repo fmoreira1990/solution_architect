@@ -1,7 +1,7 @@
 # Resumo executivo — Evolução da Plataforma de Pedidos e Catálogo
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** recomendação, investimento, riscos e decisões que dependem do cliente. Duas páginas, para quem decide — a profundidade está nos 46 documentos indexados no `README.md`.
+**Escopo deste documento:** recomendação, investimento, riscos e decisões que dependem do cliente. Duas páginas, para quem decide — a profundidade está nos 47 documentos indexados no `README.md`.
 **Fontes:** `docs/delivery/estimativa-fase1.md`, `docs/delivery/riscos-premissas.md`, ADRs 0001 a 0007
 **Data:** 2026-09-23
 
@@ -47,8 +47,8 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | **Contingência** | +15% (9,5 d.p.), como linha separada e negociável — com destino previsto: meio SRE nas semanas 3 e 4, se a recalibração da semana 2 pedir |
 | **Preço de pessoas** | **R$ 141.880** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
 | **Custo de infraestrutura** | **US$ 1.812–3.034/mês** para Pedidos **e** Catálogo, que já dividem a mesma infraestrutura · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
-| **Licenças de IA** | US$ 100–350/mês |
-| **Total da fase 1** | **≈ R$ 152.200 – 160.200** — pessoas com contingência + um mês de licenças e de infraestrutura, a R$ 5,40/US$. Sem IA seriam ≈ R$ 182.100 – 188.700 |
+| **Licenças** | US$ 705/mês — assistente de IA (US$ 525) e IDE .NET (US$ 180) |
+| **Total da fase 1** | **≈ R$ 155.500 – 162.100** — pessoas com contingência + um mês de licenças e de infraestrutura, a R$ 5,40/US$. Sem IA seriam ≈ R$ 183.100 – 189.700 |
 
 **A composição do time saiu do esforço, não o contrário** — e revelou que quem define o prazo é o SRE, não o dev. A exigência de *zero janela de indisponibilidade* faz rollout progressivo, alertas de falha silenciosa e reversibilidade sem deploy pesarem **26% do esforço**, e a IA quase não os acelera: os degraus do rollout levam o tempo que levam.
 
@@ -69,7 +69,7 @@ Não é desperdício — é o preço de uma restrição que o cliente impôs. Pr
 
 ## O que já está provado
 
-A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **128 testes**, e demonstra os dois critérios críticos do enunciado:
+A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **132 testes**, e demonstra os dois critérios críticos do enunciado:
 
 - **20 requisições concorrentes com a mesma chave criam exatamente um pedido.** As 19 respostas de replay só são alcançadas por violação da `PRIMARY KEY` — as threads competiram de verdade, e foi a constraint que segurou.
 - **O consumidor legado não quebra com a versão nova no ar.** Um consumidor de referência que emite nota fiscal na resposta do POST continua passando.

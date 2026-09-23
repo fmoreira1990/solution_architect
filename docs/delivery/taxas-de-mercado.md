@@ -143,9 +143,10 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md), medid
 | | Proposta *(com IA)* | Referência *(sem IA)* |
 |---|---|---|
 | Serviços, com contingência | R$ 141.880 | R$ 172.306 |
-| Licenças de IA *(1 mês)* | R$ 540–1.890 | — |
+| Licenças — IA *(1 mês)* | R$ 2.835 | — |
+| Licenças — IDE .NET *(1 mês)* | R$ 972 | R$ 972 |
 | Infraestrutura *(1 mês)* | R$ 9.785–16.384 | R$ 9.785–16.384 |
-| **Total** | **≈ R$ 152.200 – 160.200** | ≈ R$ 182.100 – 188.700 |
+| **Total** | **≈ R$ 155.500 – 162.100** | ≈ R$ 183.100 – 189.700 |
 
 ---
 
@@ -162,7 +163,7 @@ Esforço e redistribuição derivados em [`estimativa-fase1.md`](estimativa-fase
 | **Total — 63 d.p.** | | **R$ 123.374** |
 | Contingência 15% (9,5 d.p.) | | R$ 18.506 |
 | **Total com contingência** | | **R$ 141.880** |
-| Licenças de IA | | R$ 540–1.890/mês |
+| Licenças — IA e IDE .NET | | R$ 3.807/mês |
 
 As proporções por camada são as mesmas da referência — 53,6% custo de pessoal, 19,5% tributos, 26,8% overhead e margem —, porque cada camada é um fator aplicado igualmente a todos os perfis.
 

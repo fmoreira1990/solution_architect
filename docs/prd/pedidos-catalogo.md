@@ -138,4 +138,4 @@ Declaradas porque o enunciado não as informa. São **premissas, não fatos**, e
 ## Pendências registradas
 
 - **Persona primária: a liderança técnica da plataforma de Pedidos**, derivada em `docs/business-context/personas.md` — cinco das oito evidências de §2.2.1 convergem para quem responde ao mesmo tempo por dívida técnica, prazo, compatibilidade e metas de qualidade. A operação de pedidos é persona secundária (quem audita preço). A ordem de intensidade da dor no §1 deve ser confirmada com o Client Face junto com as personas.
-- A hipótese (e), sobre custo, não tem métrica instrumentável definida — depende de `/metricas` e da escolha de cloud detalhar o custo por pedido.
+- A hipótese (e), sobre custo, é medida pelo custo de infraestrutura por pedido, estimado em `docs/technical-context/servicos-aws.md`. Falta o teto (`CTX-15`), que é decisão do cliente (`V7`).

@@ -192,7 +192,4 @@ Registrado de propósito — `AV-08` avalia não superdimensionar. Cada linha tr
 
 ## Pendências registradas
 
-- Diagramas C4 e de sequência (`P1-01` a `P1-06`) — próximo comando, `/c4`.
-- Tabela de atributo de qualidade → mecanismo → métrica (`P1-08`) — em `/metricas`.
-- Resiliência com valores concretos de timeout, retry, circuit breaker e bulkhead (`P2-04`) — `docs/technical-context/resiliencia.md`.
-- ADR-0001 (idempotência) e ADR-0002 (outbox) detalham o passo 4 do fluxo principal e ainda não foram escritas.
+- Nenhuma pendência própria. Diagramas em `c4/`, atributos de qualidade em `atributos-qualidade.md` e valores de resiliência em `resiliencia.md`.

@@ -1,7 +1,7 @@
 # Evolução da Plataforma de Pedidos e Catálogo
 
 > Desafio técnico — Arquitetura de Soluções
-> **Prova executável:** `cd slice && python prova.py` · 128 testes
+> **Prova executável:** `cd slice && python prova.py` · 132 testes
 
 [![CI](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml/badge.svg)](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml)
 
@@ -75,11 +75,11 @@ Dados são **sintéticos** — nenhum dado real, nenhuma PII.
 
 O ciclo foi validado do zero: banco e usuário destruídos, prova executada, instruções da própria saída seguidas.
 
-Resultado esperado: **127 passed, 1 skipped**. O teste pulado é a verificação de exceção técnica vencida — ele só tem o que conferir quando alguma exceção estiver registrada, e hoje nenhuma está.
+Resultado esperado: **131 passed, 1 skipped**. O teste pulado é a verificação de exceção técnica vencida — ele só tem o que conferir quando alguma exceção estiver registrada, e hoje nenhuma está.
 
 ---
 
-## As sete decisões
+## As oito decisões
 
 | ADR | Decisão | Por quê |
 |---|---|---|
@@ -90,6 +90,7 @@ Resultado esperado: **127 passed, 1 skipped**. O teste pulado é a verificação
 | [0005](docs/decisions/ADR-0005-stack-da-fatia-executavel.md) | Stack da prova: Python + FastAPI + PostgreSQL | Determinada pelo ambiente, e declarada como tal |
 | [0006](docs/decisions/ADR-0006-residencia-de-dados-multi-regiao.md) | Segregação de PII por **domicílio do titular** | EUA não exigem residência — a decisão se defende por mérito |
 | [0007](docs/decisions/ADR-0007-aceitacao-assincrona-com-validacao-posterior.md) | Aceite local, validação assíncrona | Elimina a multiplicação de indisponibilidade em vez de deslocá-la |
+| [0008](docs/decisions/ADR-0008-stack-de-producao.md) | Produção em .NET 10 + EF Core | Ecossistema e migrations versionadas — com SQL explícito onde a garantia mora no banco |
 
 **A 0004 é a menos óbvia e a mais perigosa.** A `ADR-0007` faz o `201` deixar de significar "venda confirmada" e passar a significar "pedido recebido". O JSON é idêntico — mesmos campos, mesmo status code. **Um diff de schema passa**, e todo consumidor que emite nota no `201` quebra em produção. Daí a fachada síncrona v1.
 
@@ -119,7 +120,7 @@ docs/
 ├── prd/                 problema, hipótese, escopo e gates
 ├── business-context/    personas, jornada, domínios, glossário, métricas
 ├── technical-context/   restrições, arquitetura, C4, qualidade, resiliência, serviços AWS
-├── decisions/           as sete ADRs
+├── decisions/           as oito ADRs
 ├── security-context/    threat model, LGPD e regime dos EUA
 ├── delivery/            a proposta: plano, decomposição, estimativa, preço, riscos, resumo, slides
 ├── governance/          API pública, política de contratos, exceção técnica, fitness functions
@@ -172,7 +173,7 @@ Mapa da fatia: [`slice/README.md`](slice/README.md) — cada módulo, a decisão
 | [Padrões de desenvolvimento](docs/technical-context/padroes-desenvolvimento.md) | Ports & Adapters, SOLID aplicado a decisões reais, revisão de código de IA |
 
 ### Decisões
-[ADR-0001](docs/decisions/ADR-0001-idempotencia-na-criacao-de-pedido.md) · [0002](docs/decisions/ADR-0002-publicacao-confiavel-de-eventos-via-outbox.md) · [0003](docs/decisions/ADR-0003-snapshot-de-termos-e-desacoplamento-do-catalogo.md) · [0004](docs/decisions/ADR-0004-versionamento-e-compatibilidade-semantica.md) · [0005](docs/decisions/ADR-0005-stack-da-fatia-executavel.md) · [0006](docs/decisions/ADR-0006-residencia-de-dados-multi-regiao.md) · [0007](docs/decisions/ADR-0007-aceitacao-assincrona-com-validacao-posterior.md)
+[ADR-0001](docs/decisions/ADR-0001-idempotencia-na-criacao-de-pedido.md) · [0002](docs/decisions/ADR-0002-publicacao-confiavel-de-eventos-via-outbox.md) · [0003](docs/decisions/ADR-0003-snapshot-de-termos-e-desacoplamento-do-catalogo.md) · [0004](docs/decisions/ADR-0004-versionamento-e-compatibilidade-semantica.md) · [0005](docs/decisions/ADR-0005-stack-da-fatia-executavel.md) · [0006](docs/decisions/ADR-0006-residencia-de-dados-multi-regiao.md) · [0007](docs/decisions/ADR-0007-aceitacao-assincrona-com-validacao-posterior.md) · [0008](docs/decisions/ADR-0008-stack-de-producao.md)
 
 ### Contratos e prova
 | | |
@@ -180,7 +181,7 @@ Mapa da fatia: [`slice/README.md`](slice/README.md) — cada módulo, a decisão
 | [OpenAPI v1](contracts/openapi/orders-v1.yaml) | fachada síncrona, deprecada, com `Sunset` |
 | [OpenAPI v2](contracts/openapi/orders-v2.yaml) | aceite assíncrono, `Idempotency-Key` obrigatória |
 | [AsyncAPI](contracts/asyncapi/order-status.yaml) | eventos, at-least-once, dedup **obrigatória no contrato** |
-| [`slice/`](slice/) | 128 testes em PostgreSQL real |
+| [`slice/`](slice/) | 132 testes em PostgreSQL real |
 
 ### Segurança
 | | |
@@ -242,7 +243,7 @@ O que o CI quebra, e não apenas o que ele roda:
 
 | Verificação | Protege |
 |---|---|
-| 128 testes da fatia, **em CI** | os dois critérios críticos |
+| 132 testes da fatia, **em CI** | os dois critérios críticos |
 | Contrato **×** implementação rodando | spec drift |
 | `RECEBIDO` ausente do enum da v1 | a fachada síncrona |
 | Toda ADR com ≥ 2 alternativas rejeitadas | regra Q2 |
