@@ -67,8 +67,17 @@ def criar_app(broker=None, validador=None) -> FastAPI:
         return pedido
 
     @app.get("/v2/orders/{pedido_id}")
-    def consultar_v2(pedido_id: str):
-        return _consultar(pedido_id)
+    def consultar_v2(
+        pedido_id: str,
+        cliente_id: str = Header(..., alias="X-Cliente-Id"),
+    ):
+        """Autorização por dono — ameaças F1.4 e F2.5 do threat model.
+
+        A identidade vem da borda, nunca do corpo. Em v2 é obrigatória;
+        em v1 permanece opcional, porque torná-la obrigatória seria
+        breaking change pela lista fechada da ADR-0004.
+        """
+        return _consultar(pedido_id, cliente_id)
 
     # ---------------------------------------------------------------- v1
     @app.post("/v1/orders", status_code=201)
@@ -98,13 +107,21 @@ def criar_app(broker=None, validador=None) -> FastAPI:
         return pedidos.obter(pedido["id"])
 
     @app.get("/v1/orders/{pedido_id}")
-    def consultar_v1(pedido_id: str):
-        return _consultar(pedido_id)
+    def consultar_v1(
+        pedido_id: str,
+        cliente_id: str | None = Header(None, alias="X-Cliente-Id"),
+    ):
+        """Identidade OPCIONAL em v1 (ADR-0004). Quando fornecida, vale."""
+        return _consultar(pedido_id, cliente_id)
 
     # -------------------------------------------------------------- comum
-    def _consultar(pedido_id: str):
+    def _consultar(pedido_id: str, cliente_id: str | None = None):
         pedido = pedidos.obter(pedido_id)
-        if pedido is None:
+
+        # 404, não 403, quando o pedido é de outro cliente: responder 403
+        # confirmaria que aquele UUID existe, e a enumeração (F1.4) passaria
+        # a render informação mesmo sem devolver o pedido.
+        if pedido is None or (cliente_id is not None and pedido["cliente_id"] != cliente_id):
             raise HTTPException(404, {"erro": "pedido_nao_encontrado"})
         return pedido
 

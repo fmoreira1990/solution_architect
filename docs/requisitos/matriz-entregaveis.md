@@ -56,12 +56,12 @@ Destino final: `docs/technical-context/constraints.md` (via `/constraints`).
 | ID | Requisito | Destino | Critério de aceite |
 |---|---|---|---|
 | P1-09 | Bounded contexts, responsabilidades, ownership, linguagem de domínio | `docs/business-context/mapa-dominios.md` + `glossario.md` | Context map com tipo de relacionamento (ACL, Conformist, Partnership) |
-| P1-10 | Síncrono × assíncrono, justificando consistência, latência e acoplamento | `docs/technical-context/integracao.md` | Tabela por integração com trade-off explícito |
+| P1-10 | Síncrono × assíncrono, justificando consistência, latência e acoplamento | `docs/business-context/mapa-dominios.md` §4 | Tabela por integração com trade-off explícito |
 | P1-11 | Snapshot de preço | ADR + modelo de dados | Item carrega preço/descrição imutáveis + versão do catálogo |
 | P1-12 | Idempotência | ADR + `slice/` | Chave, escopo, TTL, resposta em replay e em conflito |
 | P1-13 | Publicação confiável de eventos | ADR + `slice/` | Outbox transacional com relay, at-least-once |
-| P1-14 | Deduplicação | `docs/technical-context/consistencia.md` | Estratégia no consumidor (event id + janela) |
-| P1-15 | Reconciliação | idem | Job/relatório de divergência pedido ↔ eventos |
+| P1-14 | Deduplicação | `docs/technical-context/architecture.md` §Consistência + `contracts/asyncapi/` | Obrigação declarada no contrato, não em documentação à parte |
+| P1-15 | Reconciliação | `docs/technical-context/architecture.md` §Consistência | Job/relatório de divergência pedido ↔ eventos |
 | P1-16 | API pública: authn, authz, quotas, versionamento | `docs/governance/politica-contratos.md` | OAuth2/mTLS, escopos, rate limit por parceiro |
 | P1-17 | **Mínimo 4 ADRs** com contexto, alternativas, decisão e consequências | `docs/decisions/ADR-NNN-*.md` | Cada uma com ≥2 alternativas rejeitadas, trade-off, gatilho de revisão e enforcement |
 
@@ -83,11 +83,11 @@ Destino final: `docs/technical-context/constraints.md` (via `/constraints`).
 
 | ID | Requisito | Destino | Critério de aceite |
 |---|---|---|---|
-| P2-06 | OpenAPI versionada para criação/consulta de pedidos | `contracts/openapi/orders-v1.yaml` | Passa no linter; documenta `Idempotency-Key` e catálogo de erros |
+| P2-06 | OpenAPI versionada para criação/consulta de pedidos | `contracts/openapi/orders-v1.yaml` + `orders-v2.yaml` | Passa no linter; documenta `Idempotency-Key` e catálogo de erros |
 | P2-07 | AsyncAPI ou schema para mudança de status | `contracts/asyncapi/order-status.yaml` | Evento versionado, chave de partição, semântica de entrega |
 | P2-08 | Prova mínima de uma decisão crítica | `slice/` | Roda isolada, sem dependência de nuvem |
 | P2-09 | Testes positivos e negativos + execução automatizada no pipeline | `slice/tests/`, `.github/workflows/` | CI verde, saída anexada como evidência |
-| P2-10 | Dados sintéticos + **um único comando documentado** | `slice/seed/`, `Makefile` | Do zero ao resultado em um comando |
+| P2-10 | Dados sintéticos + **um único comando documentado** | `slice/seed/`, `slice/prova.py` | Do zero ao resultado em um comando |
 | P2-11 | **Critério crítico:** mesma chave não duplica pedido **e** contrato novo não quebra consumidor atual | testes nomeados | Dois testes explícitos, citados no README |
 
 ---
@@ -100,7 +100,7 @@ Destino final: `docs/technical-context/constraints.md` (via `/constraints`).
 |---|---|---|---|---|
 | D-01 | Capacidade de IA: isolamento, minimização, guardrails, observabilidade, avaliação | `docs/ai-context/arquitetura-ia.md` | `/ia capacidade` | Fronteira de dados, redação de PII, eval set com limiar |
 | D-02 | Uso de IA **na elaboração**: prompts, validações, decisões rejeitadas | `docs/ai-context/uso-de-ia.md` + `prompts/` | `/ia log` | Log incremental; ≥3 sugestões rejeitadas com motivo |
-| D-03 | Fitness functions no CI (OpenAPI/AsyncAPI, ADRs, regras arquiteturais) | `docs/governance/fitness-functions.md`, `.github/workflows/fitness.yml` | `/contratos` | Pipeline falha ao quebrar contrato ou ADR malformado |
+| D-03 | Fitness functions no CI (OpenAPI/AsyncAPI, ADRs, regras arquiteturais) | `docs/governance/fitness-functions.md`, `.github/workflows/ci.yml` | `/contratos` | Pipeline falha ao quebrar contrato ou ADR malformado |
 | D-04 | Política de evolução de contratos + processo leve de exceção técnica | `docs/governance/politica-contratos.md`, `excecao-tecnica.md` | `/contratos` | Lista fechada do que é breaking; waiver com prazo de validade |
 | D-05 | Estimativa: esforço, time, custos, premissas e riscos da fase 1 | `docs/delivery/estimativa-fase1.md` | `/estimativa` | Esforço por perfil, custo de run, faixa de confiança |
 

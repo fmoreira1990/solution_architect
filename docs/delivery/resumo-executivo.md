@@ -65,7 +65,7 @@ Não é desperdício — é o preço de uma restrição que o cliente impôs. Pr
 
 ## O que já está provado
 
-A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **106 testes**, e demonstra os dois critérios críticos do edital:
+A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **111 testes**, e demonstra os dois critérios críticos do edital:
 
 - **20 requisições concorrentes com a mesma chave criam exatamente um pedido.** As 19 respostas de replay só são alcançadas por violação da `PRIMARY KEY` — as threads competiram de verdade, e foi a constraint que segurou.
 - **O consumidor legado não quebra com a versão nova no ar.** Um consumidor de referência que emite nota fiscal na resposta do POST continua passando.

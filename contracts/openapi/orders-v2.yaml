@@ -95,6 +95,14 @@ paths:
           in: path
           required: true
           schema: { type: string, format: uuid }
+        - name: X-Cliente-Id
+          in: header
+          required: true
+          description: |
+            Identidade do titular, **estabelecida pela borda** — nunca aceita
+            do corpo da requisição (ameaça F3.2 do threat model).
+            Pedido que não pertence a esta identidade responde `404`.
+          schema: { type: string }
       responses:
         '200':
           description: Pedido encontrado.
@@ -102,7 +110,11 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Pedido' }
         '404':
-          description: Pedido inexistente.
+          description: |
+            Pedido inexistente **ou pertencente a outro titular** — as duas
+            situações respondem de forma **idêntica**, de propósito. Um `403`
+            confirmaria a existência do recurso e tornaria a enumeração de
+            UUIDs informativa (ameaça F1.4).
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Erro' }

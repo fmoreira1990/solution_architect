@@ -1,7 +1,7 @@
 # Evolução da Plataforma de Pedidos e Catálogo
 
 > Desafio técnico — Arquitetura de Soluções
-> **Prova executável:** `cd slice && python prova.py` · 106 testes
+> **Prova executável:** `cd slice && python prova.py` · 111 testes
 
 ---
 
@@ -136,7 +136,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [OpenAPI v1](contracts/openapi/orders-v1.yaml) | fachada síncrona, deprecada, com `Sunset` |
 | [OpenAPI v2](contracts/openapi/orders-v2.yaml) | aceite assíncrono, `Idempotency-Key` obrigatória |
 | [AsyncAPI](contracts/asyncapi/order-status.yaml) | eventos, at-least-once, dedup **obrigatória no contrato** |
-| [`slice/`](slice/) | 106 testes em PostgreSQL real |
+| [`slice/`](slice/) | 111 testes em PostgreSQL real |
 
 ### Segurança
 | | |
@@ -152,6 +152,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Estimativa da fase 1](docs/delivery/estimativa-fase1.md) | 79 d.p., time derivado, custos, faixa de confiança |
 | [Riscos e premissas](docs/delivery/riscos-premissas.md) | premissas, débitos aceitos, fora de escopo, decisões do cliente |
 | [Resumo executivo](docs/delivery/resumo-executivo.md) | **2 páginas** — recomendação, investimento, riscos |
+| [Checklist de avaliação](docs/delivery/checklist-avaliacao.md) | os 8 critérios, a evidência de cada um e **onde ainda é fraco** |
 
 ### Governança e IA
 | | |
@@ -195,7 +196,7 @@ O que o CI quebra, e não apenas o que ele roda:
 
 | Verificação | Protege |
 |---|---|
-| 106 testes da fatia | os dois critérios críticos |
+| 111 testes da fatia | os dois critérios críticos |
 | Contrato **×** implementação rodando | spec drift |
 | `RECEBIDO` ausente do enum da v1 | a fachada síncrona |
 | Toda ADR com ≥ 2 alternativas rejeitadas | regra Q2 |
@@ -213,7 +214,7 @@ As três primeiras foram validadas por **teste de mutação** — quebra-se o qu
 ```
 docs/            38 documentos, por contexto
 contracts/       OpenAPI v1/v2 + AsyncAPI
-slice/           fatia executável — 106 testes
+slice/           fatia executável — 111 testes
 tools/           validador de diagramas
 .github/         CI: prova, diagramas, confidencialidade
 .claude/         comandos que produziram os artefatos

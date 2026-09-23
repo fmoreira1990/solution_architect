@@ -28,7 +28,7 @@
 | 1.1 | **S** | Sequestro de sessão | pedidos e dados do cliente | sessão curta, cookie `HttpOnly`/`Secure`, reautenticação em ações sensíveis | borda — *onda 60* | phishing permanece |
 | 1.2 | **T** | Adulterar preço no payload da oferta | valor cobrado | **oferta assinada com HMAC**; adulteração → `422` | ✅ `test_oferta_adulterada_e_recusada` | comprometimento da chave HMAC → item 1.3 |
 | 1.3 | **T** | Vazamento da chave de assinatura da oferta | **preço de qualquer pedido** | chave em cofre gerenciado, rotação periódica, validade curta da oferta limita a janela | **não verificado** — a fatia usa chave fixa sintética | **alto se a chave vazar** |
-| 1.4 | **I** | Enumerar UUID de pedido | pedido de terceiro | UUIDv4 + **autorização por dono** no `GET` | ⚠️ *não implementado na fatia* | exposição se a autorização faltar |
+| 1.4 | **I** | Enumerar UUID de pedido | pedido de terceiro | UUIDv4 + **autorização por dono**; pedido alheio e inexistente respondem **404 idêntico** | ✅ `test_pedido_inexistente_e_pedido_alheio_sao_indistinguiveis` | identidade precisa vir da borda (F3.2) |
 | 1.5 | **E** | ⚠️ **Reutilizar chave de idempotência de outro cliente** | **pedido de terceiro na resposta de replay** | ver achado abaixo | ✅ `test_chave_de_outro_cliente_nao_devolve_pedido_alheio` | — |
 
 ### ⚠️ Achado F1.5 — escopo da chave de idempotência
@@ -57,7 +57,7 @@ Agrava o problema o fato de `X-Chamador` ser um **header controlado pelo cliente
 | 2.2 | **S** | Falsificar webhook **de saída** | parceiro aceitar notificação forjada | **assinatura HMAC + timestamp** no webhook; parceiro verifica | *onda 60* | depende do parceiro verificar |
 | 2.3 | **T** | Enviar preço arbitrário no pedido | valor cobrado | parceiro **não tem oferta assinada**; preço é validado contra o Catálogo de forma assíncrona | ⚠️ *onda 60* | janela entre aceite e validação |
 | 2.4 | **R** | Negar ter enviado um pedido | disputa comercial | log imutável de requisição com identidade, timestamp e hash do payload | *onda 60* | — |
-| 2.5 | **I** | Consultar pedido de outro parceiro | pedido de concorrente | autorização por escopo **e por dono** | ⚠️ *não implementado na fatia* | — |
+| 2.5 | **I** | Consultar pedido de outro parceiro | pedido de concorrente | autorização por dono no `GET` | ✅ `test_consulta_de_pedido_alheio_responde_404` | escopo por parceiro fica para a onda 60 |
 | 2.6 | **D** | Inundar a API pública | disponibilidade dos demais | quota por parceiro + **bulkhead** de workers | *onda 60* | — |
 | 2.7 | **T** | **Injeção via conteúdo do parceiro** — descrição, nome, observação | log, painel, e futuro prompt de IA | tratar como **dado, nunca instrução**: escape na saída, sem interpolação em prompt | `docs/ai-context/arquitetura-ia.md` | — |
 
@@ -119,19 +119,19 @@ Agrava o problema o fato de `X-Chamador` ser um **header controlado pelo cliente
 
 | Fronteira | Ameaças | Mitigadas e **verificadas por teste** | Planejadas | Bloqueadas |
 |---|---|---|---|---|
-| F1 cliente | 5 | 2 | 2 | — |
-| F2 parceiro | 7 | — | 7 | — |
+| F1 cliente | 5 | **4** | 1 | — |
+| F2 parceiro | 7 | **1** | 6 | — |
 | F3 borda | 2 | — | 2 | — |
 | F4 dados | 5 | 1 | 4 | — |
 | F5 regiões | 3 | — | — | **3** |
 | F6 dependências | 4 | 1 *(por arquitetura)* | 3 | — |
 
-**4 de 26 ameaças têm verificação executável hoje.** As demais dependem das ondas 60 e 90 ou da `ADR-0006`. Isso é coerente com o escopo da fatia, que prova idempotência, outbox e compatibilidade — não segurança de borda.
+**7 de 26 ameaças têm verificação executável hoje.** As demais dependem das ondas 60 e 90. Isso é coerente com o escopo da fatia, que prova idempotência, outbox e compatibilidade — mas as três que o próprio threat model encontrou (F1.4, F1.5, F2.5) foram corrigidas e testadas, não apenas registradas.
 
 ## Riscos abertos
 
 1. **A chave HMAC da oferta (F1.3) é o ativo mais concentrado do desenho.** Quem a obtém falsifica preço em qualquer pedido. Na fatia ela é fixa e sintética; em produção exige cofre e rotação.
-2. **Autorização por dono no `GET /orders/{id}` não existe na fatia** (F1.4, F2.5). Qualquer um com o UUID lê o pedido. É lacuna conhecida do escopo da prova, não do desenho.
+2. ~~Autorização por dono no `GET` não existe na fatia.~~ **Implementada em 2026-09-23**, com resposta `404` indistinguível entre pedido alheio e inexistente. O que permanece aberto é a autorização **por escopo de parceiro** (onda 60): hoje a verificação é por `cliente_id`, não por contrato de parceiro.
 3. **F5 depende do instrumento de transferência (`V9`)**, que ainda não existe. Enquanto isso, nenhuma PII brasileira deveria atravessar.
 4. **Nenhum teste de segurança automatizado** além dos dois de oferta. SAST, verificação de dependências e teste de autorização ficam como débito.
 

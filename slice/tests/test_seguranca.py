@@ -138,3 +138,60 @@ def test_evento_nao_carrega_pii(broker):
     # Allowlist: todo campo novo no evento exige decisão consciente.
     # `cotado` (bool) entrou com a ADR-0007 e não é dado pessoal.
     assert set(payload) <= {"pedido_id", "cliente_id", "itens", "cotado"}
+
+
+# ------------------------------------------- F1.4 / F2.5 autorização por dono
+
+def test_consulta_de_pedido_alheio_responde_404(servidor):
+    """Ameaças F1.4 (enumeração) e F2.5 (pedido de outro parceiro).
+
+    Responde **404, não 403**: um 403 confirmaria que aquele UUID existe,
+    e a enumeração passaria a render informação mesmo sem devolver o pedido.
+    """
+    r = httpx.post(
+        f"{servidor}/v2/orders",
+        json=corpo_pedido(cliente="cliente-DONO"),
+        headers={"Idempotency-Key": str(uuid.uuid4())},
+    )
+    pedido_id = r.json()["id"]
+
+    alheio = httpx.get(
+        f"{servidor}/v2/orders/{pedido_id}", headers={"X-Cliente-Id": "cliente-INTRUSO"}
+    )
+    assert alheio.status_code == 404
+    assert "cliente-DONO" not in alheio.text
+    assert pedido_id not in alheio.text
+
+    dono = httpx.get(
+        f"{servidor}/v2/orders/{pedido_id}", headers={"X-Cliente-Id": "cliente-DONO"}
+    )
+    assert dono.status_code == 200
+
+
+def test_pedido_inexistente_e_pedido_alheio_sao_indistinguiveis(servidor):
+    """A proteção contra enumeração depende de as duas respostas serem iguais."""
+    r = httpx.post(
+        f"{servidor}/v2/orders",
+        json=corpo_pedido(cliente="cliente-DONO"),
+        headers={"Idempotency-Key": str(uuid.uuid4())},
+    )
+    h = {"X-Cliente-Id": "cliente-INTRUSO"}
+
+    alheio = httpx.get(f"{servidor}/v2/orders/{r.json()['id']}", headers=h)
+    inexistente = httpx.get(f"{servidor}/v2/orders/{uuid.uuid4()}", headers=h)
+
+    assert alheio.status_code == inexistente.status_code == 404
+    assert alheio.json() == inexistente.json(), "respostas distinguíveis permitem enumeração"
+
+
+def test_identidade_e_obrigatoria_em_v2_e_opcional_em_v1(servidor):
+    """Torná-la obrigatória em v1 seria breaking change (ADR-0004)."""
+    r = httpx.post(
+        f"{servidor}/v2/orders",
+        json=corpo_pedido(),
+        headers={"Idempotency-Key": str(uuid.uuid4())},
+    )
+    pedido_id = r.json()["id"]
+
+    assert httpx.get(f"{servidor}/v2/orders/{pedido_id}").status_code == 422
+    assert httpx.get(f"{servidor}/v1/orders/{pedido_id}").status_code == 200

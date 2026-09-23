@@ -24,7 +24,7 @@ def test_mudanca_de_preco_no_catalogo_nao_altera_o_pedido(servidor):
 
     catalogo.alterar_preco("TV-55-QLED", 429900)
 
-    consulta = httpx.get(f"{servidor}/v2/orders/{pedido_id}")
+    consulta = httpx.get(f"{servidor}/v2/orders/{pedido_id}", headers={"X-Cliente-Id": "cliente-001"})
     assert consulta.json()["itens"][0]["preco_unitario"] == preco_na_compra
 
 
@@ -43,7 +43,7 @@ def test_consulta_de_pedido_funciona_com_o_catalogo_fora_do_ar(servidor):
 
     catalogo.definir_disponibilidade(False)
 
-    consulta = httpx.get(f"{servidor}/v2/orders/{pedido_id}")
+    consulta = httpx.get(f"{servidor}/v2/orders/{pedido_id}", headers={"X-Cliente-Id": "cliente-001"})
     assert consulta.status_code == 200
 
     item = consulta.json()["itens"][0]
