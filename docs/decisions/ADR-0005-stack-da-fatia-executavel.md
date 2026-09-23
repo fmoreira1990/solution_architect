@@ -39,7 +39,7 @@ O critério 1 domina, porque `P2-10` exige *"um único comando documentado"* e a
 
 ### O que a decisão **não** é
 
-Isto **não** recomenda Python para a plataforma de Pedidos. A stack de produção depende de `CTX-13` e `CTX-14` — tamanho e senioridade do time —, ambos `???`. Decidir a stack de produção sem isso repetiria o erro que o gate G2 existe para evitar.
+Isto **não** recomenda Python para a plataforma de Pedidos. A stack de produção depende de `CTX-13` e `CTX-14` — tamanho e senioridade do time —, que só serão conhecidos depois da estimativa por tarefa. Decidir a stack de produção antes disso repetiria o erro que o gate G2 existe para evitar.
 
 ---
 

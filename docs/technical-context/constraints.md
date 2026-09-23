@@ -29,8 +29,8 @@
 
 | ID | Restrição | Número verificável | Origem | Consequência arquitetural |
 |---|---|---|---|---|
-| CTX-13 | Tamanho e senioridade do time | **`???`** | não informado | **Bloqueia `/estimativa` (`D-05`)** |
-| CTX-14 | Conhecimento atual do time na stack-alvo | **`???`** | não informado | Define rampa e peso do critério (3) do gate G2 |
+| CTX-13 | Tamanho e senioridade do time | **`???`** | não informado | **Derivado, não declarado:** o esforço por tarefa em `/estimativa` determina o perfil, e não o contrário |
+| CTX-14 | Conhecimento do time na stack-alvo | **`???`** | não informado | Afeta a rampa na estimativa. Não bloqueou o gate G2, que decidiu a stack da **prova** por disponibilidade de ambiente (`ADR-0005`) |
 
 O desafio não informa nenhuma das duas. São a premissa mais consequente ainda em aberto: `D-05` exige composição de time e esforço por senioridade, e nenhum dos dois é derivável de §2.2.1. Serão declarados como premissa em `/estimativa`, com o efeito de cada uma explicitado caso seja falsa.
 

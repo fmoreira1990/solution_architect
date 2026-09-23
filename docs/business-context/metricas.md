@@ -49,9 +49,9 @@ Esta camada **é** a métrica-alvo do PRD.
 |---|---|---|---|
 | Disponibilidade do aceite | `201 ÷ (201 + 5xx)` em janela de 1 min | 99,9% mensal | 43 min/mês |
 | Latência de aceitação | p95 de `POST /v2/orders` | ≤ 500 ms | — |
-| Latência de confirmação | p95 de `RECEBIDO` → desfecho | `???` (proposto 30 s) | — |
-| **Idade do evento mais antigo não publicado** | `now − min(criado_em)` onde `publicado_em IS NULL` | alerta em `???` | — |
-| Taxa de rejeição pós-aceite | `REJEITADO ÷ (CONFIRMADO + REJEITADO)` | limite `???`, por canal | — |
+| Latência de confirmação | p95 de `RECEBIDO` → desfecho | **≤ 30 s** | — |
+| **Idade do evento mais antigo não publicado** | `now − min(criado_em)` onde `publicado_em IS NULL` | alerta em **5 min** | — |
+| Taxa de rejeição pós-aceite | `REJEITADO ÷ (CONFIRMADO + REJEITADO)` | **≤ 2%** próprio · **≤ 8%** parceiro | — |
 | Pedidos presos em validação | contagem além do timeout | zero após reconciliação diária | — |
 
 **Segmentação obrigatória por versão de contrato.** A fachada v1 reintroduz o acoplamento que a `ADR-0007` eliminou; se a disponibilidade for reportada na média, o custo da fachada some dentro do número global. Reportar v1 e v2 separadamente.
@@ -72,11 +72,11 @@ Formato: **estímulo → ambiente → resposta → medida**.
 
 **D2.** O broker fica indisponível por 30 minutos.
 → O aceite continua respondendo `201`; o outbox acumula; nada se perde. A confirmação atrasa.
-→ **Aceite:** zero evento perdido; alerta de idade do outbox dispara em até `???`.
+→ **Aceite:** zero evento perdido; alerta de idade do outbox dispara em até **5 min**.
 
 **D3.** Uma AZ do banco cai.
 → Failover multi-AZ.
-→ **Aceite:** RTO `???`, RPO zero. *(infraestrutura, fora da fatia)*
+→ **Aceite:** RTO **15 min**, RPO **zero**. *(infraestrutura, fora da fatia)*
 
 ### Performance
 
@@ -120,7 +120,7 @@ Formato: **estímulo → ambiente → resposta → medida**.
 
 **R3.** Pedidos ficam presos em `EM_VALIDACAO` por indisponibilidade prolongada do Catálogo.
 → Reconciliação diária os identifica e aplica a política de desfecho.
-→ **Aceite:** zero pedido preso além do timeout. Política de desfecho: `???`.
+→ **Aceite:** zero pedido preso além de 24 h. Política de desfecho: **cancelamento automático com notificação ao cliente**.
 
 ### Evolução
 
@@ -140,12 +140,13 @@ Formato: **estímulo → ambiente → resposta → medida**.
 
 | Verificado por teste automatizado | Depende de infra, carga ou decisão pendente |
 |---|---|
-| D1, S1, A1, A2, R1, R2, E1, E2, P2 *(parcial)* | D3 (multi-AZ), P1 (carga 10×), S2 (quotas, onda 60), R3 (política `???`), D2 (limiar `???`) |
+| D1, S1, A1, A2, R1, R2, E1, E2, P2 *(parcial)* | D3 (multi-AZ), P1 (carga 10×), S2 (quotas, onda 60), R3 (reconciliação, onda 30), D2 (alerta, onda 30) |
 
 ---
 
 ## Pendências registradas
 
-- Cinco `???` bloqueiam metas: baselines da camada 3, p95 de confirmação, limiar do SLI de outbox, limite de rejeição pós-aceite e política de desfecho para pedido preso.
+- Os `???` restantes são **exclusivamente baselines de produção** da camada 3. Todos os alvos, limiares e políticas foram definidos em 2026-09-23 e aguardam validação com o negócio — não definição.
+- Levantar os baselines é a tarefa `P1` da onda 30 e **pré-requisito do gate G30**.
 - Os quatro primeiros são tarefa **P1 da onda 30**; o último é decisão de negócio.
 - Nenhum painel foi especificado. A escolha de ferramenta é de infraestrutura e não muda as métricas.

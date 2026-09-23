@@ -139,17 +139,17 @@ Checklist de revisão final. Cada critério precisa ser defensável apontando ar
 
 ## 7. Premissas a fechar (Frente F0)
 
-Itens não informados pelo desafio. Enquanto não fechados, ficam marcados `???` nos artefatos — regra Q7.
+A lista canônica de premissas é `docs/delivery/riscos-premissas.md` §1 — esta tabela apenas resume o estado. Uma versão anterior mantinha numeração própria, que colidia com a de lá.
 
 | # | Premissa | Valor proposto | Status |
 |---|---|---|---|
-| PR-01 | Volumetria atual de pedidos | `???` — proposta: 20k/dia, pico 3×, alvo 200k/dia | a confirmar |
-| PR-02 | Tamanho médio do pedido | `???` — proposta: 8 itens (p95 = 40) | a confirmar |
-| PR-03 | Segundo país | `???` — proposta: LATAM (define região e regime de dados) | a confirmar |
+| PR-01 | Volumetria atual | 60k/dia → 600k no alvo | ✅ decidida |
+| PR-02 | Tamanho do pedido | 8 itens em média, 15 no p95 | ✅ decidida |
+| PR-03 | Segundo país | Estados Unidos | ✅ decidida |
 | PR-04 | Cloud de referência | AWS | ✅ decidido |
 | PR-05 | Modelo de entrega ao parceiro | Webhook assinado + fallback por polling | a confirmar |
-| PR-06 | Time disponível na fase 1 | `???` | definir em `/estimativa` |
-| PR-07 | Stack da fatia executável | `???` | **decidir no gate G2 via `/stack`** |
+| CTX-13 | Tamanho e senioridade do time | `???` | **derivado** do esforço por tarefa em `/estimativa`, não declarado antes dele |
+| — | Stack da fatia executável | Python 3.12 + FastAPI + PostgreSQL 18 | ✅ decidida no gate G2 (`ADR-0005`) |
 
 ---
 

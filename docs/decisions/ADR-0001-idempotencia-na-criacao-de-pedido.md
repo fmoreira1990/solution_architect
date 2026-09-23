@@ -74,7 +74,9 @@ N requisições simultâneas com a mesma chave disputam a `UNIQUE (chamador, cha
 
 ### TTL de 24 horas
 
-Cobre a janela de retry de clientes e parceiros. Após o TTL, a mesma chave cria pedido novo. `???` — 24h é premissa e precisa ser confrontada com o comportamento real de retry dos parceiros.
+Cobre a janela de retry de clientes e parceiros. Após o TTL, a mesma chave cria pedido novo.
+
+**Implementado** em `slice/app/pedidos.py` (`TTL_IDEMPOTENCIA_HORAS = 24`). É decisão tomada, não lacuna: 24h é muito além de qualquer retry automático razoável. O que falta é **confirmação** contra o comportamento real de retry dos parceiros, não definição.
 
 ### Obrigatória em v2, opcional em v1
 
@@ -119,7 +121,7 @@ A decisão se apoia em dois pontos.
 
 ## Gatilho de revisão
 
-**Se a taxa de `409` por `payload_hash` divergente passar de `???`%.** Indica uma de duas coisas, ambas acionáveis: clientes reutilizando chave para intenções diferentes, ou nossa normalização canônica está errada. O segundo caso é nosso defeito disfarçado de erro do cliente.
+**Se a taxa de `409` por `payload_hash` divergente passar de 0,5%.** Indica uma de duas coisas, ambas acionáveis: clientes reutilizando chave para intenções diferentes, ou nossa normalização canônica está errada. O segundo caso é nosso defeito disfarçado de erro do cliente — e acima de 0,5% a segunda hipótese passa a ser a mais provável.
 
 **Se surgir retry legítimo além do TTL de 24h.** O valor foi presumido; comportamento real de parceiro pode exigir mais.
 
@@ -153,5 +155,5 @@ fi
 
 - O TTL de 24h é premissa. Confrontar com a política real de retry dos parceiros antes da onda 60.
 - A normalização canônica do payload não está especificada. Precisa entrar na OpenAPI (`P2-06`), não apenas no código.
-- O limite aceitável de `409` por divergência é `???`.
+- O limite de `409` por divergência (0,5%) foi definido em 2026-09-23 por raciocínio, não por medição: conflito legítimo de chave é evento raro, e um patamar acima disso aponta para defeito nosso.
 - **Fronteira com `ADR-0002`:** a chave de idempotência e o registro do outbox são gravados na **mesma transação** do pedido. A ordem das operações dentro dela e o tratamento da violação de unicidade são contrato comum entre as duas ADRs e estão detalhados na `ADR-0002`.

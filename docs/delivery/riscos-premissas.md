@@ -89,13 +89,13 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 | # | Decisão | Quem decide | Bloqueia |
 |---|---|---|---|
 | V1 | Existem integrações no caminho de criação além do Catálogo? | Client Face / arquitetura da conta | Prazo da onda 30; cada uma reintroduz o `CTX-17` |
-| V2 | Consumidores atuais são internos ou externos? | Client Face | `ADR-0004`, janela de deprecação |
+| ~~V2~~ | ~~Consumidores internos ou externos?~~ **Resolvido: mistos** | — | ✅ fechado em 2026-09-23. O que resta é o **inventário** (tarefa `P3`) |
 | V3 | ~~Qual é o segundo país?~~ **Resolvido: EUA** | — | ✅ fechado |
 | V9 | **Instrumento jurídico para transferência BR → EUA** (`CTX-09c`) | Jurídico / DPO | `ADR-0006`; nenhuma PII brasileira cruza sem ele |
 | V10 | **Em quais estados dos EUA a operação estará sujeita** | Jurídico / negócio | Define quais leis estaduais se aplicam |
-| V4 | Limite aceitável de rejeição pós-aceite | Negócio | Gatilho da `ADR-0007` |
-| V5 | Limite de defasagem tolerável em preço sob falha | Negócio | Regra de fallback da `ADR-0003` |
-| V6 | Política de desfecho para pedido preso em validação | Negócio / operação | Reconciliação |
+| ~~V4~~ | ~~Limite de rejeição pós-aceite~~ **Definido: 2% próprio, 8% parceiro** | — | ✅ definido; aguarda validação do negócio |
+| ~~V5~~ | ~~Defasagem tolerável de preço sob falha~~ | — | ✅ **extinta**: o fallback foi superseded pela cotação assinada (`ADR-0007`) |
+| ~~V6~~ | ~~Política de desfecho para pedido preso~~ **Definida: cancela em 24 h** | — | ✅ definida; aguarda validação da operação |
 | V7 | Teto de custo de infraestrutura (`CTX-15`) | Negócio | Uma das 5 dimensões do §2.1 fica sem verificação |
 | V8 | **Quem é dono do endereço de entrega** — Pedidos ou Logística? | Arquitetura da conta | `ADR-0006`: se ficar em Pedidos, a pseudonimização deixa de bastar |
 

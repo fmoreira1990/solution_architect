@@ -105,7 +105,7 @@ Ordem de sacrifício, do menos ao mais doloroso:
 
 Nenhum circuit breaker detecta, porque não há chamada falhando. Nenhum timeout dispara, porque nada está lento. A única coisa que detecta é o SLI:
 
-> **idade do evento mais antigo não publicado** — alerta acima de `???` (a calibrar contra o alvo de p95 de confirmação da `ADR-0007`)
+> **idade do evento mais antigo não publicado** — alerta acima de **5 minutos**, que é 10× o p95 de confirmação alvo (30 s)
 
 Implementado em `relay.idade_do_mais_antigo_pendente()` e coberto por `test_sli_de_relay_parado_detecta_pendencia`.
 
@@ -125,7 +125,7 @@ Implementado em `relay.idade_do_mais_antigo_pendente()` e coberto por `test_sli_
 ## Riscos abertos
 
 1. **Todos os valores desta página são pontos de partida, não medições.** Foram derivados do orçamento de latência de `constraints.md` §7.2, que por sua vez usa uma estimativa de ~40 ms por chamada ao Catálogo — ordem de grandeza, não medição. Precisam ser recalibrados com dado real antes da onda 60.
-2. **O limiar do SLI de relay parado é `???`.** Sem ele, o alerta não existe — e a única proteção contra a falha silenciosa fica sendo documentação.
+2. **O limiar do SLI de relay parado (5 min) é derivado, não medido.** Precisa ser recalibrado contra o comportamento real do polling na onda 30 — se o intervalo efetivo for maior que o previsto, 5 min gera ruído.
 3. **Circuit breaker por parceiro exige estado por parceiro.** Com muitos parceiros, isso vira cardinalidade de métrica e memória no gateway. Não é problema hoje; é gatilho de revisão.
 
 ## Pendências registradas

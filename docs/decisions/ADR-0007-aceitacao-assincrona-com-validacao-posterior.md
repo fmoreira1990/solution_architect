@@ -55,8 +55,10 @@ Redefinir "criação" como "aceitação" torna o p95 de 500 ms trivial. Isso é 
 | Métrica | Alvo | O que mede |
 |---|---|---|
 | p95 de **aceitação** | ≤ 500 ms (`CTX-04`) | o pedido foi recebido e persistido |
-| p95 de **confirmação** | `???` — proposto ≤ 30 s | o cliente sabe se a venda existe |
-| Taxa de rejeição pós-aceite | `???` — a estabelecer | quanto do aceite é promessa vazia |
+| p95 de **confirmação** | **≤ 30 s** | o cliente sabe se a venda existe |
+| Taxa de rejeição pós-aceite | **≤ 2%** canal próprio · **≤ 8%** parceiro | quanto do aceite é promessa vazia |
+
+**De onde vêm os números.** Os 30 s não são arbitrários: o relay opera com polling de 200 ms a 1 s, e a validação é uma consulta ao Catálogo — 30 s dá duas ordens de grandeza de folga e ainda é rápido o bastante para o cliente não abandonar a tela. Os limites de rejeição refletem a assimetria do desenho: o canal próprio **cota antes**, então rejeição ali é anomalia; o parceiro **não cota**, então rejeição é o funcionamento normal do modelo.
 
 Sem as duas últimas, "500 ms" é número de vitrine.
 
@@ -100,7 +102,7 @@ O item 3 é o mais consequente para a proposta: ele promove o outbox (ADR-0002) 
 ## Trade-offs aceitos
 
 - **Rejeição pós-aceite vira modo de operação, não incidente.** Aceita-se um pedido que pode ser recusado depois. No varejo, recusar após aceitar tem custo de experiência e implicação frente ao Código de Defesa do Consumidor. Mitigado pela cotação assinada nos canais próprios, **não eliminado** — e no canal de parceiro não há mitigação possível.
-- **A reconciliação deixa de ser opcional** (`P1-15`). Pedido preso em `EM_VALIDACAO` é dinheiro parado e cliente sem resposta. Exige timeout, varredura periódica e política de desfecho — trabalho novo que não existia no desenho síncrono.
+- **A reconciliação deixa de ser opcional** (`P1-15`). Pedido preso em `EM_VALIDACAO` é dinheiro parado e cliente sem resposta. Exige timeout de **24 h**, varredura diária e cancelamento automático com notificação — trabalho novo que não existia no desenho síncrono.
 - **O estado do pedido vira o modelo de domínio central.** Ganho de clareza em DDD, custo de complexidade: transições precisam ser explícitas, testadas e observáveis.
 - **Quebra semântica sob schema compatível.** O `201` deixa de significar "venda feita" e passa a significar "pedido recebido". Nenhum contract test de schema detecta isso. Tratado na **ADR-0004**, com fachada síncrona para v1 — e é o risco mais subestimado desta decisão.
 - **O cliente não sabe na hora.** Para canais próprios é o padrão de mercado ("pedido em análise"); ainda assim, é degradação de experiência frente à confirmação imediata.
@@ -109,9 +111,9 @@ O item 3 é o mais consequente para a proposta: ele promove o outbox (ADR-0002) 
 
 ## Gatilho de revisão
 
-**Quando a taxa de rejeição pós-aceite ultrapassar o limite acordado nos canais próprios.** Acima dele, o aceite vira promessa não confiável e a cotação assinada deixa de ser otimização e passa a ser obrigatória.
+**Quando a taxa de rejeição pós-aceite ultrapassar 2% nos canais próprios.** Acima disso o aceite vira promessa não confiável, e a cotação assinada deixa de ser otimização e passa a ser obrigatória — inclusive para o canal de parceiro, que hoje não cota.
 
-**Quando o p95 de confirmação passar de 30 s.** Indica que a validação assíncrona virou fila, não pipeline, e o cliente perde a noção de desfecho.
+**Quando o p95 de confirmação passar de 30 s.** Indica que a validação assíncrona virou fila, não pipeline, e o cliente perde a noção de desfecho. É também o gatilho de reavaliação do CDC na `ADR-0002`.
 
 **Se houver exigência regulatória ou contratual de confirmação imediata** em algum canal. Isso reabre a decisão para aquele canal especificamente, provavelmente com conferência síncrona e o custo de disponibilidade que ela traz.
 
@@ -146,7 +148,7 @@ fi
 
 ## Pendências registradas
 
-- O alvo de p95 de confirmação (proposto 30 s) e o limite de taxa de rejeição são `???`. Ambos precisam de dono no negócio antes da onda 60; sem eles, o gatilho de revisão não tem número.
-- A política de desfecho para pedido preso em `EM_VALIDACAO` não está definida: cancela automaticamente, escala para atendimento, ou tenta novamente? Decisão de negócio.
+- Os alvos de p95 de confirmação (30 s) e de taxa de rejeição (2% / 8%) foram definidos em 2026-09-23 e **precisam de validação com o negócio** antes da onda 60. São números defensáveis, não medidos.
+- **Política de desfecho para pedido preso:** após **24 h** em validação, o pedido é cancelado automaticamente e o cliente notificado. O prazo é largo de propósito — três ordens de grandeza acima do p95 de confirmação (30 s), então só alcança pedido genuinamente travado, nunca pedido lento. Definido em 2026-09-23; aguarda validação da operação.
 - A validade da cotação está implementada em 30 minutos (`oferta.emitir`, `validade_segundos=1800`). Precisa de confirmação do negócio: validade curta aumenta recotação, validade longa aumenta o risco de honrar preço defasado.
 - A interação com a idempotência (ADR-0001) precisa ficar explícita: retry após o aceite deve devolver o mesmo pedido em seu estado **corrente**, não recriar nem reverter para `RECEBIDO`.

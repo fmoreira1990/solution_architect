@@ -49,4 +49,4 @@ Não existe fronteira para parceiro externo, porque não existe parceiro integra
 
 ## O que este diagrama não mostra
 
-Quem são os consumidores atuais e se são internos ou externos permanece `???`. É a pendência mais consequente em aberto: muda `CTX-10` de negociável para contratual (ver `ADR-0004`).
+Os consumidores são **mistos** — internos e externos —, o que obriga `CTX-10` a operar em dois regimes: negociado para os internos, contratual para os externos. **Quantos são e quem são permanece `???`**: o inventário é a tarefa `P3` da onda 30, e sem ele não há como saber quando uma versão pode ser removida.

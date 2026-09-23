@@ -21,7 +21,7 @@
 | **Outbox** | Tabela de eventos gravada na **mesma transação** do pedido, lida depois pelo relay. Garante que evento e estado nunca divirjam. | Pedidos |
 | **Relay** | Processo que lê o outbox e publica no broker, marcando o que já saiu. | Pedidos |
 | **Rejeição pós-aceite** | Pedido aceito e depois recusado na validação. É modo de operação previsto, não incidente. | Pedidos |
-| **Consumidor** | Sistema que consome o contrato de Pedidos — API ou evento. Pode ser interno ou externo: **ainda `???`**. | — |
+| **Consumidor** | Sistema que consome o contrato de Pedidos — API ou evento. **Mistos**: internos (fiscal, BI, atendimento) e externos (integradores). O regime de deprecação difere entre os dois. | — |
 | **Parceiro** | Marketplace externo que envia pedidos pela API pública. **Não cota**: submete os termos do sistema dele, conferidos depois contra o Catálogo. Seu conteúdo é **não confiável**. | Notificação e Parceiros |
 | **Canal próprio** | Web e app móvel da própria rede. **Cota antes** de submeter, e por isso tem o preço honrado. | Pedidos |
 
@@ -49,5 +49,5 @@ Palavras que causaram confusão e não devem aparecer nos artefatos sem qualific
 
 ## Pendências registradas
 
-- **Consumidor** permanece `???` quanto a ser interno ou externo. É a pendência mais consequente em aberto: muda `CTX-10` de negociável para contratual (`ADR-0004`).
+- **Consumidor** foi definido como **misto** em 2026-09-23. O que permanece `???` é **quantos são e quem são** — inventário é a tarefa `P3` da onda 30, e sem ele a política de contratos não sabe quando pode contrair.
 - Termos de logística e fiscal não entraram por serem escopo OUT; entram se o escopo mudar.

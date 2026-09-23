@@ -81,11 +81,13 @@ At-least-once transfere responsabilidade. Todo consumidor deduplica por `event_i
 
 ### Expurgo obrigatório
 
-Eventos publicados há mais de `???` dias são removidos. A ~3M eventos/dia do dimensionamento, ausência de expurgo transforma o outbox no maior objeto da base em poucos meses.
+Eventos publicados há mais de **90 dias** são removidos. A ~3M eventos/dia do dimensionamento, isso estabiliza a tabela em ~270M linhas em vez de crescer para sempre. O prazo acompanha a retenção de log de acesso, para que auditoria e rastreio de evento cubram a mesma janela.
 
-### SLI: idade do evento mais antigo não publicado
+### SLI: idade do evento mais antigo não publicado — alerta em **5 minutos**
 
 É a única métrica que detecta relay parado. A falha é **silenciosa**: nada quebra, o aceite continua respondendo `201`, e os pedidos simplesmente demoram cada vez mais a confirmar. Sem esse alerta, descobre-se pelo cliente.
+
+**O limiar de 5 min é 10× o p95 de confirmação alvo (30 s).** Folgado o bastante para não gerar ruído com variação normal de polling, apertado o bastante para detectar relay parado antes que o cliente perceba.
 
 ---
 
@@ -117,13 +119,13 @@ O CDC é tecnicamente superior em latência e carga. Foi rejeitado por prazo e p
 - **Carga adicional no banco.** O polling consulta continuamente, inclusive quando não há nada. Com índice parcial em `publicado_em IS NULL` o custo é baixo, mas não é zero.
 - **O outbox acopla seu crescimento ao do pedido.** Mesma base, mesmo destino de backup e restore. Expurgo deixa de ser higiene e vira requisito.
 - **Sem ordenação global.** Consumidor que dependa de ordem entre pedidos diferentes não é suportado. Restrição declarada, não omissão.
-- **Falha silenciosa do relay.** Nada quebra quando ele para. Depende inteiramente do SLI de idade do evento mais antigo — e um alerta mal configurado equivale a não ter a garantia.
+- **Falha silenciosa do relay.** Nada quebra quando ele para. Depende inteiramente do SLI de idade do evento mais antigo, com alerta em 5 min — e um alerta mal configurado equivale a não ter a garantia.
 
 ---
 
 ## Gatilho de revisão
 
-**Se a latência de publicação p95 ultrapassar `???` ms de forma sustentada.** É o sinal que promove o CDC de alternativa rejeitada a necessidade — e a rejeição foi explicitamente por prazo, então a reabertura é esperada, não excepcional.
+**Se a latência de publicação p95 ultrapassar 3 s de forma sustentada.** É o sinal que promove o CDC de alternativa rejeitada a necessidade — e a rejeição foi explicitamente por prazo, então a reabertura é esperada, não excepcional. O limiar é 10% do alvo de p95 de confirmação da `ADR-0007`: acima disso, o transporte passa a dominar o tempo de desfecho.
 
 **Se a tabela de outbox passar a dominar o volume da base** mesmo com expurgo ativo. Indica que retenção e política de arquivamento precisam sair da mesma base.
 
@@ -161,7 +163,6 @@ fi
 ## Pendências registradas
 
 - O intervalo de polling (200 ms a 1 s) é proposta; precisa ser calibrado contra o alvo de p95 de confirmação da `ADR-0007`.
-- A janela de retenção do expurgo é `???`.
-- O limiar de alerta para idade do evento mais antigo é `???`.
+- A janela de retenção (90 dias) e o limiar de alerta (5 min) foram definidos em 2026-09-23 e precisam de validação com a operação. O alerta é **10× o p95 de confirmação** — folga suficiente para não gerar ruído, apertado o bastante para detectar relay parado antes do cliente.
 - A janela de deduplicação exigida do consumidor não está definida e precisa entrar no AsyncAPI — sem ela, a obrigação é vaga demais para ser cobrada.
 - Não há inventário de consumidores atuais dos eventos (mesma pendência de `ADR-0004`). Sem ele, não se sabe quantos já deduplicam.

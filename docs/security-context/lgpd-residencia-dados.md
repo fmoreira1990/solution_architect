@@ -19,7 +19,7 @@
 | Dados de pagamento | sistema de pagamento externo *(tokenizado)* | **pessoal** | execução de contrato | conforme PCI; **nunca em Pedidos** |
 | Snapshot dos itens (SKU, preço, descrição) | Pedidos | **não pessoal** | — | vida do pedido |
 | Histórico de compra | Pedidos | **pessoal por agregação** | execução de contrato / legítimo interesse | — |
-| Log de acesso à API | Observabilidade | **pessoal** (IP, identificador) | legítimo interesse | 90 dias `???` |
+| Log de acesso à API | Observabilidade | **pessoal** (IP, identificador) | legítimo interesse | **90 dias** |
 
 **Decisão de desenho:** **Pedidos não armazena nome, e-mail, telefone nem documento.** Guarda `cliente_id` e consulta Identidade quando precisar. Isso reduz drasticamente a superfície do banco mais volumoso e mais replicado do sistema.
 
@@ -127,7 +127,7 @@ O padrão de segregação é decidido na `ADR-0006`.
 1. **O enquadramento da seção 4 é leitura de arquiteto, não parecer jurídico.** A afirmação central — EUA sem mandato de residência para dado comercial de varejo — precisa de confirmação do DPO. Se estiver errada, a `ADR-0006` não muda de decisão, mas muda de justificativa.
 2. **Endereço de entrega sem dono.** Se cair em Pedidos, a estratégia de pseudonimização da seção 3 deixa de ser suficiente.
 3. **Nenhum dos controles da seção 5 está verificado por teste**, exceto dados sintéticos e ausência de PII no evento. Redação de log e telemetria sem PII são débito.
-4. **Retenção de log em 90 dias é `???`.** Foi escrito como proposta, não como política aprovada.
+4. **A retenção de 90 dias foi definida em 2026-09-23 e precisa de aprovação do jurídico.** Ela acompanha a retenção do outbox, para que auditoria de acesso e rastreio de evento cubram a mesma janela — mas o prazo legal aplicável pode ser outro.
 5. **Sem instrumento de transferência BR → EUA (`V9`), nenhuma PII brasileira deveria atravessar.** É pré-requisito da onda 90, não formalidade posterior.
 6. **Não se sabe em quais estados americanos a operação estará sujeita (`V10`).** Os limiares da CCPA/CPRA dependem de receita e de volume de consumidores.
 7. **O serviço de preferências de privacidade é escopo novo**, exigido por `CTX-09d`, e não estava no plano 30/60/90 original.

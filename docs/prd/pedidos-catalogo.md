@@ -102,7 +102,9 @@ Por onda, com gate de saída que autoriza a seguinte (§4 exige plano 30/60/90; 
 | Continuidade | Consumidores quebrados por evolução de contrato | 0 (nada evoluiu ainda) | 0 durante 6 meses | transversal |
 | Custo | Custo de infraestrutura por pedido | `???` | não cresce proporcionalmente ao volume | G90 |
 
-**Os `???` são deliberados.** Não há dado de produção disponível no enunciado, e inventar baseline contaminaria `/metricas`, `/constraints` e `/estimativa` a jusante. São a primeira pergunta a fazer ao Client Face — e o resumo executivo (`E-06`) vai listá-los como "decisões que precisam de validação".
+**Os `???` restantes são deliberados** (regra Q7). Todos são **baseline de produção** — números que só existem medindo o sistema atual. Inventá-los contaminaria `/metricas` e `/estimativa` a jusante. São a tarefa `P1` da onda 30 e **pré-requisito do gate G30**: sem régua, o gate é indecidível.
+
+Premissas que dependiam de decisão, e não de medição, já foram fechadas — ver tabela abaixo.
 
 ### Kill criteria
 
@@ -119,9 +121,9 @@ Declaradas porque o enunciado não as informa. São **premissas, não fatos**, e
 
 | # | Premissa | Valor adotado | Efeito se falsa |
 |---|---|---|---|
-| PR-01 | Volumetria atual | `???` — proposta: 20k pedidos/dia, pico 3×, alvo 200k/dia | Redimensiona particionamento, cache e custo |
-| PR-02 | Tamanho do pedido | `???` — proposta: 8 itens em média, 15 no p95 | Muda o peso do N+1 e o orçamento de latência por hop |
-| PR-03 | Segundo país | `???` — proposta: país LATAM | Define região, regime de dados e moeda |
+| PR-01 | Volumetria atual | ✅ **60k pedidos/dia → 600k no alvo** | Redimensiona particionamento, cache e custo |
+| PR-02 | Tamanho do pedido | ✅ **8 itens em média, 15 no p95** | Muda o peso do N+1 e o orçamento de latência por hop |
+| PR-03 | Segundo país | ✅ **Estados Unidos** | Sem mandato de residência; o que importa é a transferência BR → EUA sob LGPD (`CTX-09c`) |
 | PR-04 | Cloud de referência | AWS | Muda serviços, não a arquitetura lógica |
 | PR-05 | Entrega ao parceiro | Webhook assinado + fallback por polling | Muda o contrato de notificação |
 

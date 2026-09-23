@@ -18,7 +18,7 @@
 | **Performance** | p95 ≤ 500 ms na **aceitação** (`CTX-04`) | Aceite local: sem I/O externo no caminho crítico | 0007 | p95 de aceitação | orçamento por hop em `constraints.md` §7.2 |
 | | | Cotação em lote: 9 chamadas → 2 | 0003 | req/s no Catálogo | — *(onda 60)* |
 | | | Snapshot elimina leituras futuras | 0003 | chamadas ao Catálogo por pedido | `test_consulta_de_pedido_funciona_com_o_catalogo_fora_do_ar` |
-| | p95 de confirmação `???` — proposto 30 s | Validação assíncrona por evento | 0007 | p95 de confirmação | **a instrumentar** |
+| | p95 de confirmação **≤ 30 s** | Validação assíncrona por evento | 0007 | p95 de confirmação | **a instrumentar** — onda 30 |
 | **Escalabilidade** | 10× em 90 dias (`CTX-02`) | Eliminação do N+1 (multiplicava por item **e** por pedido) | 0003 | req/s no Catálogo sob carga | teste de carga — onda 90 |
 | | | Validação assíncrona absorve pico sem bloquear o aceite | 0007 | profundidade da fila de validação | — |
 | **Integridade** | zero pedido duplicado (`CTX-07`) | `PRIMARY KEY (chamador, chave)` — a constraint **é** a garantia | 0001 | duplicatas/mês | ⭐ `test_vinte_requisicoes_concorrentes_criam_exatamente_um_pedido` |

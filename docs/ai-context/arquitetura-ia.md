@@ -96,7 +96,7 @@ flowchart TB
 
 **Redação de PII antes do modelo.** Nome, e-mail, telefone, documento e endereço são substituídos por marcadores antes do prompt. O modelo recebe *"o pedido de [CLIENTE] com entrega em [ENDERECO]"*, e a resposta é reidratada na saída. O provedor do modelo nunca vê dado pessoal.
 
-**Retenção:** prompts e respostas por `???` dias, sem PII (já redigida), para avaliação e depuração. Prazo precisa de aprovação.
+**Retenção:** prompts e respostas por **30 dias**, sem PII (já redigida), para avaliação e depuração. Prazo menor que o de log de acesso (90 dias) porque prompt é dado de menor valor probatório e maior risco residual de conter PII que escapou da redação.
 
 **Residência:** o serviço de IA é **regional** e chama o modelo da região correspondente. Prompt de cliente brasileiro não atravessa para os EUA — seria transferência internacional (`CTX-09c`), pela porta dos fundos.
 
@@ -201,6 +201,6 @@ A última linha é a mais importante: sem a ferramenta, o modelo ainda "sabe" fa
 ## Pendências registradas
 
 - Volume e custo de chamados, para o caso de negócio.
-- Prazo de retenção de prompts, com aprovação do DPO.
+- A retenção de prompts (30 dias) precisa de aprovação do DPO.
 - Escolha do provedor de modelo, com atenção a residência — o serviço é regional por decisão da `ADR-0006`.
 - O eval set precisa existir **antes** da primeira versão em produção, não depois.

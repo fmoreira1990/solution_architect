@@ -119,7 +119,7 @@ A separação entre (a) e (b) é deliberada. Confundir snapshot com cache é o e
 
 - **Desnormalização deliberada.** Descrição e preço passam a existir em dois lugares. São ~4,8M linhas de item/dia no alvo, cada uma carregando texto que antes era referência — ~3 GB/dia, ~1,1 TB/ano. Exige política de particionamento e arquivamento.
 - **Correção de cadastro não propaga.** Descrição cadastrada errada não se corrige nos pedidos já emitidos pela via normal. **Na maioria dos casos isso é o comportamento certo**, mas exige processo explícito de exceção para os casos em que não é — sem esse processo, a decisão vira armadilha operacional.
-- **O fallback aceita vender a preço defasado.** É decisão de negócio embutida em decisão técnica, e está registrada como tal. O limite de defasagem tolerável é `???` e precisa de dono no negócio antes da onda 30.
+- ~~O fallback aceita vender a preço defasado.~~ **Trade-off extinto com a seção (b).** A `ADR-0007` substituiu o fallback pela cotação assinada: o preço não é relido na criação, então não há defasagem a tolerar. A pergunta sobre o limite tolerável sobreviveu à resposta por um tempo, e foi removida na auditoria de 2026-09-23.
 - **O cache não fecha `CTX-17` sozinho.** A onda 30 melhora a disponibilidade sem garanti-la nos 99,9%. O compromisso pleno depende do read model da onda 60 — e isso precisa estar explícito na proposta, não implícito.
 - **A fronteira do que congela pode estar errada.** Foi decidida por raciocínio de domínio, sem validação com a operação. Se "promoção aplicada" precisar ser recalculada retroativamente por decisão comercial, a tabela muda.
 
@@ -165,7 +165,7 @@ fi
 
 ## Pendências registradas
 
-- O limite de defasagem tolerável do fallback é `???` e precisa de dono no negócio antes da onda 30. Sem ele, a regra de recusa não tem número.
+- ~~Limite de defasagem tolerável do fallback~~ — pendência extinta junto com a seção (b). O que resta no lugar é a **validade da cotação**, implementada em 30 minutos (`oferta.emitir`).
 - A fronteira "congela / não congela" não foi validada com a operação nem com o financeiro. É a premissa mais frágil desta ADR.
 - O valor de ~40 ms por chamada ao Catálogo, usado no cálculo do orçamento de latência, é estimativa de ordem de grandeza. A medição entra em `/metricas`.
 - ADR-0001 (idempotência) e ADR-0002 (outbox) ainda não foram escritas e compõem a mesma onda 30. A sequência de gravação na transação — pedido, itens, snapshot e outbox — é fronteira comum entre esta ADR e a 0002.
