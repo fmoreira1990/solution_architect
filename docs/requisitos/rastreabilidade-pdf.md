@@ -190,12 +190,12 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](chec
 | Bullet do PDF | Resposta | |
 |---|---|---|
 | *"Repositório no GitHub com README, premissas, instruções de execução e índice dos artefatos"* | `README.md` — os 4 itens, mais roteiro de leitura por tempo disponível | ✅ |
-| *"Diagramas C4 e de sequência em formato versionável, como Mermaid, PlantUML ou Structurizr DSL"* | 17 diagramas validados pelo parser oficial no CI | ✅ |
+| *"Diagramas C4 e de sequência em formato versionável, como Mermaid, PlantUML ou Structurizr DSL"* | 18 diagramas validados pelo parser oficial no CI | ✅ |
 | *"Mapa de domínios, no mínimo quatro ADRs, threat model e plano incremental de 30/60/90 dias"* | os 4, com 7 ADRs | ✅ |
 | *"Especificações OpenAPI e AsyncAPI/schema, acompanhadas da fatia executável e seus testes"* | os 3 contratos + `slice/` com 132 testes | ✅ |
 | *"Documento explicativo da ferramenta de IA utilizada, motivo da escolha, prompts relevantes, validações e cuidados com dados"* | `uso-de-ia.md` — os 5 itens em seções próprias | ✅ |
 | *"Resumo executivo de até duas páginas com recomendação, investimento, riscos e decisões que precisam de validação"* | `resumo-executivo.md` — os 4 itens | ✅ |
-| *(desejável)* *"breve apresentação em vídeo ou slides"* | `apresentacao/slides.md` — 10 slides | ✅ |
+| *(desejável)* *"breve apresentação em vídeo ou slides"* | `apresentacao/slides.md` — 12 slides, com versão em HTML gerada por `tools/gerar-slides.py` | ✅ |
 
 ---
 

@@ -23,6 +23,8 @@ A escolha se apoia em três propriedades:
 
 **A IA propõe, deriva e verifica. A decisão é humana.**
 
+O método é **desenvolvimento guiado por especificação** (*spec-driven development*, SDD): nada é escrito antes de a especificação que o justifica existir. Negócio, escopo, personas, jornada e restrições foram definidos em **entrevistas guiadas pelo Claude** — os comandos de `.claude/commands/` fazem uma pergunta por vez até a especificação fechar —, e só depois vieram arquitetura, decisões, contratos e código.
+
 | Atividade | Responsável humano | Papel da IA |
 |---|---|---|
 | Escopo e prioridade | define | — |

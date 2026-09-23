@@ -78,6 +78,7 @@ Exclusões explícitas. Nenhuma é omissão.
 | F5 | **Precificação das ondas 60 e 90** | §2.5.3 limita o compromisso orçado à fase 1 |
 | F6 | **Escolha de ferramenta de observabilidade** | Decisão de infraestrutura; não muda as métricas |
 | F7 | **Multi-tenancy para outras bandeiras do grupo** | Não foi pedido; adicioná-lo agora seria superdimensionar |
+| F8 | **Alteração de pedido aceito** | Por decisão: mudar é cancelar e criar outro. Preserva o snapshot e mantém um só caminho de escrita (`ADR-0001`) |
 
 ---
 

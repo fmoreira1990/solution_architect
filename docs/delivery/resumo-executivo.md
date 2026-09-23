@@ -115,7 +115,7 @@ Nenhuma pode ser resolvida pela equipe técnica. As três em destaque afetam pra
 
 **Nove débitos aceitos**, entre eles: a fachada de compatibilidade reintroduz o acoplamento para consumidores antigos — consciente, minoritário e com data de vencimento; o snapshot desnormaliza ~1,1 TB/ano; rejeição pós-aceite vira modo de operação previsto, não incidente.
 
-**Sete exclusões explícitas**, sendo uma definitiva: **o histórico de preços não pode ser reconstruído**. O dado do preço praticado nunca foi gravado — não é caro recuperar, é impossível. Pedidos anteriores à onda 30 seguem sem prova de preço, para sempre.
+**Oito exclusões explícitas**, entre elas a alteração de pedido aceito — mudar é cancelar e criar outro. Uma é definitiva: **o histórico de preços não pode ser reconstruído**. O dado do preço praticado nunca foi gravado — não é caro recuperar, é impossível. Pedidos anteriores à onda 30 seguem sem prova de preço, para sempre.
 
 ---
 

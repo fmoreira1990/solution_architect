@@ -2,7 +2,7 @@
 
 **Status:** Aceita — 2026-09-22
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** a garantia de não-duplicação na **criação** de pedido. Não cobre idempotência de cancelamento, alteração ou de outras operações.
+**Escopo deste documento:** a garantia de não-duplicação na **criação** de pedido. Pedido aceito **não é alterável** — mudar é cancelar e criar outro (ver *"Pedido aceito não se altera"*). O cancelamento é operação própria, fora desta ADR.
 **Requisitos cobertos:** `CTX-07`, `P1-12`, `P2-08`, `P2-11`
 **Fontes:** `docs/technical-context/constraints.md`, `ADR-0002` (transação comum), `ADR-0004` (compatibilidade), `ADR-0007` (aceite local)
 **Data:** 2026-09-22 *(revista em 2026-09-23 após o achado F1.5 do threat model)*
@@ -85,6 +85,21 @@ Tornar um campo de requisição obrigatório é **breaking change** pela lista f
 - **v1** — header opcional. Sem chave, comportamento atual; com chave, idempotente. Não pioramos nem quebramos.
 - **v2** — obrigatória.
 
+### Pedido aceito não se altera
+
+O `POST` só **cria**. Não existe reenviar um pedido para atualizá-lo, nem endpoint de alteração. Para mudar itens, quantidades, endereço ou qualquer outro dado, o cliente **cancela o pedido e cria outro**, com uma `Idempotency-Key` nova — é outra intenção de compra.
+
+| O cliente reenvia o pedido editado… | Resultado |
+|---|---|
+| com a **mesma chave** | **`409`** — o `payload_hash` não bate, e o servidor não adivinha qual versão vale |
+| com **chave nova**, sem cancelar o anterior | cria um **segundo pedido**; o primeiro continua valendo. Por isso o contrato diz que o `POST` não atualiza |
+
+Três razões sustentam a regra:
+
+1. **O snapshot é o registro da venda.** Preço, descrição e versão do catálogo foram acordados no aceite (`ADR-0003`); alterá-los reescreveria o que o cliente comprou.
+2. **O pedido já produziu efeitos.** O evento `PedidoRecebido` foi publicado e a validação começou (`ADR-0007`); consumidores podem ter emitido nota ou reservado despacho. Cancelar é um evento que todos entendem; alterar exigiria que cada consumidor soubesse desfazer parte do que fez.
+3. **Um só caminho de escrita.** Idempotência, snapshot e outbox existem só na criação. Uma operação de alteração precisaria de tudo isso de novo, com controle de versão para edições simultâneas — complexidade que nenhuma restrição do enunciado pede (`AV-08`).
+
 ---
 
 ## Alternativas consideradas
@@ -116,6 +131,7 @@ A decisão se apoia em dois pontos.
 - **O TTL cria uma janela.** Retry legítimo após 24h cria pedido novo. Aceito, por ser muito além de qualquer retry automático razoável.
 - **Replay devolve estado corrente, divergindo da convenção de mercado.** Ganha-se verdade, perde-se familiaridade. Precisa estar explícito na OpenAPI.
 - **A tabela cresce com o volume.** 600k pedidos/dia com TTL de 24h — expurgo é obrigatório, mesma política do outbox.
+- **Pedido aceito não se altera.** Corrigir um item custa ao cliente um cancelamento e um pedido novo. Aceito: preserva o snapshot e mantém um só caminho de escrita.
 
 ---
 
@@ -125,7 +141,7 @@ A decisão se apoia em dois pontos.
 
 **Se surgir retry legítimo além do TTL de 24h.** O valor foi presumido; comportamento real de parceiro pode exigir mais.
 
-**Se a idempotência precisar valer para outras operações** além da criação (cancelamento, alteração). A decisão atual cobre um endpoint; generalizar exige repensar o escopo da chave.
+**Se o negócio exigir alteração de pedido aceito.** Hoje a regra é cancelar e criar outro. Alterar exigiria idempotência própria por operação e controle de versão (`If-Match`) contra edições simultâneas — é repensar o escopo da chave, não estendê-lo.
 
 ---
 
@@ -157,3 +173,4 @@ fi
 - A normalização canônica do payload não está especificada. Precisa entrar na OpenAPI (`P2-06`), não apenas no código.
 - O limite de `409` por divergência (0,5%) vem de raciocínio, não de medição: conflito legítimo de chave é evento raro, e um patamar acima disso aponta para defeito nosso.
 - **Fronteira com `ADR-0002`:** a chave de idempotência e o registro do outbox são gravados na **mesma transação** do pedido. A ordem das operações dentro dela e o tratamento da violação de unicidade são contrato comum entre as duas ADRs e estão detalhados na `ADR-0002`.
+- **Cancelamento pelo cliente** precisa de endpoint próprio no contrato — é o único jeito de mudar um pedido. Idempotente por natureza: cancelar duas vezes dá o mesmo resultado. Não está no contrato da v2.

@@ -210,8 +210,8 @@ A `ADR-0006` exige roteamento **por domicílio do titular, não por geografia da
 
 | Alternativa | Decisão | Por quê |
 |---|---|---|
-| **ElastiCache** (Valkey/Redis), 1 primário + 1 réplica em AZ distinta | ✅ **Escolhido** | Invalidação por CDC precisa de **um lugar só** para invalidar. Réplica em outra AZ evita que a perda de uma AZ derrube a cotação junto |
-| Cache em processo, dentro das tarefas de aceite | ❌ Rejeitado | Custo zero, mas **cada tarefa teria seu próprio estado**: com autoscaling de 2 a 6, a invalidação por CDC precisaria alcançar todas, e uma tarefa nova sobe fria. Preço praticado divergente entre tarefas é exatamente o que o snapshot existe para evitar |
+| **ElastiCache** (Valkey/Redis), 1 primário + 1 réplica em AZ distinta | ✅ **Escolhido** | A invalidação precisa de **um lugar só** para apagar a chave. Réplica em outra AZ evita que a perda de uma AZ derrube a cotação junto |
+| Cache em processo, dentro das tarefas de Pedidos | ❌ Rejeitado | Custo zero, mas **cada tarefa teria seu próprio estado**: com autoscaling de 2 a 6, a invalidação precisaria alcançar todas, e uma tarefa nova sobe fria. Preço praticado divergente entre tarefas é exatamente o que o snapshot existe para evitar |
 | Read model dedicado do Catálogo | ❌ Rejeitado **nesta onda** | É a resposta certa se o cache não sustentar o p95 — e já está registrado como entrega condicional da onda 90 no `plano-30-60-90.md`. Antecipá-lo é pagar por capacidade que ainda não foi medida (`AV-08`) |
 | DynamoDB como store de leitura | ❌ Rejeitado | Resolveria, mas acrescenta um modelo de dados e um runtime novos para um problema que o cache resolve com uma dependência a menos |
 
@@ -219,6 +219,25 @@ A `ADR-0006` exige roteamento **por domicílio do titular, não por geografia da
 **Custo:** **US$ 90–160/mês**
 
 > ⚠️ **O tier depende do conjunto de trabalho do Catálogo, que é `???`.** Quantidade de SKUs ativos e tamanho médio do registro não constam do enunciado. O `t4g.medium` cobre da ordem de 1 a 2 milhões de SKUs com registro enxuto; um catálogo com mídia embutida ou muito maior exige subir de tier, e o custo acompanha. **É a linha deste documento com a premissa mais frágil** — está aqui dimensionada, não medida.
+
+### Invalidação — quando um preço muda
+
+Preço velho no cache não é só dado desatualizado: **a cotação assinada é honrada** (`ADR-0007`). Se o cache servir o preço antigo, a empresa vende por ele durante toda a validade da cotação. Por isso a invalidação tem três camadas:
+
+| Camada | Como | Quando entra |
+|---|---|---|
+| **TTL de 5 minutos** | toda entrada expira sozinha; uma invalidação perdida se corrige em até 5 min | onda 30 — é configuração |
+| **Evento `PrecoAlterado`** | o Catálogo publica a mudança pelo mesmo padrão de outbox da `ADR-0002`; um consumidor apaga a chave no cache | onda 60, quando o Catálogo já é alterado para a leitura em lote |
+| **Leitura no miss** | a cotação busca os SKUs ausentes em lote, na réplica de leitura do Catálogo, e repopula o cache | desde a onda 30 — fora do caminho de criação do pedido |
+
+**Exposição máxima a preço antigo: 5 min de TTL + 30 min de validade da cotação.** Precisa do aceite do negócio, junto com a validade da cotação — que já é pendência da `ADR-0007`.
+
+| Alternativa de invalidação | Decisão | Por quê |
+|---|---|---|
+| **Evento de domínio publicado pelo Catálogo + TTL** | ✅ **Escolhida** | o Catálogo decide o que é mudança de preço; Pedidos não conhece o schema dele |
+| CDC lendo as tabelas do Catálogo | ❌ Rejeitada | acopla ao **schema interno**: o Catálogo renomeia uma coluna e a invalidação quebra em silêncio |
+| Só TTL | ❌ Rejeitada como estado final | simples, mas toda mudança de preço espera o TTL inteiro. Serve de ponto de partida na onda 30 |
+| Catálogo apagando a chave direto no cache, ao gravar | ❌ Rejeitada | escrita dupla — banco e cache — sem garantia de que a segunda acontece. É o problema que o outbox resolve |
 
 > **Por que o cache não é opcional nem barato de remover:** sem ele, a cotação lê o Catálogo de forma síncrona e o `CTX-17` volta — a disponibilidade composta de 99,8% contra um orçamento de 43,2 min/mês. O cache é o que mantém a cotação *fora* do caminho crítico do aceite.
 

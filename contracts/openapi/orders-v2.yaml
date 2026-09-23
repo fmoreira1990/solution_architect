@@ -42,6 +42,11 @@ paths:
     post:
       tags: [pedidos]
       summary: Aceita um pedido
+      description: |
+        Só **cria**. Pedido aceito não é alterável: para mudar itens, quantidades
+        ou endereço, cancele o pedido e crie outro, com uma `Idempotency-Key` nova.
+        Reenviar o pedido editado com a mesma chave devolve `409`; com chave nova,
+        cria um segundo pedido.
       operationId: criarPedidoV2
       parameters:
         - $ref: '#/components/parameters/IdempotencyKeyObrigatoria'

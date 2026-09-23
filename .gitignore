@@ -25,3 +25,6 @@ slice/*.db-shm
 Thumbs.db
 desktop.ini
 node_modules/
+
+# Gerado de slides.md por tools/gerar-slides.py
+docs/delivery/apresentacao/slides.html
