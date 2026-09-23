@@ -23,7 +23,7 @@ Isso não é postura defensiva genérica — tem consequência concreta em quatr
 | Decisão | Valor |
 |---|---|
 | Fluxo | `client_credentials` |
-| Emissor | Amazon Cognito *(ver `servicos-aws.md` §4)* |
+| Emissor | Amazon Cognito *(ver `servicos-aws.md` §5)* |
 | Token | JWT, validade de **15 min** |
 | Rotação de segredo | a cada 90 dias, com **janela de sobreposição** de 7 dias |
 | mTLS | **opcional**, para parceiros de alto volume ou que exijam por contrato |

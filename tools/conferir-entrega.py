@@ -82,6 +82,7 @@ esperado = {
     r"(\d+) passed": n_testes,
     r"\*\*(\d+) ADRs\*\*": n_adrs,
     r"(\d+) diagramas válidos": n_diagramas,
+    r"(\d+) diagramas validados": n_diagramas,
     r"\*\*(\d+) diagramas\*\*": n_diagramas,
     r"\*\*(\d+) documentos\*\*": n_docs,
     r"os (\d+) documentos": n_docs,

@@ -180,7 +180,7 @@ $ cd slice && python prova.py
 | **Time** | 5,5 pessoas — 1 arquiteto (30%), 2 sênior, 1 pleno, 1,5 SRE |
 | **Prazo** | 20 dias úteis · cabe nos 30 |
 | **Preço de pessoas** | **R$ 172.306** faturados, com contingência |
-| **Infraestrutura** | US$ 835–1.489/mês · **< meio centavo por pedido** |
+| **Infraestrutura** | US$ 925–1.649/mês · **< meio centavo por pedido** |
 
 O preço é **faturado**: sobre o custo carregado de CLT incidem ainda **19,53%** de tributos do Lucro Presumido. Das quatro camadas, 53,6% é custo de pessoal, 19,5% tributo e 26,8% overhead e margem.
 

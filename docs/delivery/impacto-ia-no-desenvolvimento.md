@@ -12,7 +12,7 @@
 
 Quase toda proposta que promete ganho com IA estima por analogia ou por material de fornecedor. Aqui há algo melhor: **a fatia executável foi construída com assistência de IA, e o processo está registrado.**
 
-O que ela produziu: 128 testes em PostgreSQL real, 7 ADRs, 16 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
+O que ela produziu: 128 testes em PostgreSQL real, 7 ADRs, 17 diagramas validados, 3 contratos versionados, 18 fitness functions — em cerca de **dois dias** de trabalho assistido.
 
 E, mais importante para estimar: o registro em `uso-de-ia.md` mostra **onde a IA acelerou e onde ela errou**. É isso que permite projetar em vez de torcer.
 
@@ -114,7 +114,7 @@ Faixa ampla porque o modelo de cobrança varia entre assento fixo, consumo e hí
 | Pessoas | 5,5 | **4,5** |
 | Prazo | 20 dias úteis | **16 dias úteis** |
 | Licenças de IA | — | **US$ 90–320/mês** |
-| Infraestrutura AWS | US$ 835–1.489/mês | igual |
+| Infraestrutura AWS | US$ 925–1.649/mês | igual |
 | Preço de pessoas *(faturado)* | R$ 149.832 | **R$ 123.795** |
 
 *Valores faturados, já com encargos CLT e com os tributos do Lucro Presumido — ver [taxas-de-mercado.md](taxas-de-mercado.md).*

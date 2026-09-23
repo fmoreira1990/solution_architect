@@ -171,11 +171,11 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | **esforço** | 79 d.p. em 47 tarefas; cenário com IA em 63 d.p. | ✅ |
 | **composição de time** | 5,5 pessoas, **derivada** do esforço | ✅ |
-| **custos principais** | pessoas: tabela pronta, taxa é comercial · infra: `servicos-aws.md`, US$ 835–1.489/mês · licenças de IA: US$ 90–320/mês | ✅ |
+| **custos principais** | pessoas: tabela pronta, taxa é comercial · infra: `servicos-aws.md`, US$ 925–1.649/mês · licenças de IA: US$ 90–320/mês | ✅ |
 | **premissas** | 8 premissas com efeito declarado se falsas | ✅ |
 | **riscos** | 6 riscos com impacto e resposta, mais faixa de confiança | ✅ |
 
-> ~~Lacuna: custo genérico, sem serviço nomeado.~~ **Fechada em 2026-09-24** com `servicos-aws.md`. O exercício corrigiu o número para baixo: de US$ 1.700–3.700 para **US$ 835–1.489**, porque a faixa anterior presumia Kafka gerenciado e Aurora — capacidade que o dimensionamento não pede.
+> ~~Lacuna: custo genérico, sem serviço nomeado.~~ **Fechada em 2026-09-24** com `servicos-aws.md`. O exercício corrigiu o número para baixo: de US$ 1.700–3.700 para **US$ 925–1.649**, porque a faixa anterior presumia Kafka gerenciado e Aurora — capacidade que o dimensionamento não pede.
 
 ---
 

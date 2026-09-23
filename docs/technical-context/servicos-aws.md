@@ -34,6 +34,97 @@ De `constraints.md` §7:
 
 ---
 
+## A topologia — o que roda onde
+
+O diagrama de contêineres (`c4/containers-to-be.md`) é **lógico**: diz quem chama quem. Este é o **de implantação**: diz o que é público, o que é privado, o que é Multi-AZ e onde está a fronteira de confiança.
+
+```mermaid
+flowchart TB
+    ext(["Cliente · Parceiro<br/><i>internet</i>"])
+
+    subgraph borda["🛡️ Gerenciado, fora da VPC — fronteira de confiança"]
+        apigw["<b>API Gateway</b> HTTP API<br/><i>quota e throttling por chave</i>"]
+        cognito["<b>Cognito</b><br/><i>OAuth2 client credentials</i>"]
+    end
+
+    subgraph pubnet["VPC · subrede pública"]
+        nat["<b>NAT Gateway</b> ×2<br/><i>1 por AZ · custo fixo</i>"]
+    end
+
+    subgraph privnet["🔒 VPC · subredes privadas · 2 AZs — sem rota de entrada da internet"]
+        aceite["<b>ECS Fargate — aceite</b><br/><i>2 tarefas, autoscaling até 6</i>"]
+        relay["<b>ECS Fargate — relay</b><br/><i>1 tarefa</i>"]
+        valid["<b>ECS Fargate — validador</b><br/><i>1 tarefa</i>"]
+        rds[("<b>RDS PostgreSQL</b> Multi-AZ<br/>db.m6g.large<br/><i>AZ-a primário · AZ-b standby</i>")]
+        cache[("<b>ElastiCache</b><br/><i>primário AZ-a · réplica AZ-b</i>")]
+    end
+
+    subgraph msg["Mensageria gerenciada"]
+        sns{{"<b>SNS</b> — fan-out"}}
+        sqs{{"<b>SQS FIFO</b><br/><i>MessageGroupId = pedido_id</i>"}}
+        dlq{{"DLQ"}}
+    end
+
+    apoio["Secrets Manager · KMS regional · ECR · S3<br/><i>via VPC Endpoint, não pelo NAT</i>"]
+    cat["<b>Catálogo</b><br/><i>existente · não orçado aqui</i>"]
+
+    ext --> apigw
+    apigw -.->|"valida token"| cognito
+    apigw ==>|"única entrada"| aceite
+
+    aceite ===>|"1 transação: pedido+snapshot<br/>+chave+outbox"| rds
+    aceite -->|"cotação em lote<br/><i>fora do caminho crítico</i>"| cache
+    cache -.->|"popula · miss não falha"| cat
+
+    relay -->|"FOR UPDATE SKIP LOCKED"| rds
+    relay -->|"publica ANTES de marcar"| sns
+    sns --> sqs
+    sqs --> valid
+    sqs -.->|"após maxReceiveCount"| dlq
+    valid -->|"confirma ou rejeita"| rds
+    valid -.->|"confere termos"| cat
+
+    aceite -.-> apoio
+    relay -.->|"egress: patches e imagens"| nat
+
+    style rds stroke-width:4px
+    style aceite stroke-width:3px
+    linkStyle 3 stroke:#080,stroke-width:4px
+```
+
+### O que o diagrama de implantação mostra e o lógico não
+
+**Uma única porta de entrada.** Nada na subrede privada tem rota vinda da internet. O API Gateway é o único ponto exposto, e é onde `CTX-08` (quota por parceiro) é resolvido sem código — coerente com a fronteira `F2` do threat model.
+
+**O SPOF tem nome e tem AZ.** O diagrama lógico diz *"banco de Pedidos é o único SPOF"*. Aqui ele vira `db.m6g.large` Multi-AZ, primário em AZ-a e standby síncrono em AZ-b. É o que transforma a afirmação de disponibilidade em configuração verificável.
+
+**O NAT só aparece no egress, e ainda assim custa.** Nenhum fluxo de negócio passa por ele — mas ele cobra ~US$ 65/mês antes do primeiro byte. Está no diagrama justamente para não sumir da conta.
+
+**Secrets, KMS, ECR e S3 saem por VPC Endpoint, não pelo NAT.** Decisão de custo, não de segurança: tráfego de imagem e de segredo pelo NAT é pago duas vezes.
+
+### Cada contêiner lógico, e o serviço que o hospeda
+
+| Contêiner em `containers-to-be.md` | Serviço AWS | Onda | No custo da onda 30? |
+|---|---|---|---|
+| Serviço de Pedidos *(aceite + cotação)* | ECS Fargate, 2→6 tarefas | 30 | ✅ |
+| Relay do Outbox | ECS Fargate, 1 tarefa | 30 | ✅ |
+| Validador assíncrono | ECS Fargate, 1 tarefa | 30 | ✅ |
+| Store transacional de Pedidos | RDS PostgreSQL Multi-AZ | 30 | ✅ |
+| **Cache do Catálogo** | **ElastiCache (Valkey/Redis)** | **30** | ✅ *(ver §2)* |
+| Broker | SNS + SQS FIFO + DLQ | 30 | ✅ |
+| Borda | API Gateway HTTP + Cognito | 30 ¹ | ✅ |
+| **API Pública de Parceiros** | ECS Fargate, tarefas adicionais | **60** | ❌ — fora do escopo da fase 1 |
+| **Gateway de Notificação** | ECS Fargate + SQS + DLQ | **60** | ❌ |
+| **BFF multi-canal** | ECS Fargate | **90** | ❌ |
+| Catálogo e seu banco | já existem | — | ❌ — não é entrega desta proposta |
+
+¹ O API Gateway entra já na onda 30 porque a fachada síncrona `/v1` e o roteamento por versão (`ADR-0004`) dependem dele. As quotas por parceiro só passam a ser exercidas na onda 60.
+
+> **Três contêineres do alvo não estão no custo da fase 1** — API Pública, Gateway de Notificação e BFF. Não é esquecimento: §2.5.3 limita o compromisso à fase 1, e eles são entrega das ondas 60 e 90. O acréscimo delas está estimado em ordem de grandeza no fim deste documento.
+
+
+---
+
 ## 1. Store transacional de Pedidos
 
 **Capacidade:** pedido, itens com snapshot, chave de idempotência e outbox **na mesma transação** (`ADR-0001`, `ADR-0002`, `ADR-0003`). Exige `FOR UPDATE SKIP LOCKED`.
@@ -52,7 +143,27 @@ De `constraints.md` §7:
 
 ---
 
-## 2. Computação — aceite, relay e validador
+## 2. Cache do Catálogo
+
+**Capacidade:** serve **a cotação** (`POST /v2/quotes`) e os atributos operacionais fora do snapshot — unidade, peso, mídia. É o componente que tira a leitura do Catálogo do caminho crítico, e portanto o que faz a conta do `CTX-17` fechar. Miss **não pode falhar a requisição** (`ADR-0003`).
+
+| Alternativa | Decisão | Por quê |
+|---|---|---|
+| **ElastiCache** (Valkey/Redis), 1 primário + 1 réplica em AZ distinta | ✅ **Escolhido** | Invalidação por CDC precisa de **um lugar só** para invalidar. Réplica em outra AZ evita que a perda de uma AZ derrube a cotação junto |
+| Cache em processo, dentro das tarefas de aceite | ❌ Rejeitado | Custo zero, mas **cada tarefa teria seu próprio estado**: com autoscaling de 2 a 6, a invalidação por CDC precisaria alcançar todas, e uma tarefa nova sobe fria. Preço praticado divergente entre tarefas é exatamente o que o snapshot existe para evitar |
+| Read model dedicado do Catálogo | ❌ Rejeitado **nesta onda** | É a resposta certa se o cache não sustentar o p95 — e já está registrado como entrega condicional da onda 90 no `plano-30-60-90.md`. Antecipá-lo é pagar por capacidade que ainda não foi medida (`AV-08`) |
+| DynamoDB como store de leitura | ❌ Rejeitado | Resolveria, mas acrescenta um modelo de dados e um runtime novos para um problema que o cache resolve com uma dependência a menos |
+
+**Tier:** 2 nós `cache.t4g.medium` (~3 GB cada), primário e réplica em AZs distintas
+**Custo:** **US$ 90–160/mês**
+
+> ⚠️ **O tier depende do conjunto de trabalho do Catálogo, que é `???`.** Quantidade de SKUs ativos e tamanho médio do registro não constam do enunciado. O `t4g.medium` cobre da ordem de 1 a 2 milhões de SKUs com registro enxuto; um catálogo com mídia embutida ou muito maior exige subir de tier, e o custo acompanha. **É a linha deste documento com a premissa mais frágil** — está aqui dimensionada, não medida.
+
+> **Por que o cache não é opcional nem barato de remover:** sem ele, a cotação lê o Catálogo de forma síncrona e o `CTX-17` volta — a disponibilidade composta de 99,8% contra um orçamento de 43,2 min/mês. O cache é o que mantém a cotação *fora* do caminho crítico do aceite.
+
+---
+
+## 3. Computação — aceite, relay e validador
 
 **Capacidade:** três processos. O aceite é síncrono e sensível a latência; relay e validador são contínuos e tolerantes.
 
@@ -68,7 +179,7 @@ De `constraints.md` §7:
 
 ---
 
-## 3. Broker de eventos
+## 4. Broker de eventos
 
 **Capacidade:** ~3M eventos/dia, ordenação **por agregado** (`chave_particao = pedido_id`), entrega at-least-once, DLQ.
 
@@ -85,7 +196,7 @@ De `constraints.md` §7:
 
 ---
 
-## 4. Borda e API pública
+## 5. Borda e API pública
 
 **Capacidade:** autenticação, autorização por escopo, **quotas por parceiro**, roteamento por versão (`/v1`, `/v2`).
 
@@ -99,7 +210,7 @@ De `constraints.md` §7:
 
 ---
 
-## 5. Observabilidade
+## 6. Observabilidade
 
 **Capacidade:** tracing do caminho crítico, SLI de idade do evento mais antigo, alertas, painel comparativo entre caminhos durante a convivência.
 
@@ -113,7 +224,7 @@ De `constraints.md` §7:
 
 ---
 
-## 6. Rede e apoio
+## 7. Rede e apoio
 
 | Item | Serviço | Custo |
 |---|---|---|
@@ -132,16 +243,17 @@ De `constraints.md` §7:
 | Componente | Serviço | Mín. | Máx. |
 |---|---|---|---|
 | Store transacional | RDS PostgreSQL Multi-AZ, `db.m6g.large` | 480 | 620 |
+| Cache do Catálogo | ElastiCache, 2 nós `cache.t4g.medium` | 90 | 160 |
 | Computação | ECS Fargate, 4 tarefas | 90 | 220 |
 | Broker | SNS + SQS FIFO | 25 | 60 |
 | Borda | API Gateway HTTP + Cognito | 40 | 90 |
 | Observabilidade | CloudWatch + X-Ray | 120 | 350 |
 | Rede e apoio | NAT, Secrets, KMS, S3, ECR | 80 | 149 |
-| | **Total mensal** | **US$ 835** | **US$ 1.489** |
+| | **Total mensal** | **US$ 925** | **US$ 1.649** |
 
 ### Isto corrige a estimativa anterior
 
-`estimativa-fase1.md` §4.2 projetava **US$ 1.700–3.700/mês** com componentes genéricos. Com os serviços nomeados e dimensionados, o número real fica em **US$ 835–1.489** — a faixa anterior era conservadora **por falta de especificidade**, não por prudência.
+`estimativa-fase1.md` §4.2 projetava **US$ 1.700–3.700/mês** com componentes genéricos. Com os serviços nomeados e dimensionados, o número real fica em **US$ 925–1.649** — a faixa anterior era conservadora **por falta de especificidade**, não por prudência.
 
 A diferença vem quase toda de duas escolhas:
 
@@ -157,9 +269,9 @@ A diferença vem quase toda de duas escolhas:
 ## Custo por pedido
 
 ```
-US$ 835–1.489/mês ÷ 600.000 pedidos/dia × 30
-= US$ 0,000046 a 0,000083 por pedido
-≈ R$ 0,00025 a 0,00045 (a R$ 5,40/US$)
+US$ 925–1.649/mês ÷ (600.000 pedidos/dia × 30)
+= US$ 0,000051 a 0,000092 por pedido
+≈ R$ 0,00028 a 0,00050 (a R$ 5,40/US$)
 ```
 
 **Menos de meio centavo por pedido.** Isso responde a perna (e) da hipótese do PRD — *"o ganho de escala não exige crescimento proporcional de infraestrutura"* — e mostra que `CTX-16` é atendível: a maior parte do custo é **fixo** (Multi-AZ, NAT, control planes), não por transação.
@@ -174,9 +286,10 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 
 | Onda | Acréscimo | Impacto |
 |---|---|---|
-| 60 | Gateway de notificação, mais tráfego na borda | **+10 a 20%** |
+| 60 | **API Pública de Parceiros** e **Gateway de Notificação** — tarefas Fargate adicionais, fila e DLQ próprias, mais tráfego na borda | **+15 a 25%** |
 | 90 | **Segunda região** (`ADR-0006`): RDS, ECS, NAT e observabilidade duplicados na região dos EUA | **+70 a 90%** — o salto real |
-| 90 | Escala 10× | pouco em fixo, mais em I/O e ingestão de log |
+| 90 | **BFF multi-canal** — tarefas Fargate adicionais | **+5 a 10%** |
+| 90 | Escala 10× | pouco em fixo, mais em I/O e ingestão de log; o **cache sobe de tier** ou vira read model |
 
 **O salto de custo é a onda 90, não a 30.** Multi-região duplica quase toda a infraestrutura fixa. Isso precisa estar claro antes de alguém aprovar as três ondas olhando só o número da primeira.
 
@@ -191,6 +304,8 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 | A3 | Retenção de log de 90 dias, alinhada ao expurgo do outbox | Retenção maior domina a conta de observabilidade |
 | A4 | 2 AZs, não 3 | 3 AZs adicionam ~US$ 35/mês de NAT |
 | A5 | Tráfego de saída moderado | Egress a US$ 0,09/GB pode surpreender com webhooks volumosos |
+| A6 | **Conjunto de trabalho do Catálogo cabe em ~3 GB** — nº de SKUs ativos é `???` | Catálogo muito maior ou com mídia embutida exige subir o tier do ElastiCache |
+| A7 | O Catálogo e seu banco **já existem e não são orçados aqui** | Se a proposta tiver de hospedá-los também, a conta muda de patamar |
 
 ## Riscos
 
@@ -198,9 +313,11 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 2. **NAT Gateway é custo fixo que ninguém lembra.** ~US$ 65/mês antes de qualquer tráfego.
 3. **Preços mudam e variam por negociação.** Nenhum número aqui substitui a calculadora oficial.
 4. **A escolha SQS sobre MSK assume que ninguém pedirá replay histórico.** Se pedir, o custo do broker sobe ~5×.
+5. **O tier do cache é o número menos ancorado do documento.** Depende do tamanho do Catálogo, que é `???`. Subir dois tiers triplica essa linha — e ela é a segunda maior depois do banco.
 
 ## Pendências registradas
 
 - Confirmar todos os valores na calculadora oficial antes de virar proposta.
 - `CTX-15` (teto de custo) segue `???` — decisão `V7`.
 - A escolha de região para a operação dos EUA depende de `V10`.
+- **Dimensionar o cache exige o nº de SKUs ativos e o tamanho médio do registro do Catálogo** (`A6`). É a primeira medição a pedir junto com o baseline `P1`.

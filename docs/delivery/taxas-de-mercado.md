@@ -74,7 +74,7 @@ Regime de **Lucro Presumido**, atividade de prestação de serviços.
 | CSLL | presunção de **32%** | 9% | **2,88%** |
 | | | **Total** | **19,53%** |
 
-¹ **5% é o teto e a hipótese conservadora.** Serviços de TI costumam ser enquadrados entre 2% e 3% em vários municípios. Com ISS a 2%, a carga total cai para **16,53%**.
+¹ **5% é o teto, e é a alíquota adotada** — decisão deliberada de orçar pelo pior caso. Serviços de TI são enquadrados entre 2% e 3% em vários municípios; com ISS a 2% a carga cai para **16,53%**, e o desvio joga a favor da proposta em vez de contra.
 
 ² O adicional incide sobre o lucro presumido que exceder R$ 60 mil no trimestre. Para uma consultoria já acima desse patamar, **a alíquota marginal de um projeto novo inclui o adicional integralmente** — que é a hipótese usada aqui.
 
@@ -138,7 +138,7 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
 | | |
 |---|---|
-| AWS em regime | US$ 835–1.489/mês → **R$ 4.509–8.041/mês** |
+| AWS em regime | US$ 925–1.649/mês → **R$ 4.995–8.905/mês** |
 
 *Câmbio de R$ 5,40/US$, premissa declarada. Normalmente contratada direto pelo cliente ou repassada a custo — neste caso não sofre o gross-up.*
 
@@ -147,8 +147,8 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 | | |
 |---|---|
 | Serviços, com contingência | R$ 172.306 |
-| Infraestrutura | R$ 4.509–8.041 |
-| **Total** | **≈ R$ 176.800 – 180.300** |
+| Infraestrutura | R$ 4.995–8.905 |
+| **Total** | **≈ R$ 177.300 – 181.200** |
 
 ---
 
@@ -181,8 +181,8 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
 | # | Premissa | Se falsa |
 |---|---|---|
-| T1 | Regime de **Lucro Presumido** | Simples Nacional muda as camadas 2 **e** 4 ao mesmo tempo — exige recálculo, não ajuste de fator |
-| T2 | ISS a **5%** (teto) | TI costuma ser 2–3%; a 2%, o total cai 3,6% |
+| T1 | Regime de **Lucro Presumido** — ✅ **decidido** | Simples Nacional muda as camadas 2 **e** 4 ao mesmo tempo — exige recálculo, não ajuste de fator |
+| T2 | ISS a **5%**, o teto — ✅ **decidido**, hipótese conservadora | Se o município enquadrar TI em 2–3%, o total cai até 3,6% — a favor da proposta, nunca contra |
 | T3 | Adicional de IRPJ **aplicável** | Empresa abaixo de R$ 60 mil de lucro presumido trimestral não o recolhe — total cai para 16,33% |
 | T4 | Fator comercial de **1,5×** | Camada menos ancorada; a 1,3× o total cai 13% |
 | T5 | Salários na média nacional | São Paulo acima; contratação remota em outras praças, abaixo |
@@ -208,5 +208,5 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
 ## Pendências registradas
 
-- Confirmar o regime tributário e a alíquota de ISS do município de prestação — juntos movem até 8% do total.
+- ~~Confirmar o regime tributário e a alíquota de ISS.~~ **Decidido:** Lucro Presumido e ISS a 5%, o teto. A escolha do teto é deliberada — se o município enquadrar TI em faixa menor, o desvio é a favor da proposta.
 - Substituir as camadas 2, 3 e 4 pelos números reais da empresa antes de virar proposta.

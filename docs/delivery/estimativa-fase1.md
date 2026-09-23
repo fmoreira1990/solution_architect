@@ -110,14 +110,15 @@ Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`]
 | Componente | Serviço | US$/mês |
 |---|---|---|
 | Store transacional | RDS PostgreSQL Multi-AZ, `db.m6g.large` | 480–620 |
+| Cache do Catálogo | ElastiCache, 2 nós `cache.t4g.medium` | 90–160 |
 | Computação | ECS Fargate, 4 tarefas | 90–220 |
 | Broker | SNS + SQS FIFO | 25–60 |
 | Borda | API Gateway HTTP + Cognito | 40–90 |
 | Observabilidade | CloudWatch + X-Ray | 120–350 |
 | Rede e apoio | NAT, Secrets, KMS, S3, ECR | 80–149 |
-| **Total** | | **US$ 835–1.489** |
+| **Total** | | **US$ 925–1.649** |
 
-**Custo por pedido: menos de meio centavo** (US$ 0,000046 a 0,000083). A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
+**Custo por pedido: menos de meio centavo** (US$ 0,000051 a 0,000092). A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
 
 > **Uma versão anterior deste documento projetava US$ 1.700–3.700/mês** com componentes genéricos. Com os serviços nomeados, o número real é **metade disso**. A faixa anterior era conservadora por falta de especificidade, não por prudência — e quase toda a diferença veio de duas escolhas: SQS no lugar de Kafka gerenciado (~US$ 500/mês) e RDS no lugar de Aurora (~US$ 200/mês). Nos dois casos, a opção mais cara entregava capacidade que o dimensionamento não pede.
 
