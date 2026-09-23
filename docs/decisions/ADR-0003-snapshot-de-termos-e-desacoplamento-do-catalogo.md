@@ -60,7 +60,7 @@ pedido_item
 | Congela | Por que é compromisso | Não congela | Por que é operacional |
 |---|---|---|---|
 | Preço unitário, moeda | base do valor cobrado | Status de entrega | estado que evolui por natureza |
-| Descrição e atributos exibidos | o cliente comprou o que viu | Estoque disponível | recurso contendido, não acordado (ver ADR-0007) |
+| Descrição e atributos exibidos | o cliente comprou o que viu | Correspondência com o Catálogo | é verificação do mundo no instante, não acordo (ver ADR-0007) |
 | Promoção aplicada | condição da compra | Dados cadastrais do cliente | ciclo próprio e sujeito a LGPD |
 | **Unidade de medida** | "quantidade 2" não significa nada sem "kg" ou "un" | Localização no armazém, curva ABC | nunca foi prometido a ninguém |
 | **Peso e dimensões** | base do **frete cotado** ao cliente | Fornecedor atual | interno, invisível ao cliente |
@@ -82,11 +82,11 @@ pedido_item
 
 Dois argumentos independentes derrubaram a solução de cache, e a convergência entre eles é o que justifica a mudança de posição:
 
-1. **Pelo lado da fidelidade de oferta.** A divergência real não é entre cache e Catálogo — é entre o preço que o cliente viu em T0 e o que Pedidos leria em T1. Nenhum cache atravessa esse intervalo, que em carrinho persistente é de dias. Pior: **invalidação mais rápida piora a fidelidade**, porque destrói o preço ofertado mais cedo. Frescor e estabilidade de oferta são requisitos opostos e não saem do mesmo mecanismo.
+1. **Pelo lado da fidelidade da cotação.** A divergência real não é entre cache e Catálogo — é entre o preço que o cliente viu em T0 e o que Pedidos leria em T1, intervalo que pode ser de dias. Pior: **invalidação mais rápida piora a fidelidade**, porque destrói o preço cotado mais cedo. Frescor e estabilidade de cotação são requisitos opostos e não saem do mesmo mecanismo.
 
 2. **Pelo lado da disponibilidade.** Cache com fallback reduz a janela de indisponibilidade, mas não zera a dependência: no miss, a chamada síncrona volta, e o `CTX-17` com ela.
 
-A saída — preço estabelecido no **carrinho** e não relido na criação — elimina a leitura em vez de otimizá-la. Isso expôs que a dependência restante era o **estoque**, que não pode ser congelado por ser recurso contendido, e levou à aceitação assíncrona da `ADR-0007`.
+A saída — preço estabelecido em uma **cotação prévia** e não relido na criação — elimina a leitura em vez de otimizá-la. Isso expôs que a dependência restante era a **conferência dos termos contra o Catálogo**, que não pode ser congelada por ser verificação e não acordo, e levou à aceitação assíncrona da `ADR-0007`.
 
 **Nota de processo:** a alternativa "read model por evento" havia sido rejeitada abaixo *por prazo, não por mérito*. Ela foi alcançada de novo por um caminho independente — o da correção de negócio —, o que confirma que a rejeição por prazo merecia reexame. O desfecho foi melhor que o read model: nenhuma leitura, em vez de uma leitura local.
 

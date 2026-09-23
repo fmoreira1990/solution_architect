@@ -42,7 +42,7 @@ Uma política que valida apenas schema entrega **falsa segurança** — pior que
 | S3 | Alterar a **garantia de entrega** de um evento | exactly-once → at-least-once |
 | S4 | Alterar unidade, moeda ou fuso **sem renomear** o campo | preço em reais → centavos |
 | S5 | Alterar **ordem ou cardinalidade** esperada de eventos | evento que era único passa a repetir |
-| S6 | Alterar o **efeito colateral** de uma operação | POST que reservava estoque deixa de reservar |
+| S6 | Alterar o **efeito colateral** de uma operação | `POST /quotes` que congelava o preço passa a apenas consultá-lo |
 
 **Qualquer item das duas listas exige nova versão e ADR.** Não há exceção por "mudança pequena" — o tamanho da mudança não tem relação com o tamanho da quebra.
 

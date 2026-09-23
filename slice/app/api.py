@@ -11,7 +11,7 @@ import uuid
 
 from fastapi import FastAPI, Header, HTTPException, Response
 
-from . import oferta, pedidos, relay
+from . import catalogo, oferta, pedidos, relay
 from .broker import BrokerStub
 from .validador import Validador
 
@@ -34,6 +34,24 @@ def criar_app(broker=None, validador=None) -> FastAPI:
             raise HTTPException(409, {"erro": "chave_idempotencia_conflitante", "detalhe": str(e)})
 
     # ---------------------------------------------------------------- v2
+    @app.post("/v2/quotes", status_code=201)
+    def cotar_v2(corpo: dict):
+        """Cotação (ADR-0007).
+
+        Única rota que lê o Catálogo de forma síncrona — e está **fora** do
+        caminho crítico que `CTX-04` cronometra. Devolve os termos assinados;
+        a criação valida a assinatura localmente.
+        """
+        try:
+            itens = [(i["sku"], i["quantidade"]) for i in corpo["itens"]]
+            return oferta.emitir(itens)
+        except KeyError as e:
+            raise HTTPException(422, {"erro": "sku_inexistente", "detalhe": str(e)})
+        except catalogo.CatalogoIndisponivel as e:
+            # Degradação: sem Catálogo não há cotação, mas pedidos existentes
+            # seguem consultáveis e o aceite continua funcionando.
+            raise HTTPException(503, {"erro": "catalogo_indisponivel", "detalhe": str(e)})
+
     @app.post("/v2/orders", status_code=201)
     def criar_v2(
         corpo: dict,

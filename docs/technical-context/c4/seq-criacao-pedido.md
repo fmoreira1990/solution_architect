@@ -15,31 +15,27 @@ sequenceDiagram
     autonumber
     actor C as Cliente
     participant B as BFF
-    participant Ca as Carrinho e Oferta
     participant K as Cache/Catálogo
-    participant E as Estoque
     participant P as Pedidos
     participant DB as Banco de Pedidos
     participant R as Relay
     participant Br as Broker
-    participant V as Validadores
+    participant V as Validador
 
     rect rgb(238, 246, 255)
-    note over C,E: ANTES do caminho crítico — aqui mora a chamada externa
-    C->>B: monta carrinho
-    B->>Ca: cotar itens
-    Ca->>K: resolver em LOTE (2 chamadas, não 9)
-    K-->>Ca: preço, descrição, unidade, peso
-    Ca->>E: reservar (TTL)
-    E-->>Ca: reservado
-    Ca-->>B: OFERTA ASSINADA (HMAC + validade)
+    note over C,K: ANTES do caminho crítico — aqui mora a chamada externa
+    C->>B: monta o pedido
+    B->>P: POST /v2/quotes
+    P->>K: resolver em LOTE (2 chamadas, não 9)
+    K-->>P: preço, descrição, unidade, peso
+    P-->>B: COTAÇÃO ASSINADA (HMAC + validade)
     end
 
     rect rgb(232, 245, 233)
     note over C,DB: CAMINHO CRÍTICO — p95 ≤ 500ms · ZERO chamada de saída
     C->>B: finalizar
-    B->>P: POST /v2/orders<br/>Idempotency-Key + oferta
-    P->>P: valida oferta (assinatura + validade) — LOCAL
+    B->>P: POST /v2/orders<br/>Idempotency-Key + cotação
+    P->>P: valida cotação (assinatura + validade) — LOCAL
     P->>DB: BEGIN
     P->>DB: 1. idempotency_key ← falha rápido na PK
     P->>DB: 2. pedido (status=RECEBIDO)
@@ -57,6 +53,7 @@ sequenceDiagram
     R->>DB: marca publicado_em (②)
     Br->>V: entrega (at-least-once)
     V->>V: deduplica por event_id
+    V->>K: confere os termos vs. Catálogo
     V->>P: confirmar / rejeitar
     P->>DB: transição + novo outbox
     end
@@ -66,7 +63,7 @@ sequenceDiagram
 
 ## Leitura do diagrama
 
-**As três faixas são a decisão arquitetural.** Tudo que exige resposta externa está na faixa azul (antes) ou amarela (depois). A faixa verde — o caminho crítico que `CTX-04` cronometra — não tem **nenhuma** chamada de saída.
+**As três faixas são a decisão arquitetural.** Tudo que exige resposta externa está na faixa azul (a cotação) ou amarela (a validação). A faixa verde — o caminho crítico que `CTX-04` cronometra — não tem **nenhuma** chamada de saída.
 
 **A ordem dentro da transação não é arbitrária.** A chave de idempotência entra **primeiro** para falhar rápido na `PRIMARY KEY`; se falhar, a transação inteira é revertida, inclusive o outbox — nunca sobra evento órfão.
 
@@ -92,8 +89,8 @@ sequenceDiagram
         DB-->>P: ❌ violação de PRIMARY KEY
         P->>P: payload_hash não confere
         P-->>B: 409 Conflict — nenhum pedido criado
-    else Oferta expirada ou adulterada
-        B->>P: POST com oferta inválida
+    else Cotação expirada ou adulterada
+        B->>P: POST com cotação inválida
         P->>P: HMAC não confere ou expira_em vencido
         P-->>B: 422 — não abre transação
     else 20 requisições CONCORRENTES, mesma chave
@@ -114,7 +111,9 @@ sequenceDiagram
 | Retry mesma chave | `test_replay_com_mesma_chave_devolve_o_mesmo_pedido` |
 | **20 concorrentes** | `test_vinte_requisicoes_concorrentes_criam_exatamente_um_pedido` ⭐ |
 | Payload divergente | `test_mesma_chave_com_payload_diferente_responde_409` |
-| Oferta expirada / adulterada | `test_oferta_expirada_e_recusada`, `test_oferta_adulterada_e_recusada` |
+| Cotação expirada / adulterada | `test_oferta_expirada_e_recusada`, `test_oferta_adulterada_e_recusada` |
+| Cotação honrada mesmo com o Catálogo mudando | `test_cotacao_assinada_e_honrada_mesmo_com_o_catalogo_mudando` |
+| Parceiro com preço divergente é rejeitado depois | `test_parceiro_com_preco_divergente_e_rejeitado_apos_o_aceite` |
 | Transação única | `test_pedido_e_evento_nascem_na_mesma_transacao` |
 | Replay com estado corrente | `test_replay_devolve_estado_corrente_e_nao_o_gravado` |
 
@@ -122,4 +121,4 @@ sequenceDiagram
 
 ## Canal de parceiro
 
-Idêntico a partir do `POST`, **sem a faixa azul**: o parceiro não tem carrinho, logo não tem oferta nem reserva. Preço e atributos vêm no payload dele e são validados de forma assíncrona junto com o estoque. Taxa de rejeição estruturalmente maior — esperado, não defeito.
+Idêntico a partir do `POST`, **sem a faixa azul**: o parceiro não cota. Preço e atributos vêm no payload dele e são conferidos contra o Catálogo na validação assíncrona. Taxa de rejeição estruturalmente maior — esperado, não defeito.

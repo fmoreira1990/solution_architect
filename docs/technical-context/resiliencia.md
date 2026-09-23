@@ -20,12 +20,12 @@ Isso importa porque é aritmético: cada dependência síncrona no caminho crít
 
 ## Orçamento de tempo, antes dos valores
 
-Timeout que não cabe no orçamento de latência é ficção. O caminho de cotação (Carrinho → Catálogo) tem **80 ms** no orçamento de `CTX-04`; qualquer timeout acima disso significa que o cliente já desistiu antes da resposta chegar.
+Timeout que não cabe no orçamento de latência é ficção. A cotação (Pedidos → Catálogo) tem **80 ms** no orçamento de `CTX-04`; qualquer timeout acima disso significa que o cliente já desistiu antes de a resposta chegar.
 
 | Chamada | Orçamento | Timeout | Retentativas | Orçamento total pior caso |
 |---|---|---|---|---|
-| Carrinho → Catálogo (lote) | 80 ms | **150 ms** | 1 | 300 ms + jitter |
-| Carrinho → Estoque (reserva) | 120 ms | **250 ms** | 1 | 500 ms |
+| Cotação → Catálogo (lote) | 80 ms | **150 ms** | 1 | 300 ms + jitter |
+| Validação assíncrona → Catálogo | fora do caminho crítico | **2 s** | 3, com backoff | — |
 | Relay → Broker | fora do caminho crítico | **2 s** | infinitas, com backoff | — |
 | Gateway → Webhook do parceiro | fora do caminho crítico | **5 s** | 6, em ~30 min | — |
 | Aplicação → Banco | 120 ms | **1 s** | 0 | 1 s |
@@ -59,7 +59,7 @@ espera = min(base × 2^tentativa, teto) × (0,5 + random(0,5))
 | Dependência | Abre em | Meio-aberto | Comportamento aberto |
 |---|---|---|---|
 | Catálogo | 50% de erro em 20 requisições / 10 s | 1 sonda a cada 5 s | serve do cache, marca a cotação como defasada |
-| Estoque (reserva) | 50% em 20 req / 10 s | 1 sonda / 5 s | segue **sem** reserva; rejeição pós-aceite sobe |
+| Catálogo (validação) | 50% em 20 req / 10 s | 1 sonda / 5 s | validação não conclui; pedido **permanece** em `RECEBIDO` |
 | Webhook por parceiro | 5 falhas seguidas | 1 sonda / 60 s | acumula em fila; DLQ após a janela |
 
 **O breaker do webhook é por parceiro, não global.** Um parceiro fora do ar não pode abrir o circuito dos demais — é o que transforma o gateway em bulkhead de verdade.
@@ -88,9 +88,9 @@ Ordem de sacrifício, do menos ao mais doloroso:
 |---|---|---|---|
 | 1 | Catálogo lento | cotação usa cache; preço pode estar defasado | compra funciona |
 | 2 | Catálogo fora | vitrine limitada a itens em cache | **pedidos existentes consultáveis** |
-| 3 | Estoque fora | sem reserva; rejeição pós-aceite sobe | **aceite funciona** |
+| 3 | Catálogo fora na validação | pedidos ficam em `RECEBIDO`; reconciliação assume | **aceite funciona** |
 | 4 | Broker fora | outbox acumula; confirmação atrasa | **aceite funciona** |
-| 5 | Pagamento fora | pedidos ficam em `EM_VALIDACAO` | **aceite funciona** |
+| 5 | Relay parado | confirmação atrasa; outbox acumula | **aceite funciona** |
 | 6 | Banco de Pedidos fora | **aceite para** | nada — é o único SPOF |
 
 **Dos seis cenários, apenas o último derrota a criação de pedido.** Essa é a propriedade que o desenho compra em troca da complexidade assíncrona, e é o que torna `CTX-03` alcançável.

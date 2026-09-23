@@ -55,7 +55,7 @@ Isto **não** recomenda Python para a plataforma de Pedidos. A stack de produç�
 
 ### Duas rejeições que valem registro
 
-**`make` como comando único.** O `make` desta máquina é da Embarcadero, **incompatível com GNU Make**. Um `Makefile` teria falhado no ambiente onde foi escrito. `python prova.py` não depende de ferramenta externa.
+**`make` como comando único.** O `make` disponível no ambiente de desenvolvimento **não é GNU Make**, e um `Makefile` teria falhado onde foi escrito. `python prova.py` não depende de ferramenta externa nem de variante de implementação.
 
 **Broker real (Kafka, Redpanda).** Rejeitado por escopo, não por indisponibilidade. A decisão provada é *"pedido e evento nunca divergem"*, que vive na **transação** e no **relay** — não no transporte. Um broker real não fortaleceria a prova e quebraria o comando único. O stub registra publicações e entrega duplicatas, que é exatamente o que o at-least-once produz.
 

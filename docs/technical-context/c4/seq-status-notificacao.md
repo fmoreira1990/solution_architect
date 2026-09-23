@@ -13,7 +13,7 @@
 ```mermaid
 sequenceDiagram
     autonumber
-    participant V as Validadores<br/>(estoque, pagamento, fraude)
+    participant V as Validador<br/>(termos vs. Catálogo)
     participant P as Pedidos
     participant DB as Banco
     participant R as Relay
@@ -119,7 +119,7 @@ sequenceDiagram
     loop diário
         J->>DB: pedidos em EM_VALIDACAO além do timeout
         J->>DB: eventos no outbox não publicados
-        J->>DB: reservas expiradas sem pedido
+        J->>DB: cotações expiradas e nunca usadas
         J->>Op: relatório + alerta
     end
 ```

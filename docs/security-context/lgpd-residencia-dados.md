@@ -16,7 +16,7 @@
 | Nome, e-mail, telefone | **Identidade** *(não em Pedidos)* | **pessoal** | execução de contrato | enquanto houver relação + prazo legal |
 | Endereço de entrega | Pedidos ou Logística | **pessoal** | execução de contrato | prazo fiscal |
 | CPF / documento | Identidade, Fiscal | **pessoal sensível na prática** | obrigação legal (fiscal) | prazo fiscal — não expurgável antes |
-| Dados de pagamento | **Pagamento** *(tokenizado)* | **pessoal** | execução de contrato | conforme PCI; nunca em Pedidos |
+| Dados de pagamento | sistema de pagamento externo *(tokenizado)* | **pessoal** | execução de contrato | conforme PCI; **nunca em Pedidos** |
 | Snapshot dos itens (SKU, preço, descrição) | Pedidos | **não pessoal** | — | vida do pedido |
 | Histórico de compra | Pedidos | **pessoal por agregação** | execução de contrato / legítimo interesse | — |
 | Log de acesso à API | Observabilidade | **pessoal** (IP, identificador) | legítimo interesse | 90 dias `???` |
@@ -80,7 +80,7 @@ O enunciado fala em *"requisitos de residência de dados do novo país"*. Essa f
 | **Opt-out de venda/compartilhamento** + sinal GPC na Califórnia | Requisito **novo**, sem equivalente direto na LGPD: a preferência precisa propagar a todo consumidor de dado, inclusive parceiros |
 | **Sem mandato de residência** | Segregação regional deixa de ser obrigação e vira **escolha justificada** |
 | **Notificação de incidente** por lei estadual | Processo de resposta precisa mapear jurisdições |
-| **PCI DSS** para dados de cartão | Contratual, não legal; já atendido por tokenização em Pagamento |
+| **PCI DSS** para dados de cartão | Contratual, não legal; atendido por tokenização no provedor de pagamento, fora desta plataforma |
 
 ### A restrição que de fato aparece: a transferência
 

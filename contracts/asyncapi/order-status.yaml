@@ -7,7 +7,7 @@ info:
     Eventos publicados por Pedidos (ADR-0002). Atendem `CTX-08` — notificação
     assíncrona de mudança de status para parceiros de marketplace — e são
     também o **mecanismo de continuidade do processo** (ADR-0007): a validação
-    de estoque, pagamento e fraude acontece em cima deles.
+    dos termos contra o Catálogo acontece em cima deles.
 
     Evento perdido aqui não é aviso perdido. É **venda parada**.
 
@@ -61,8 +61,8 @@ operations:
       $ref: '#/channels/pedidos.ciclo-de-vida'
     summary: Consumir os eventos de ciclo de vida do pedido.
     description: |
-      Consumidores típicos: validação (estoque, pagamento, antifraude),
-      gateway de notificação a parceiros, fiscal e logística.
+      Consumidores típicos: o validador assíncrono (confere os termos contra
+      o Catálogo) e o gateway de notificação a parceiros.
 
       Todos deduplicam por `event_id`.
 
@@ -92,7 +92,7 @@ components:
       summary: |
         Rejeição pós-aceite é **modo de operação previsto**, não incidente
         (ADR-0007). O canal de parceiro tem taxa estruturalmente maior, por
-        não ter carrinho — logo, nem oferta nem reserva.
+        não cotar: ele submete os termos do sistema dele, conferidos depois.
       contentType: application/json
       payload:
         $ref: '#/components/schemas/EnvelopeMudancaDeEstado'

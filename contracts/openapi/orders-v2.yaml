@@ -140,7 +140,7 @@ components:
     Oferta:
       type: object
       description: |
-        Emitida pelo Carrinho e **carregada** pela criação, não relida
+        Emitida por `POST /v2/quotes` e **carregada** pela criação, não relida
         (ADR-0007). É o que remove o Catálogo do caminho crítico.
       required: [itens, catalogo_versao, expira_em, assinatura]
       properties:

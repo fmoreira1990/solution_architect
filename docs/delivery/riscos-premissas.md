@@ -20,12 +20,12 @@ Se qualquer uma for falsa, algo muda. A coluna da direita diz **o quê**.
 | PR-04 | Cloud AWS | decidida | Muda serviços, não a arquitetura lógica |
 | PR-05 | Entrega ao parceiro por webhook assinado + polling | declarada | Muda o contrato de notificação |
 | PR-06 | 60% do volume em 8h comerciais, pico de 3× | **inventada** | **Varejo tem Black Friday.** Se o pico real for 10× ou 20×, o dimensionamento inteiro muda |
-| PR-07 | **Estoque e Pagamento existem como serviços integráveis** | **inventada** | A `ADR-0007` pressupõe integrações que não existem. **A onda 30 não cabe em 30 dias** |
-| PR-08 | Já existe um carrinho na plataforma atual | **inventada** | "Carrinho e Oferta" deixa de ser evolução e vira contexto novo. Esforço da onda 30 sobe |
+| ~~PR-07~~ | ~~Estoque e Pagamento existem como serviços integráveis~~ | ✅ **eliminada** | Removida em 2026-09-23 pelo recorte de escopo: contextos não nomeados pelo enunciado saíram do desenho. O risco deixou de existir em vez de ser administrado |
+| PR-08 | A capacidade de **cotação** pode já existir na plataforma atual | declarada | Se existir, é evolução de algo e não capacidade nova — o esforço da onda 30 cai |
 | PR-09 | ~40 ms por chamada ao Catálogo | estimativa | Todo o orçamento de latência de `constraints.md` §7.2 se desloca |
 | PR-10 | TTL de 24h cobre o retry dos parceiros | declarada | Retry legítimo além disso cria pedido novo |
 
-**PR-07 é a mais perigosa.** O enunciado nunca menciona Estoque nem Pagamento; a arquitetura os trata como existentes. É a premissa que, sozinha, invalida o prazo de `CTX-11`.
+**O maior risco da proposta foi eliminado, não mitigado.** `PR-07` supunha Estoque e Pagamento como serviços existentes — inventando escopo que o enunciado não nomeia. O recorte de 2026-09-23 removeu esses contextos do desenho, e a `ADR-0007` foi reancorada no Catálogo sem perder o argumento do `CTX-17`.
 
 ---
 
@@ -35,7 +35,7 @@ Probabilidade × impacto, com resposta. Ordenados por exposição.
 
 | # | Risco | Prob. | Impacto | Resposta |
 |---|---|---|---|---|
-| R1 | **Estoque/Pagamento não existirem** (PR-07) | Média | Crítico | Validar **antes** de comprometer o prazo. É a primeira pergunta ao Client Face |
+| R1 | **A plataforma real ter integrações no caminho de criação** que o enunciado não nomeia | Média | Alto | Cada uma reintroduz o `CTX-17`. Mapear antes de comprometer o prazo — primeira pergunta ao Client Face |
 | R2 | **Pré-requisitos P1–P3 escorregarem** — baseline, observabilidade, inventário de consumidores | Alta | Alto | Tratá-los como caminho crítico, não tarefa paralela. Sem baseline o G30 é indecidível |
 | R3 | **Consumidores atuais serem externos** | Média | Alto | Muda `CTX-10` de negociável para contratual; 6 meses vira piso, não teto. Client Face precisa entrar |
 | R4 | **Deduplicação nos consumidores depender de terceiros** (tarefa A9) | Alta | Médio | Declarar no contrato AsyncAPI; prever janela de adequação; medir quem já deduplica |
@@ -61,7 +61,7 @@ Coisas que sabemos estar erradas ou incompletas e escolhemos carregar.
 | D5 | **Sem ordenação global de eventos** | Nenhum requisito pede | Se algum consumidor exigir |
 | D6 | **Sem testes de injeção de falha (chaos)** | Não cabe nas 3 ondas | Antes de escalar para 10× real |
 | D7 | **Valores de timeout derivados, não medidos** | Baseline não existe | Recalibrar na onda 30 (tarefa P1) |
-| D8 | **Oversell como modo de operação** | Consequência direta da `ADR-0007` | Mitigado por reserva e autorizar-sem-capturar; não eliminado |
+| D8 | **Rejeição pós-aceite como modo de operação** | Consequência direta da `ADR-0007` | Mitigada pela cotação assinada nos canais próprios; **sem mitigação** no canal de parceiro |
 | D9 | **Backfill de snapshot impossível** | O dado nunca existiu | **Nunca se resolve.** Pedidos antigos seguem sem prova de preço |
 
 ---
@@ -88,7 +88,7 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 
 | # | Decisão | Quem decide | Bloqueia |
 |---|---|---|---|
-| V1 | Estoque e Pagamento existem? (PR-07) | Client Face / arquitetura da conta | Prazo da onda 30 |
+| V1 | Existem integrações no caminho de criação além do Catálogo? | Client Face / arquitetura da conta | Prazo da onda 30; cada uma reintroduz o `CTX-17` |
 | V2 | Consumidores atuais são internos ou externos? | Client Face | `ADR-0004`, janela de deprecação |
 | V3 | ~~Qual é o segundo país?~~ **Resolvido: EUA** | — | ✅ fechado |
 | V9 | **Instrumento jurídico para transferência BR → EUA** (`CTX-09c`) | Jurídico / DPO | `ADR-0006`; nenhuma PII brasileira cruza sem ele |
@@ -105,4 +105,4 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 
 A proposta tem **três premissas inventadas** (PR-06, PR-07, PR-08), **nove débitos aceitos** e **oito decisões que dependem do cliente**. Isso não é fragilidade da análise — é o estado real de qualquer proposta feita sobre um enunciado, e declará-lo é o que permite ao cliente decidir com informação.
 
-O maior risco isolado é **PR-07**: se Estoque e Pagamento não existirem, o prazo de 30 dias não fecha, e isso precisa ser verificado antes de qualquer compromisso comercial.
+O recorte de escopo de 2026-09-23 eliminou o maior risco isolado — `PR-07`, que supunha Estoque e Pagamento como existentes. O que resta de mais perigoso é `V1`: se a plataforma real tiver integrações no caminho de criação que o enunciado não nomeia, cada uma reintroduz o `CTX-17` e muda o prazo.

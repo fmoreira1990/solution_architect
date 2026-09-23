@@ -17,6 +17,11 @@ import { JSDOM } from 'jsdom';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const RAIZ = resolve(process.argv[2] ?? join(AQUI, '..', 'docs'));
 
+// Guarda contra falso-verde. Uma versão anterior deixou de encontrar metade
+// dos diagramas (arquivos gravados com CRLF) e continuou passando, sem ter
+// validado nada. Contagem mínima é a defesa contra esse modo de falha.
+const MINIMO = Number(process.env.MERMAID_MINIMO ?? 10);
+
 // Mermaid precisa de DOM para sanitizar rótulos HTML; Node puro não tem.
 const dom = new JSDOM('<!DOCTYPE html><body></body>', { pretendToBeVisual: true });
 global.window = dom.window;
@@ -26,6 +31,8 @@ global.Element = dom.window.Element;
 global.SVGElement = dom.window.SVGElement;
 
 const mermaid = (await import('mermaid')).default;
+
+const BLOCO = /```mermaid\n([\s\S]*?)```/g;
 
 function varrer(dir, acc = []) {
   for (const entrada of readdirSync(dir)) {
@@ -40,8 +47,11 @@ let total = 0;
 let erros = 0;
 
 for (const arquivo of varrer(RAIZ).sort()) {
-  const texto = readFileSync(arquivo, 'utf8');
-  const blocos = [...texto.matchAll(/```mermaid\n([\s\S]*?)```/g)].map((m) => m[1]);
+  // Normaliza CRLF antes de casar: sem isso, arquivo gravado no Windows
+  // simplesmente não é visto, e o validador passa sem olhar.
+  const texto = readFileSync(arquivo, 'utf8').split('\r\n').join('\n');
+  const blocos = [...texto.matchAll(BLOCO)].map((m) => m[1]);
+
   for (let i = 0; i < blocos.length; i++) {
     total++;
     const nome = `${relative(RAIZ, arquivo)} [${i + 1}]`;
@@ -57,4 +67,11 @@ for (const arquivo of varrer(RAIZ).sort()) {
 }
 
 console.log(`\n${total} diagramas, ${erros} com erro`);
+
+if (total < MINIMO) {
+  console.log(`ERRO: esperado ao menos ${MINIMO} diagramas, encontrado ${total}.`);
+  console.log('A varredura deixou de encontrar arquivos — build vermelho em vez de falso-verde.');
+  process.exit(2);
+}
+
 process.exit(erros ? 1 : 0);

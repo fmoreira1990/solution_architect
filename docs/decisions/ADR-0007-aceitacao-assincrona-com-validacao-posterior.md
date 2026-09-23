@@ -2,7 +2,7 @@
 
 **Status:** Aceita — 2026-09-22
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** **em que momento do ciclo de vida** o pedido é validado. Não decide quem valida (estoque, pagamento, fraude) nem como — decide que a validação é posterior ao aceite.
+**Escopo deste documento:** **em que momento do ciclo de vida** o pedido é validado contra o Catálogo. Não decide as regras de validação em si — decide que ela é posterior ao aceite.
 **Requisitos cobertos:** `CTX-03`, `CTX-04`, `CTX-08`, `CTX-17`, `P1-10`, `P1-13`, `P1-15`
 **Supersede:** `ADR-0003` seção (b) — caminho de leitura na criação
 **Fontes:** `docs/technical-context/constraints.md` (§8), `docs/decisions/ADR-0003-...md`, `docs/business-context/jornada.md`
@@ -12,29 +12,25 @@
 
 ## Contexto
 
-A ADR-0003 removeu o Catálogo do caminho de criação por meio do snapshot, e a evolução do desenho levou o preço a ser estabelecido no carrinho — não relido na criação. Isso resolveu a dependência de **preço**.
+A `ADR-0003` removeu o Catálogo do caminho de **leitura** por meio do snapshot: consultar um pedido não depende mais dele. Restou a dependência no caminho de **criação** — validar que os termos submetidos correspondem ao Catálogo.
 
-Restou a **disponibilidade de estoque**, que não pode receber o mesmo tratamento. A assimetria é de natureza, não de implementação:
+Essa validação não pode ser resolvida por snapshot, e a assimetria é de natureza:
 
 | | Natureza | Congelável? |
 |---|---|---|
-| **Preço** | termo **acordado** entre as partes | ✅ é compromisso, e compromisso se registra |
-| **Estoque** | recurso **contendido** com outros compradores | ❌ não se acorda estoque; ele é do mundo real |
+| **Termos acordados** (preço, descrição, unidade) | compromisso entre as partes | ✅ é acordo, e acordo se registra |
+| **Correspondência com o Catálogo** | estado do mundo **no instante da validação** | ❌ não se acorda; é verificação |
 
-Com verificação síncrona de estoque no aceite, o `CTX-17` apenas troca de parceiro e a aritmética permanece idêntica:
+O canal de parceiro torna isso concreto: o parceiro submete preço e descrição vindos do sistema **dele**. Alguém precisa conferir contra o Catálogo — e fazer isso de forma síncrona reintroduz o `CTX-17`:
 
 ```
-Pedidos 99,9% × Estoque 99,9%   = 99,8%  →  86,4 min/mês
-Com pagamento síncrono também:
-Pedidos × Estoque × Pagamento   = 99,7%  → 129,6 min/mês
-Error budget de CTX-03                    →  43,2 min/mês
+Pedidos 99,9% × Catálogo 99,9%  =  99,8%  →  86,4 min/mês
+Error budget de CTX-03                     →  43,2 min/mês
 ```
 
-Cada dependência síncrona no caminho crítico multiplica a indisponibilidade. Três serviços a 99,9% entregam 99,7% — **três vezes** o budget.
+Cada dependência síncrona no caminho crítico multiplica a indisponibilidade. A aritmética é a mesma da `ADR-0003` §8 de `constraints.md`, com o Catálogo no papel que antes era da leitura de preço.
 
-O padrão consolidado de mercado resolve isso invertendo a ordem: marketplaces aceitam o pedido primeiro e validam estoque, pagamento e fraude em seguida.
-
----
+O padrão consolidado de mercado resolve invertendo a ordem: aceita-se o pedido primeiro e valida-se em seguida.
 
 ## Decisão
 
@@ -43,14 +39,14 @@ O pedido é **aceito** de forma local e **validado** de forma assíncrona.
 ### Máquina de estados
 
 ```
-POST /orders  →  201  RECEBIDO            operação local: valida a oferta
-                        ↓ outbox              do carrinho, persiste, publica
-                    EM_VALIDACAO          estoque · pagamento · fraude
+POST /orders  →  201  RECEBIDO            operação local: valida a cotação
+                        ↓ outbox              assinada, persiste, publica
+                    EM_VALIDACAO          confere os termos contra o Catálogo
                         ↓
             CONFIRMADO  ou  REJEITADO     → evento → cliente e parceiro
 ```
 
-O handler de criação **não faz nenhuma chamada de saída**. Ele valida a oferta (dado local, vindo do carrinho), grava pedido, itens, snapshot e outbox na mesma transação, e responde.
+O handler de criação **não faz nenhuma chamada de saída**. Ele valida a cotação (assinatura e validade — verificação local), grava pedido, itens, snapshot e outbox na mesma transação, e responde.
 
 ### Dois SLOs, não um
 
@@ -64,15 +60,15 @@ Redefinir "criação" como "aceitação" torna o p95 de 500 ms trivial. Isso é 
 
 Sem as duas últimas, "500 ms" é número de vitrine.
 
-### Pagamento: autorizar no aceite, capturar na confirmação
+### Cotação assinada — otimização, não pré-requisito
 
-Aceitar o que talvez não se possa entregar exige que o dinheiro não seja movimentado antes da confirmação. Autorização reserva o limite sem capturar; captura ocorre em `CONFIRMADO`. Em `REJEITADO`, a autorização é liberada.
+Canais próprios obtêm uma **cotação** antes de submeter o pedido: `POST /v2/quotes` lê o Catálogo e devolve os termos assinados com validade. A criação valida a assinatura **localmente** e honra o preço cotado, mesmo que o Catálogo mude depois.
 
-### Reserva no carrinho — otimização, não pré-requisito
+Isso reduz a rejeição pós-aceite a praticamente zero nesses canais — mas **não é condição para a decisão funcionar**, e por isso entra como otimização, não como ADR separada.
 
-Para canais próprios (web e app), reservar estoque no carrinho com TTL reduz a taxa de rejeição pós-aceite. **Não é condição para esta decisão funcionar**, e por isso entra aqui como otimização e não como ADR separada.
+O canal de parceiro **não tem cotação**: ele submete preço e descrição do sistema dele. A conferência contra o Catálogo acontece na validação assíncrona, e sua taxa de rejeição é estruturalmente maior. Comportamento esperado do modelo, não defeito.
 
-O canal de parceiro não tem carrinho e, portanto, não tem reserva — sua taxa de rejeição é estruturalmente maior. Isso é comportamento esperado do modelo, não defeito.
+**A cotação é capacidade do próprio Pedidos**, não um contexto separado: ela existe para tirar a leitura do Catálogo do caminho crítico, e quem a emite é quem precisa do resultado.
 
 ---
 
@@ -81,10 +77,10 @@ O canal de parceiro não tem carrinho e, portanto, não tem reserva — sua taxa
 | Alternativa | Status | Por quê |
 |---|---|---|
 | **Aceitação assíncrona com validação posterior** | ✅ **Escolhida** | Única que zera dependência síncrona no caminho crítico. Resolve `CTX-17` em vez de deslocá-lo, e transforma `CTX-08` em mecanismo primário |
-| Validação síncrona de estoque no aceite | ❌ Rejeitada | 99,9% × 99,9% = 99,8% → 86,4 min/mês contra budget de 43,2. `CTX-03` inatingível, mesma armadilha da ADR-0003 com outro parceiro |
-| Reserva no carrinho + confirmação síncrona rápida | ❌ Rejeitada | Reduz a janela mas mantém chamada síncrona no aceite; e o canal de parceiro, sem carrinho, fica sem cobertura |
-| Aceitação assíncrona **sem** reserva alguma | ❌ Rejeitada | Funciona, mas eleva a rejeição nos canais próprios quando a redução é barata. Pior experiência sem ganho arquitetural |
-| Two-phase commit com Estoque e Pagamento | ❌ Rejeitada | Acopla o commit do pedido à disponibilidade de dois serviços externos; piora latência e disponibilidade simultaneamente, e não escala ao 10× |
+| Conferência síncrona contra o Catálogo no aceite | ❌ Rejeitada | 99,9% × 99,9% = 99,8% → 86,4 min/mês contra budget de 43,2. `CTX-03` inatingível — a mesma aritmética que a `ADR-0003` já havia enfrentado no caminho de leitura |
+| Cotação prévia + conferência síncrona rápida no aceite | ❌ Rejeitada | Reduz a janela mas mantém chamada síncrona; e o canal de parceiro, que não cota, fica sem cobertura |
+| Aceitação assíncrona **sem** cotação alguma | ❌ Rejeitada | Funciona, mas eleva a rejeição nos canais próprios quando a redução é barata. Pior experiência sem ganho arquitetural |
+| Two-phase commit entre Pedidos e Catálogo | ❌ Rejeitada | Acopla o commit do pedido à disponibilidade do Catálogo; piora latência e disponibilidade ao mesmo tempo, e não escala ao 10× |
 | Saga com compensação síncrona no aceite | ❌ Rejeitada | Mesma dependência síncrona, com complexidade adicional de compensação — o pior dos dois mundos |
 
 ---
@@ -103,7 +99,7 @@ O item 3 é o mais consequente para a proposta: ele promove o outbox (ADR-0002) 
 
 ## Trade-offs aceitos
 
-- **Oversell é agora um modo de operação, não um incidente.** Aceita-se o que talvez não se entregue. No varejo físico, cancelar depois tem custo de experiência e implicação frente ao Código de Defesa do Consumidor. Mitigado por autorizar-sem-capturar e por reserva nos canais próprios, **não eliminado**.
+- **Rejeição pós-aceite vira modo de operação, não incidente.** Aceita-se um pedido que pode ser recusado depois. No varejo, recusar após aceitar tem custo de experiência e implicação frente ao Código de Defesa do Consumidor. Mitigado pela cotação assinada nos canais próprios, **não eliminado** — e no canal de parceiro não há mitigação possível.
 - **A reconciliação deixa de ser opcional** (`P1-15`). Pedido preso em `EM_VALIDACAO` é dinheiro parado e cliente sem resposta. Exige timeout, varredura periódica e política de desfecho — trabalho novo que não existia no desenho síncrono.
 - **O estado do pedido vira o modelo de domínio central.** Ganho de clareza em DDD, custo de complexidade: transições precisam ser explícitas, testadas e observáveis.
 - **Quebra semântica sob schema compatível.** O `201` deixa de significar "venda feita" e passa a significar "pedido recebido". Nenhum contract test de schema detecta isso. Tratado na **ADR-0004**, com fachada síncrona para v1 — e é o risco mais subestimado desta decisão.
@@ -113,11 +109,11 @@ O item 3 é o mais consequente para a proposta: ele promove o outbox (ADR-0002) 
 
 ## Gatilho de revisão
 
-**Quando a taxa de rejeição pós-aceite ultrapassar `???`% nos canais próprios** — o valor precisa ser estabelecido com o negócio antes da onda 60. Acima dele, o aceite vira promessa não confiável e a reserva no carrinho deixa de ser otimização e passa a ser obrigatória.
+**Quando a taxa de rejeição pós-aceite ultrapassar o limite acordado nos canais próprios.** Acima dele, o aceite vira promessa não confiável e a cotação assinada deixa de ser otimização e passa a ser obrigatória.
 
 **Quando o p95 de confirmação passar de 30 s.** Indica que a validação assíncrona virou fila, não pipeline, e o cliente perde a noção de desfecho.
 
-**Se houver exigência regulatória ou contratual de confirmação imediata** em algum canal. Isso reabre a decisão para aquele canal especificamente, provavelmente com reserva síncrona.
+**Se houver exigência regulatória ou contratual de confirmação imediata** em algum canal. Isso reabre a decisão para aquele canal especificamente, provavelmente com conferência síncrona e o custo de disponibilidade que ela traz.
 
 ---
 
@@ -125,7 +121,7 @@ O item 3 é o mais consequente para a proposta: ele promove o outbox (ADR-0002) 
 
 **Fitness function primária — teste com as dependências desligadas:**
 
-> O pipeline sobe Pedidos **sem Estoque e sem Pagamento** e verifica que `POST /orders` responde `201 RECEBIDO` e que o evento correspondente está no outbox. Se falhar, alguma validação voltou ao caminho síncrono.
+> O pipeline sobe Pedidos **com o Catálogo fora do ar** e verifica que `POST /orders` responde `201 RECEBIDO` e que o evento correspondente está no outbox. Se falhar, alguma validação voltou ao caminho síncrono.
 
 **Complementares, no CI:**
 
@@ -139,7 +135,7 @@ O item 3 é o mais consequente para a proposta: ele promove o outbox (ADR-0002) 
 if grep -rnE 'http(Client)?\.(get|post|put)|fetch\(|HttpClient' \
      ./src/pedidos/criacao 2>/dev/null; then
   echo "ADR-0007: chamada de saída no caminho de aceite do pedido." >&2
-  echo "O aceite é local. Validação de estoque/pagamento é assíncrona." >&2
+  echo "O aceite e local. A conferencia contra o Catalogo e assincrona." >&2
   exit 2
 fi
 ```
@@ -152,5 +148,5 @@ fi
 
 - O alvo de p95 de confirmação (proposto 30 s) e o limite de taxa de rejeição são `???`. Ambos precisam de dono no negócio antes da onda 60; sem eles, o gatilho de revisão não tem número.
 - A política de desfecho para pedido preso em `EM_VALIDACAO` não está definida: cancela automaticamente, escala para atendimento, ou tenta novamente? Decisão de negócio.
-- O TTL da reserva no carrinho não está definido e é o dial que calibra subvenda por carrinho abandonado.
+- A validade da cotação está implementada em 30 minutos (`oferta.emitir`, `validade_segundos=1800`). Precisa de confirmação do negócio: validade curta aumenta recotação, validade longa aumenta o risco de honrar preço defasado.
 - A interação com a idempotência (ADR-0001) precisa ficar explícita: retry após o aceite deve devolver o mesmo pedido em seu estado **corrente**, não recriar nem reverter para `RECEBIDO`.

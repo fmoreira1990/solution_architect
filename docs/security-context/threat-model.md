@@ -16,8 +16,8 @@
 | F2 | Internet → **parceiro de marketplace** | **nenhuma** — conteúdo dele é dado, nunca instrução | **alta** |
 | F3 | Borda → serviços internos | média | média |
 | F4 | Serviços → dados (PII) | alta | **alta** |
-| F5 | Região A ↔ Região B | alta | **alta** — `ADR-0006` pendente |
-| F6 | Plataforma → dependências (Catálogo, Estoque, Pagamento) | média | média |
+| F5 | Região Brasil ↔ Região EUA | alta | **alta** |
+| F6 | Plataforma → Catálogo | média | média |
 
 ---
 
@@ -94,11 +94,11 @@ Agrava o problema o fato de `X-Chamador` ser um **header controlado pelo cliente
 
 | # | STRIDE | Ameaça | Ativo | Mitigação | Risco residual |
 |---|---|---|---|---|---|
-| 5.1 | **I** | PII do país B replicada para a região A | conformidade regulatória | segregação regional — **`ADR-0006` pendente** | **bloqueado** |
+| 5.1 | **I** | PII brasileira replicada para a região dos EUA sem instrumento | `CTX-09c` — transferência internacional sob LGPD | segregação por domicílio (`ADR-0006`) | **alto até `V9` existir** |
 | 5.2 | **I** | Backup cruzando fronteira | idem | backup regional, chaves regionais | bloqueado |
 | 5.3 | **I** | Observabilidade exportando PII entre regiões | idem | telemetria sem PII; identificadores apenas | — |
 
-**Toda esta fronteira depende de `PR-03`** — qual é o segundo país. Sem isso, o regime aplicável é desconhecido e a `ADR-0006` não pode ser decidida. É o bloqueio mais consequente em aberto.
+**`PR-03` fechou como Estados Unidos**, e o regime não é o presumido: não há mandato de residência, mas há transferência internacional sob LGPD na direção BR → EUA. A `ADR-0006` está aceita; o que falta é o instrumento jurídico (`V9`).
 
 ---
 
@@ -132,7 +132,7 @@ Agrava o problema o fato de `X-Chamador` ser um **header controlado pelo cliente
 
 1. **A chave HMAC da oferta (F1.3) é o ativo mais concentrado do desenho.** Quem a obtém falsifica preço em qualquer pedido. Na fatia ela é fixa e sintética; em produção exige cofre e rotação.
 2. **Autorização por dono no `GET /orders/{id}` não existe na fatia** (F1.4, F2.5). Qualquer um com o UUID lê o pedido. É lacuna conhecida do escopo da prova, não do desenho.
-3. **F5 inteira está bloqueada** por `PR-03`.
+3. **F5 depende do instrumento de transferência (`V9`)**, que ainda não existe. Enquanto isso, nenhuma PII brasileira deveria atravessar.
 4. **Nenhum teste de segurança automatizado** além dos dois de oferta. SAST, verificação de dependências e teste de autorização ficam como débito.
 
 ## Pendências registradas

@@ -61,7 +61,7 @@ def aceitar(chamador: str, chave: str, corpo: dict):
     """Aceita o pedido. Retorna (pedido, foi_replay).
 
     Nenhuma chamada de saída acontece aqui — é a garantia da ADR-0007,
-    verificada pelo teste que sobe a aplicação sem Estoque e sem Pagamento.
+    verificada pelo teste que cria pedido com o Catálogo fora do ar.
     """
     oferta.validar(corpo["oferta"])  # local: assinatura e validade
 
@@ -104,6 +104,9 @@ def aceitar(chamador: str, chave: str, corpo: dict):
             _gravar_outbox(con, "PedidoRecebido", pedido_id, {
                 "pedido_id": pedido_id,
                 "cliente_id": corpo["cliente_id"],
+                # ADR-0007: pedido cotado tem o preço HONRADO na validação;
+                # pedido sem cotação (parceiro) é conferido contra o Catálogo.
+                "cotado": bool(corpo["oferta"].get("assinatura")),
                 "itens": [{"sku": i["sku"], "quantidade": i["quantidade"]} for i in itens],
             })
 

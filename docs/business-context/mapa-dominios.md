@@ -1,85 +1,106 @@
 # Mapa de Domínios — Pedidos e Catálogo
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** bounded contexts, ownership de dados e relacionamentos entre contextos. A topologia de execução está em `docs/technical-context/architecture.md`.
+**Escopo deste documento:** bounded contexts, ownership de dados e relacionamentos. O escopo é **exatamente o que o enunciado nomeia**: Pedidos e Catálogo, mais as capacidades que §2.2.1 exige (parceiros e identidade). A topologia de execução está em `docs/technical-context/architecture.md`.
 **Requisitos cobertos:** `P1-09`, `P1-10`
-**Fontes:** `docs/prd/pedidos-catalogo.md`, `docs/technical-context/constraints.md`, `docs/decisions/ADR-0003`, `ADR-0004`, `ADR-0007`
-**Data:** 2026-09-22
+**Fontes:** `docs/prd/pedidos-catalogo.md`, `docs/technical-context/constraints.md`, `ADR-0003`, `ADR-0004`, `ADR-0007`
+**Data:** 2026-09-23 *(recorte revisto: contextos não presentes no enunciado foram removidos)*
+
+---
+
+## A linha de corte
+
+O desafio descreve uma *"plataforma de **Pedidos e Catálogo**"*. Uma versão anterior deste mapa incluía Estoque, Pagamento e Carrinho como contextos.
+
+**Eles foram removidos**, e a regra que os removeu é simples:
+
+> Entra no mapa o que o enunciado nomeia. Fica fora o que seria preciso **inventar** para que a solução parecesse completa.
+
+Estoque, Pagamento e Carrinho estavam registrados em `riscos-premissas.md` como `PR-07` e `PR-08` — premissas **inventadas**, e a mais perigosa da proposta: *"se não existirem, a onda 30 não cabe em 30 dias"*. Removê-los elimina o risco em vez de administrá-lo, e é o que `AV-08` avalia como não superdimensionar.
+
+A arquitetura não ficou mais fraca com isso. O argumento central da `ADR-0007` — dependência síncrona no caminho crítico torna `CTX-03` inatingível — **não dependia do Estoque**. Depende de haver dependência síncrona, e o Catálogo cumpre esse papel.
 
 ---
 
 ## 1. Contextos
 
-### Core — onde está a vantagem competitiva
+### Core
 
-**Pedidos** · *núcleo do problema*
+**Pedidos** · *o núcleo do problema*
 Aceita, valida e acompanha o ciclo de vida do pedido. Dono da máquina de estados, do snapshot dos termos, da chave de idempotência e do outbox.
-**Ownership:** `pedido`, `pedido_item`, `snapshot de termos`, `idempotency_key`, `outbox`, `transicao_estado`.
-**Não é dono de:** preço vigente, saldo de estoque, transação de pagamento.
 
-**Carrinho e Oferta** · *contexto novo, emergiu da `ADR-0007`*
-Monta o carrinho, **cota** o preço e emite a **oferta assinada** com validade. Opcionalmente reserva estoque para canais próprios.
-**Ownership:** `carrinho`, `oferta`, `reserva`.
-Existe porque o preço precisa ser estabelecido **antes** da criação e carregado por ela — é o que remove a leitura de catálogo do caminho crítico.
+Inclui a capacidade de **cotação**: `POST /v2/quotes` lê o Catálogo e devolve os termos assinados com validade. Ela é de Pedidos, não de um contexto separado — existe para tirar a leitura do Catálogo do caminho crítico, e quem a emite é quem precisa do resultado.
 
-### Supporting — necessários, não diferenciais
+**Ownership:** `pedido`, `pedido_item`, `snapshot de termos`, `cotacao`, `idempotency_key`, `outbox`, `transicao_estado`.
+**Não é dono de:** preço vigente, catálogo de produtos.
 
-**Catálogo** — produto, preço vigente, unidade de medida, peso, dimensões, mídia.
-**Ownership:** `produto`, `preco_vigente`, `atributo`. Upstream de Carrinho.
+**Catálogo** · *a fonte dos termos*
+Produto, preço vigente, descrição, unidade de medida, peso e dimensões. Upstream de Pedidos.
 
-**Estoque** — saldo, reserva e baixa. Recurso **contendido**: não é congelável (`ADR-0007`).
-**Ownership:** `saldo`, `reserva`, `movimento`.
+**Ownership:** `produto`, `preco_vigente`, `atributo`.
 
-**Pagamento** — autorização, captura e estorno. Autoriza no aceite, captura na confirmação.
-**Ownership:** `transacao`, `autorizacao`.
+### Supporting — exigidos por §2.2.1
 
 **Notificação e Parceiros** — entrega assíncrona de mudança de status, com assinatura, retry e DLQ.
+Existe porque `CTX-08` o exige: *"Parceiros solicitam API pública versionada e notificações assíncronas de mudança de status"*.
 **Ownership:** `assinatura_webhook`, `tentativa_entrega`, `dlq`.
 
 **Identidade e Acesso** — autenticação de cliente e de parceiro, escopos, quotas por parceiro.
-**Ownership:** `credencial_parceiro`, `escopo`, `quota`.
+Existe porque `P1-16` exige autenticação, autorização e quotas na API pública, e porque o threat model (F1.5, F3.2) mostrou que a identidade do chamador precisa vir da borda, nunca de header do cliente.
+**Ownership:** `credencial_parceiro`, `escopo`, `quota`, `preferencia_privacidade`.
 
-### Fora do escopo
+### Explicitamente fora
 
-**Fiscal, logística e meios de pagamento locais do segundo país** — escopo OUT nº 3 do PRD. Aparecem no mapa apenas como consumidores de evento, para que a fronteira fique explícita.
+| Fora do mapa | Por quê |
+|---|---|
+| **Estoque** | Não citado no enunciado. Incluí-lo era inventar escopo |
+| **Pagamento** | Idem |
+| **Carrinho** | A cotação resolve o que ele resolveria, dentro de Pedidos |
+| **Fiscal e logística** | Escopo OUT nº 3 do PRD |
+
+Nenhum deles é negado como realidade — uma plataforma de varejo tem todos. Eles estão fora **deste desenho**, porque o desafio não os apresenta e porque assumi-los criaria dependência de prazo sobre integrações cuja existência ninguém confirmou.
 
 ---
 
 ## 2. Context map
 
-```
-                    ┌──────────────┐
-                    │   Catálogo   │  (upstream)
-                    └──────┬───────┘
-                           │ Customer/Supplier + ACL
-                           ▼
-   cliente ──────►  ┌──────────────┐
-                    │  Carrinho e  │──── reserva ───► Estoque
-                    │    Oferta    │
-                    └──────┬───────┘
-                           │ OFERTA ASSINADA
-                           │ (Published Language)
-                           ▼
- parceiro ───────►  ┌──────────────┐
-  (sem oferta)      │   PEDIDOS    │  ◄── núcleo
-                    └──────┬───────┘
-                           │ eventos de domínio (Open Host Service)
-              ┌────────────┼────────────┬──────────────┐
-              ▼            ▼            ▼              ▼
-          Estoque     Pagamento    Notificação      Fiscal
-                                   e Parceiros    (fora do escopo)
+```mermaid
+flowchart TB
+    cliente(["Cliente<br/>web e app"])
+    parceiro(["Parceiro de<br/>marketplace"])
+
+    subgraph core["Core"]
+        pedidos["<b>PEDIDOS</b><br/><i>aceite · estados · snapshot<br/>idempotência · outbox · cotação</i>"]
+        catalogo["<b>CATÁLOGO</b><br/><i>produto · preço vigente<br/>unidade · peso</i>"]
+    end
+
+    subgraph apoio["Supporting"]
+        identidade["Identidade<br/>e Acesso"]
+        notif["Notificação<br/>e Parceiros"]
+    end
+
+    cliente -->|"cota e cria"| pedidos
+    parceiro -->|"cria · sem cotação"| pedidos
+    identidade -->|"identidade do chamador"| pedidos
+
+    pedidos -->|"cotação: lê em LOTE<br/><i>fora do caminho crítico</i>"| catalogo
+    pedidos -.->|"validação ASSÍNCRONA<br/>confere termos"| catalogo
+    pedidos ==>|"eventos de domínio"| notif
+    notif -->|"webhook assinado"| parceiro
+
+    style pedidos stroke-width:4px
+    linkStyle 5 stroke:#080,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 | De → Para | Padrão | Por quê |
 |---|---|---|
-| Carrinho → Catálogo | **Customer/Supplier + ACL** | Catálogo tem modelo rico e ciclo próprio; a ACL traduz produto em oferta enxuta e protege Carrinho de mudanças upstream |
-| Carrinho → Pedidos | **Published Language** — a oferta assinada | A oferta é contrato explícito e versionado entre os dois, não acoplamento de modelo. É o que permite Pedidos aceitar sem consultar ninguém |
-| Carrinho → Estoque | **Customer/Supplier**, síncrono | Reserva exige resposta imediata; fica **fora** do caminho crítico de criação, no momento do carrinho |
-| Pedidos → Estoque, Pagamento | **Customer/Supplier**, assíncrono por evento | `ADR-0007`: validação posterior. Nenhuma chamada de saída no aceite |
-| Pedidos → Notificação, Fiscal | **Open Host Service** | Pedidos publica eventos de domínio versionados; consumidores se inscrevem sem que Pedidos os conheça |
+| Pedidos → Catálogo *(cotação)* | **Customer/Supplier + ACL** | Catálogo tem modelo rico e ciclo próprio; a ACL traduz produto em termos cotáveis. Acontece **antes** da criação, fora do caminho crítico |
+| Pedidos → Catálogo *(validação)* | **Customer/Supplier, assíncrono** | `ADR-0007`: conferir os termos submetidos não bloqueia o aceite |
+| Pedidos → Notificação | **Open Host Service** | Pedidos publica eventos de domínio versionados; consumidores se inscrevem sem que Pedidos os conheça |
+| Identidade → Pedidos | **Conformist** | Pedidos consome a identidade que a borda estabelece. Não negocia o modelo, e **não aceita identidade vinda do cliente** (F3.2) |
 | Parceiro → Pedidos | **Open Host Service + Published Language** | OpenAPI e AsyncAPI versionadas (`CTX-08`). Fronteira de confiança: conteúdo do parceiro é **não confiável** |
 
-**Assimetria deliberada entre canais.** Canal próprio traz oferta e reserva; parceiro não tem carrinho e, portanto, não tem nenhum dos dois. A consequência — taxa de rejeição pós-aceite estruturalmente maior no canal de parceiro — é comportamento esperado do modelo, e está registrada na `ADR-0007`.
+**A assimetria entre canais é deliberada.** Canal próprio cota antes e tem os termos assinados; parceiro submete os termos do sistema dele e é conferido depois. A consequência — rejeição pós-aceite estruturalmente maior no canal de parceiro — é comportamento esperado do modelo, registrado na `ADR-0007`.
 
 ---
 
@@ -87,14 +108,14 @@ Existe porque o preço precisa ser estabelecido **antes** da criação e carrega
 
 | Dado | Dono | Quem lê | Regra |
 |---|---|---|---|
-| `preco_vigente` | Catálogo | Carrinho | Ninguém além do Catálogo escreve |
-| `oferta` (preço cotado + validade + assinatura) | Carrinho | Pedidos | Imutável após emissão; expira por tempo |
+| `preco_vigente`, `produto` | Catálogo | Pedidos (na cotação) | Ninguém além do Catálogo escreve |
+| `cotacao` (termos + validade + assinatura) | Pedidos | Pedidos | Imutável após emissão; expira por tempo |
 | `snapshot` no item do pedido | Pedidos | todos | **Imutável para sempre.** Cópia dos termos, não referência |
-| `saldo` e `reserva` | Estoque | Carrinho, Pedidos | Recurso contendido; nunca congelado |
 | `estado do pedido` | Pedidos | todos | Só Pedidos transiciona; transição inválida é recusada pelo domínio |
 | `outbox` | Pedidos | relay | Escrito na **mesma transação** do pedido |
+| `preferencia_privacidade` | Identidade | todos os consumidores de dado | `CTX-09d`: precisa ser honrada por toda a cadeia |
 
-**A regra que sustenta o desenho:** o pedido é **autocontido** no que diz respeito a termos acordados. Nenhuma leitura de pedido depende de outro contexto — verificado pelo teste com o Catálogo desligado (`ADR-0003`, Enforcement).
+**A regra que sustenta o desenho:** o pedido é **autocontido** no que diz respeito a termos acordados. Nenhuma leitura de pedido depende de outro contexto — verificado pelo teste que consulta o pedido com o Catálogo fora do ar.
 
 ---
 
@@ -102,25 +123,24 @@ Existe porque o preço precisa ser estabelecido **antes** da criação e carrega
 
 | Integração | Modo | Consistência | Justificativa |
 |---|---|---|---|
-| Carrinho → Catálogo | **síncrona** | forte no instante da cotação | O cliente precisa ver preço agora. Está fora do caminho crítico de criação, então não afeta `CTX-04` nem `CTX-17` |
-| Carrinho → Estoque (reserva) | **síncrona** | forte | Reserva exige confirmação imediata; recurso contendido não tolera consistência eventual |
+| Pedidos → Catálogo (cotação) | **síncrona** | forte no instante da cotação | O cliente precisa ver preço agora. Fora do caminho crítico de criação, então não afeta `CTX-04` nem `CTX-17` |
 | Canal → Pedidos (aceite) | **síncrona, porém local** | forte, sem dependência externa | É o caminho crítico. Zero chamada de saída (`ADR-0007`) |
-| Pedidos → Estoque, Pagamento (validação) | **assíncrona** | eventual | Trocar acoplamento por tempo: o pedido existe antes de ser confirmado |
-| Pedidos → Notificação e demais consumidores | **assíncrona** | eventual, at-least-once | `CTX-08`. Consumidor deduplica por `event_id` |
-| Notificação → Parceiro (webhook) | **assíncrona** | at-least-once, com retry e DLQ | Parceiro é externo e indisponível com frequência; entrega precisa sobreviver a isso |
+| Pedidos → Catálogo (validação) | **assíncrona** | eventual | Trocar acoplamento por tempo: o pedido existe antes de ser confirmado |
+| Pedidos → consumidores de evento | **assíncrona** | eventual, at-least-once | `CTX-08`. Consumidor deduplica por `event_id` |
+| Notificação → Parceiro (webhook) | **assíncrona** | at-least-once, com retry e DLQ | Parceiro é externo e indisponível com frequência; a entrega precisa sobreviver a isso |
 
-**Critério aplicado:** síncrono apenas quando alguém **espera a resposta para decidir agora**. Todo o resto é assíncrono — porque cada dependência síncrona no caminho crítico multiplica a indisponibilidade (`CTX-17`).
+**Critério aplicado:** síncrono apenas quando alguém **espera a resposta para decidir agora**. Todo o resto é assíncrono, porque cada dependência síncrona no caminho crítico multiplica a indisponibilidade (`CTX-17`).
 
 ---
 
 ## 5. Riscos abertos
 
-1. **Carrinho e Oferta é contexto novo.** Não estava no enunciado e nasceu do desenho. Se a plataforma atual já tiver um carrinho com modelo próprio, a oferta assinada é acréscimo a ele, não contexto novo — e o esforço da onda 30 muda.
-2. **A fronteira entre Carrinho e Pedidos pode ser artificial.** Se na prática forem o mesmo time e o mesmo deploy, a separação é lógica e não física. Isso é aceitável, mas precisa ser dito — separar contexto não obriga a separar serviço.
-3. **Estoque e Pagamento são tratados como existentes.** O enunciado não os menciona. Se não existirem como serviços, a `ADR-0007` pressupõe integrações que precisam ser construídas — e a onda 30 não cabe em 30 dias.
+1. **A cotação pode já existir na plataforma atual**, em outra forma. Se existir, é evolução de algo, não capacidade nova — e o esforço da onda 30 muda.
+2. **Identidade é tratada como existente.** O enunciado não a nomeia, mas `P1-16` exige autenticação e quotas, então alguma forma dela já opera hoje. Premissa mais leve que as removidas, e declarada.
+3. **Notificação e Parceiros não existe hoje** — é o que `CTX-08` pede para construir. Não é premissa; é entrega da onda 60.
 
 ## Pendências registradas
 
 - O glossário da linguagem ubíqua está em `docs/business-context/glossario.md`.
-- A decisão de residência de dados (`ADR-0006`) definirá se Pedidos é regional, global ou híbrido. Até lá, o mapa é agnóstico de região.
-- Não há inventário dos consumidores atuais dos eventos de Pedidos — mesma pendência levantada na `ADR-0004`.
+- Não há inventário dos consumidores atuais dos eventos de Pedidos — tarefa `P3` da onda 30, e bloqueio da `ADR-0004`.
+- A validade da cotação está implementada em 30 minutos e precisa de confirmação do negócio.

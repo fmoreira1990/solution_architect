@@ -19,7 +19,7 @@
 3. **Consulta o Catálogo** para responder disputa de preço e descobre que o valor **já mudou** — não há o que apresentar.
 4. **Adia pedido de integração** de parceiro de marketplace, porque não existe API pública versionada para oferecer.
 5. **Evita tocar no contrato atual**, mesmo sabendo que ele limita a evolução, por não ter como provar que uma mudança não quebra consumidor.
-6. **Acompanha a latência** da criação de pedido degradar conforme o carrinho cresce, sem orçamento de latência por hop para saber onde ela se perde.
+6. **Acompanha a latência** da criação de pedido degradar conforme o pedido cresce, sem orçamento de latência por hop para saber onde ela se perde.
 7. **Planeja a expansão** (app, marketplace, segundo país) sabendo que o desenho atual não absorve 10×.
 
 **Dor neste momento:**
@@ -120,7 +120,7 @@ Pré-requisito do gate G30, não tarefa paralela:
 |---|---|---|
 | Pedidos duplicados por retry / mês | é a meta primária da onda 30 | G30 |
 | Eventos publicados vs. pedidos commitados (divergência) | quantifica a perda que o outbox elimina | G30 |
-| p95 de criação por faixa de itens no carrinho | isola o custo do N+1 do resto do caminho | G60 |
+| p95 de criação por faixa de itens no pedido | isola o custo do N+1 do resto do caminho | G60 |
 | Nº de consumidores integrados e quais versões consomem | define se a deprecação é negociável ou contratual | `/contratos` |
 | Disputas de preço sem resposta / mês | dimensiona a dor da secundária A | resumo executivo |
 

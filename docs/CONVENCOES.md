@@ -1,7 +1,7 @@
 # Convenções de Especificação
 
 **Escopo deste documento:** define como todo artefato deste repositório é nomeado, cabeçalhado e considerado pronto.
-**Fontes:** padrão observado em `D:\Curso IA Ponta` (estrutura `docs/` + `.claude/commands/`), adaptado aos entregáveis do desafio Stefanini.
+**Fontes:** convenções de documentação de arquitetura adotadas neste projeto, alinhadas aos entregáveis exigidos pelo desafio.
 **Data:** 2026-09-22
 
 ---
@@ -27,7 +27,7 @@ slice/                     # fatia executável (stack definida no gate G2)
 ```
 
 **Regras de nomenclatura**
-- Pastas em inglês, conteúdo em português — como no projeto de origem.
+- Pastas em inglês, conteúdo em português.
 - Arquivos em `kebab-case`, sem prefixo numérico, exceto ADRs (`ADR-NNN-<slug>.md`).
 - Um artefato por arquivo. Um comando produz um arquivo.
 
@@ -161,7 +161,3 @@ Cada comando em `.claude/commands/` conduz **uma entrevista, uma pergunta por ve
 O campo **Rejeitado** é obrigatório e não pode ficar vazio em todas as entradas — o critério `AV-07` avalia justamente a capacidade de recusar saída de IA, não de aceitá-la.
 
 ---
-
-## 8. Nota sobre `.claude/settings.json`
-
-O projeto de origem define hooks de som com `afplay` (macOS). Este projeto roda em Windows; o arquivo **não** foi copiado. Se quiser o equivalente, o comando é `powershell -c [console]::beep(800,200)` ou `(New-Object Media.SoundPlayer 'C:\Windows\Media\notify.wav').PlaySync()`.

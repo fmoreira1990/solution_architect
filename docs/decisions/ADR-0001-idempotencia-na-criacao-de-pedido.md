@@ -90,7 +90,7 @@ Tornar um campo de requisição obrigatório é **breaking change** pela lista f
 | Alternativa | Status | Por quê |
 |---|---|---|
 | **`Idempotency-Key` + store transacional** | ✅ **Escolhida** | Explícita, sob controle do cliente, resolve concorrência pelo banco e cabe na mesma transação da `ADR-0002` |
-| Chave natural do pedido (cliente + carrinho + janela de tempo) | ❌ Rejeitada | O servidor infere a intenção em vez de recebê-la. Falha quando o cliente **quer** dois pedidos iguais, e a janela de tempo é sempre arbitrária |
+| Chave natural do pedido (cliente + itens + janela de tempo) | ❌ Rejeitada | O servidor infere a intenção em vez de recebê-la. Falha quando o cliente **quer** dois pedidos iguais, e a janela de tempo é sempre arbitrária |
 | Deduplicação por hash do payload, sem chave | ❌ Rejeitada | Falso positivo caro: cliente que compra o mesmo item duas vezes em um minuto tem o segundo pedido silenciosamente engolido. Perder venda é pior que duplicá-la |
 | Deduplicação apenas no broker, por `event_id` | ❌ Rejeitada | Trata o sintoma. O pedido **já foi gravado duas vezes** no banco; deduplicar o evento não desfaz a linha duplicada |
 | Lock distribuído (Redis) na chave | ❌ Rejeitada | Introduz dependência externa síncrona no caminho crítico — exatamente o que a `ADR-0007` eliminou. A `UNIQUE` do banco resolve de graça |

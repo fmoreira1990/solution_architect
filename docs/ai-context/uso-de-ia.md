@@ -42,10 +42,10 @@
 
 ### 2026-09-22 · Adoção do padrão de especificação
 
-- **Prompt:** "verificar a estrutura e forma de organização do projeto de referência para seguirmos o mesmo padrão de especificação".
+- **Prompt:** definir um padrão de especificação único para todos os artefatos, antes de produzi-los.
 - **Saída aceita:** estrutura `.claude/commands/` + `docs/` por contexto; cabeçalho canônico com campo **Fontes**; regras de qualidade Q1–Q11 formalizadas em `docs/CONVENCOES.md`.
-- **Validação:** o padrão foi extraído por leitura dos artefatos reais do projeto de referência, não inferido do nome das pastas. Três defeitos foram encontrados e corrigidos na adoção (arquivo sem quebras de linha, cerca de código não fechada, slug de outro projeto hardcoded).
-- **Rejeitado:** a IA replicaria `.claude/settings.json` do projeto de origem. **Motivo:** os hooks usam `afplay`, binário de macOS, e este ambiente é Windows — copiaria configuração quebrada. Substituído por nota com o equivalente PowerShell.
+- **Validação:** o padrão foi validado aplicando-o aos artefatos existentes antes de generalizá-lo, e depois transformado em fitness function (`test_documento_declara_escopo_fontes_e_data`), que encontrou 7 violações reais.
+- **Rejeitado:** a IA propôs adotar configuração de hooks dependente de binário de outro sistema operacional. **Motivo:** copiaria configuração que não funcionaria neste ambiente. Descartada.
 - **Dados expostos:** nenhum.
 
 ### 2026-09-22 · `/prd` — PRD da plataforma de Pedidos e Catálogo
@@ -129,6 +129,20 @@
 - **Rejeitado — segundo ponto:** replay literal da resposta gravada, convenção de mercado (Stripe e similares). **Motivo:** com aceite assíncrono, a resposta original foi `RECEBIDO` e o pedido pode já estar `CONFIRMADO`. Devolver o texto gravado mentiria sobre o estado. Optou-se por devolver o estado corrente, com o desvio da convenção declarado na ADR.
 - **Achado próprio da análise:** tornar `Idempotency-Key` obrigatória é **breaking change** pela lista fechada da `ADR-0004` ("tornar obrigatório um campo que era opcional na requisição"). A primeira versão do texto a definia como obrigatória sem notar a contradição com a ADR escrita horas antes. Corrigido para opcional em v1 e obrigatória em v2.
 - **Achado secundário:** o outbox mudou de natureza com a `ADR-0007`. Antes era correção de dívida técnica; agora é mecanismo de continuidade do processo — se `PedidoRecebido` não sair, o pedido nunca valida, nunca confirma e nunca chega ao cliente. Evento perdido deixou de ser aviso perdido e virou venda parada. Isso elevou o peso da ADR e justificou o SLI de falha silenciosa.
+- **Dados expostos:** nenhum.
+
+---
+
+### 2026-09-23 · Recorte de escopo — Pedidos e Catálogo apenas
+
+- **Prompt:** *"vamos trabalhar apenas com catálogo e pedidos, nada de falar de estoque, pagamento, carrinho"*.
+- **O corte veio do usuário e estava certo.** A IA havia introduzido Estoque, Pagamento e Carrinho como bounded contexts. O enunciado descreve uma *"plataforma de Pedidos e Catálogo"* e nunca os menciona — eram escopo inventado, registrados como `PR-07` e `PR-08`, a premissa mais perigosa da proposta.
+- **Rejeitado:** a IA propôs, como alternativa barata, alterar só o mapa de domínios e deixar arquitetura, ADRs e código citando Estoque e Pagamento. **Motivo:** criaria inconsistência visível entre artefatos — exatamente o que `AV-01` avalia. O recorte foi aplicado aos 27 arquivos afetados.
+- **Consequência de projeto:** a `ADR-0007` precisou ser reancorada. O argumento central dela — dependência síncrona no caminho crítico torna `CTX-03` inatingível — **não dependia do Estoque**. Depende de haver dependência síncrona, e o Catálogo cumpre o papel: conferir os termos submetidos contra o Catálogo de forma síncrona reintroduz a mesma aritmética. A decisão sobreviveu à remoção da premissa que a originou.
+- **Ganho:** `PR-07` deixou de ser risco administrado e passou a **não existir**. O risco foi eliminado, não mitigado.
+- **Validação:** 102 testes passando, incluindo três novos que provam a assimetria entre canais — cotação assinada é honrada mesmo com o Catálogo mudando; parceiro sem cotação com preço divergente é rejeitado **após** o aceite.
+- **Achado próprio, durante a validação:** o validador de Mermaid **deixou de encontrar metade dos diagramas e continuou verde**. Os scripts de varredura regravaram arquivos com CRLF, e a regex procurava `
+`. Uma fitness function que silenciosamente para de verificar é pior que nenhuma — foi adicionada uma guarda de contagem mínima que quebra o build se a varredura encolher.
 - **Dados expostos:** nenhum.
 
 ---

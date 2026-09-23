@@ -31,9 +31,9 @@
 | **Compatibilidade** | contratos válidos ≥ 6 meses (`CTX-10`, `CTX-12`) | Fachada síncrona v1 sobre núcleo assíncrono | 0004 | consumidores quebrados | ⭐ `test_consumidor_v1_continua_passando_com_a_v2_no_ar` |
 | | | Lista fechada de breaking **semântico**, não só estrutural | 0004 | — | `test_v1_nunca_declara_recebido_como_status` |
 | | | Expand-and-contract + `Deprecation`/`Sunset` | 0004 | tráfego por versão | `test_v1_esta_marcada_como_deprecada_com_sunset` |
-| **Segurança** | LGPD e residência (`CTX-09`) | Oferta assinada (HMAC): adulteração de preço é recusada | 0007 | tentativas rejeitadas | `test_oferta_adulterada_e_recusada` |
+| **Segurança** | LGPD e regime do 2º país (`CTX-09`) | Cotação assinada (HMAC): adulteração de preço é recusada | 0007 | tentativas rejeitadas | `test_oferta_adulterada_e_recusada` |
 | | | OAuth2, escopos e quotas por parceiro na borda | — | 401/403/429 por parceiro | — *(onda 60)* |
-| | | Segregação regional de PII | **0006 pendente** | — | — |
+| | | Segregação de PII por domicílio do titular | 0006 | — | — *(onda 90)* |
 | **Observabilidade** | detectar falha silenciosa | SLI: idade do evento mais antigo não publicado | 0002 | idade em segundos | `test_sli_de_relay_parado_detecta_pendencia` |
 | | | Observabilidade comparativa (caminho novo × antigo) | — | divergência de resultado | pré-requisito P2 da onda 30 |
 | **Evolutibilidade** | evoluir sem quebrar | Fitness functions no CI comparando contrato × implementação | 0004 | build vermelho ao divergir | `test_schema_do_pedido_bate_com_a_resposta_real_da_api` |
@@ -53,11 +53,11 @@ Tabela de atributo por atributo esconde o que mais importa em arquitetura: onde 
 | **Disponibilidade × consistência** | Aceite disponível, validação eventual (`ADR-0007`) | Oversell vira modo de operação; cliente não sabe na hora |
 | **Compatibilidade × evolutibilidade** | Fachada v1 protege o legado enquanto v2 evolui | Duas semânticas no ar por 6 meses; fachada reintroduz `CTX-17` para v1 |
 | **Auditabilidade × custo de armazenamento** | Snapshot desnormalizado em todo item | ~4,8M linhas/dia, ~1,1 TB/ano; exige particionamento |
-| **Performance × frescor de preço** | Preço congelado na oferta, com validade | Oferta vence e obriga recotação |
+| **Performance × frescor de preço** | Preço congelado na cotação, com validade | Cotação vence e obriga recotação |
 | **Prazo × qualidade da migração** | Sem janela de indisponibilidade (`CTX-11`) | Fase 1 custa mais que uma migração com janela |
 | **Integridade × latência de publicação** | Outbox por polling, não CDC | Latência de publicação = intervalo de poll |
 
-**O conflito mais consequente é o primeiro.** Ele não é técnico: aceitar um pedido que pode ser rejeitado é decisão de negócio embutida numa decisão de arquitetura. Está registrado como tal na `ADR-0007`, com mitigação (autorizar sem capturar, reservar no carrinho) e sem a pretensão de eliminá-lo.
+**O conflito mais consequente é o primeiro.** Ele não é técnico: aceitar um pedido que pode ser rejeitado é decisão de negócio embutida numa decisão de arquitetura. Está registrado como tal na `ADR-0007`, com mitigação (cotação assinada nos canais próprios) e sem a pretensão de eliminá-lo.
 
 ---
 
@@ -68,7 +68,7 @@ Registrado para não passar por cobertura que não existe:
 - **Disponibilidade e RTO/RPO** — dependem de infraestrutura, fora do escopo da fatia.
 - **p95 sob carga de 10×** — exige teste de carga, previsto para a onda 90.
 - **Custo por pedido** — sem baseline (`CTX-15` e `CTX-16` são `???`).
-- **Residência de dados** — bloqueado pela `ADR-0006`.
+- **Segregação regional de PII** — onda 90, conforme `ADR-0006`.
 - **Segurança de borda** (OAuth2, quotas) — onda 60.
 
 Dos dez atributos, **seis têm verificação executável hoje**. Os quatro restantes dependem de infraestrutura, carga real ou decisão pendente — e estão nomeados, não omitidos.

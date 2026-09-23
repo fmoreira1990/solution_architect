@@ -1,7 +1,12 @@
-"""Oferta assinada — ADR-0007.
+"""Cotação assinada — ADR-0007.
 
-O preço é estabelecido no carrinho e CARREGADO pela criação, não relido.
-É isto que remove a leitura do Catálogo do caminho crítico.
+Capacidade do próprio Pedidos, não de um contexto separado: `POST /v2/quotes`
+lê o Catálogo e devolve os termos assinados com validade. A criação valida a
+assinatura LOCALMENTE — é isto que tira a leitura do Catálogo do caminho
+crítico e mantém `CTX-04` alcançável.
+
+O canal de parceiro não cota: submete os termos do sistema dele, sem
+assinatura. Esses são conferidos contra o Catálogo na validação assíncrona.
 """
 import hashlib
 import hmac
@@ -32,7 +37,11 @@ def _assinar(corpo: dict) -> str:
 
 
 def emitir(skus_e_quantidades: list[tuple[str, float]], validade_segundos: int = 1800) -> dict:
-    """Papel do Carrinho: cota o preço no Catálogo e congela os termos."""
+    """Cotação: lê o Catálogo em LOTE e congela os termos, assinados.
+
+    Validade de 30 min: curta demais aumenta recotação, longa demais aumenta
+    o risco de honrar preço defasado. Precisa de confirmação do negócio.
+    """
     itens = []
     for sku, quantidade in skus_e_quantidades:
         p = catalogo.obter(sku)
@@ -58,10 +67,20 @@ def emitir(skus_e_quantidades: list[tuple[str, float]], validade_segundos: int =
 
 
 def validar(oferta: dict) -> None:
-    """Validação LOCAL: assinatura e validade. Nenhuma chamada de saída."""
-    if not isinstance(oferta, dict) or "assinatura" not in oferta:
-        raise OfertaInvalida("oferta ausente ou malformada")
+    """Validação LOCAL. Nenhuma chamada de saída (ADR-0007).
+
+    Termos SEM assinatura são aceitos: é o canal de parceiro, que submete os
+    termos do sistema dele. A conferência contra o Catálogo acontece depois,
+    de forma assíncrona. Termos COM assinatura precisam conferir e estar
+    dentro da validade.
+    """
+    if not isinstance(oferta, dict) or "itens" not in oferta:
+        raise OfertaInvalida("termos ausentes ou malformados")
+
+    if "assinatura" not in oferta:
+        return  # canal de parceiro: conferido na validação assíncrona
+
     if not hmac.compare_digest(_assinar(oferta), oferta["assinatura"]):
         raise OfertaInvalida("assinatura não confere")
     if float(oferta.get("expira_em", 0)) < time.time():
-        raise OfertaExpirada("oferta expirada — recotar")
+        raise OfertaExpirada("cotação expirada — recotar")

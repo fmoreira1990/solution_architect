@@ -56,7 +56,7 @@ Esta camada **é** a métrica-alvo do PRD.
 
 **Segmentação obrigatória por versão de contrato.** A fachada v1 reintroduz o acoplamento que a `ADR-0007` eliminou; se a disponibilidade for reportada na média, o custo da fachada some dentro do número global. Reportar v1 e v2 separadamente.
 
-**Segmentação obrigatória por canal** na taxa de rejeição. O parceiro não tem carrinho, logo não tem oferta nem reserva — sua rejeição é estruturalmente maior. Misturar canais esconde tanto o comportamento normal quanto a anomalia real.
+**Segmentação obrigatória por canal** na taxa de rejeição. O parceiro **não cota**: submete os termos do sistema dele, conferidos depois — sua rejeição é estruturalmente maior. Misturar canais esconde tanto o comportamento normal quanto a anomalia real.
 
 ---
 
@@ -86,7 +86,7 @@ Formato: **estímulo → ambiente → resposta → medida**.
 
 **P2.** Pedido com 40 itens (bem acima do p95 de 15).
 → Cotação em lote resolve em 2 chamadas, não 41.
-→ **Aceite:** p95 ≤ 500 ms independentemente do tamanho do carrinho.
+→ **Aceite:** p95 ≤ 500 ms independentemente do número de itens.
 
 ### Segurança
 
@@ -118,7 +118,7 @@ Formato: **estímulo → ambiente → resposta → medida**.
 → A `PRIMARY KEY` serializa; uma cria, as demais fazem replay.
 → **Aceite:** exatamente 1 pedido. ⭐ `test_vinte_requisicoes_concorrentes_criam_exatamente_um_pedido`.
 
-**R3.** Pedidos ficam presos em `EM_VALIDACAO` por falha prolongada do Pagamento.
+**R3.** Pedidos ficam presos em `EM_VALIDACAO` por indisponibilidade prolongada do Catálogo.
 → Reconciliação diária os identifica e aplica a política de desfecho.
 → **Aceite:** zero pedido preso além do timeout. Política de desfecho: `???`.
 

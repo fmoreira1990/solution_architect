@@ -135,4 +135,6 @@ def test_evento_nao_carrega_pii(broker):
     payload = _json.loads(broker.publicados[0]["payload"])
     proibidos = {"nome", "email", "cpf", "documento", "telefone", "endereco", "cep"}
     assert not (proibidos & set(payload)), f"PII no evento: {proibidos & set(payload)}"
-    assert set(payload) <= {"pedido_id", "cliente_id", "itens"}
+    # Allowlist: todo campo novo no evento exige decisão consciente.
+    # `cotado` (bool) entrou com a ADR-0007 e não é dado pessoal.
+    assert set(payload) <= {"pedido_id", "cliente_id", "itens", "cotado"}
