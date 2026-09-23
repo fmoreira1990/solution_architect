@@ -46,7 +46,7 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | **Prazo** | 20 dias úteis · **cabe nos 30 corridos** |
 | **Contingência** | +15% (12 d.p.), como linha separada e negociável |
 | **Custo de pessoas** | 79 d.p. × taxa por senioridade — *insumo pronto; preço é decisão comercial* |
-| **Custo de infraestrutura** | US$ 1.700–3.700/mês em regime, derivado do dimensionamento |
+| **Custo de infraestrutura** | **US$ 835–1.489/mês** · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
 
 **A composição do time saiu do esforço, não o contrário.** E ela revelou algo contraintuitivo: **SRE consome 26%** — mais que o dobro do arquiteto. A causa é a exigência de *zero janela de indisponibilidade*: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de operação, não de desenvolvimento.
 

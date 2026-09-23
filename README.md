@@ -128,6 +128,7 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Sequência: status](docs/technical-context/c4/seq-status-notificacao.md) | queda do relay, parceiro fora, reconciliação |
 | [Atributos de qualidade](docs/technical-context/atributos-qualidade.md) | atributo → mecanismo → métrica → **onde é verificado** |
 | [Resiliência](docs/technical-context/resiliencia.md) | timeout, retry, breaker e bulkhead com **valor por dependência** |
+| [Serviços AWS](docs/technical-context/servicos-aws.md) | capacidade → serviço → tier → custo, com alternativa confrontada |
 
 ### Decisões
 [ADR-0001](docs/decisions/ADR-0001-idempotencia-na-criacao-de-pedido.md) · [0002](docs/decisions/ADR-0002-publicacao-confiavel-de-eventos-via-outbox.md) · [0003](docs/decisions/ADR-0003-snapshot-de-termos-e-desacoplamento-do-catalogo.md) · [0004](docs/decisions/ADR-0004-versionamento-e-compatibilidade-semantica.md) · [0005](docs/decisions/ADR-0005-stack-da-fatia-executavel.md) · [0006](docs/decisions/ADR-0006-residencia-de-dados-multi-regiao.md) · [0007](docs/decisions/ADR-0007-aceitacao-assincrona-com-validacao-posterior.md)
@@ -154,11 +155,13 @@ Um avaliador tem tempo limitado. Em ordem de retorno:
 | [Estimativa da fase 1](docs/delivery/estimativa-fase1.md) | 79 d.p., time derivado, custos, faixa de confiança |
 | [Riscos e premissas](docs/delivery/riscos-premissas.md) | premissas, débitos aceitos, fora de escopo, decisões do cliente |
 | [Resumo executivo](docs/delivery/resumo-executivo.md) | **2 páginas** — recomendação, investimento, riscos |
+| [Rastreabilidade do enunciado](docs/requisitos/rastreabilidade-pdf.md) | cada tópico do PDF e o artefato que o responde |
 | [Checklist de avaliação](docs/delivery/checklist-avaliacao.md) | os 8 critérios, a evidência de cada um e **onde ainda é fraco** |
 
 ### Governança e IA
 | | |
 |---|---|
+| [Estratégia de API pública](docs/governance/estrategia-api-publica.md) | autenticação, autorização, quotas e versionamento, com estado por item |
 | [Política de contratos](docs/governance/politica-contratos.md) | lista fechada de breaking **estrutural e semântico** |
 | [Exceção técnica](docs/governance/excecao-tecnica.md) | waiver com validade; vencido **quebra o build** |
 | [Fitness functions](docs/governance/fitness-functions.md) | as verificações e os testes de mutação que as validam |

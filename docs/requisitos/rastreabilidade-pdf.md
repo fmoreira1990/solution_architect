@@ -102,11 +102,10 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | *"bounded contexts, responsabilidades, ownership de dados e linguagem de domínio"* | `mapa-dominios.md` + `glossario.md` | ✅ |
 | *"Decidir onde usar integração síncrona ou assíncrona e justificar consistência, latência e acoplamento"* | `mapa-dominios.md` §4 — tabela por integração com o critério declarado | ✅ |
 | *"Tratar snapshot de preço, idempotência, publicação confiável, deduplicação e reconciliação"* | 5 de 5: `ADR-0003`, `ADR-0001`, `ADR-0002`, dedup no AsyncAPI, reconciliação em `architecture.md` | ✅ |
-| *"Definir estratégia para APIs públicas, autenticação, autorização, quotas e versionamento"* | versionamento ✅ · autorização por dono ✅ · **autenticação e quotas apenas descritas** | 🟡 |
+| *"Definir estratégia para APIs públicas, autenticação, autorização, quotas e versionamento"* | `estrategia-api-publica.md` — os 4 itens consolidados, com estado de implementação por item | ✅ |
 | *"Registrar no mínimo quatro ADRs com contexto, alternativas, decisão e consequências"* | **7 ADRs**, formato verificado por fitness function | ✅ |
 
-> **Lacuna concreta:** não existe um documento consolidado de *"estratégia de API pública"*. Autenticação (OAuth2 *client credentials*, mTLS) e quotas por parceiro aparecem espalhados em `architecture.md`, `threat-model.md` e `politica-contratos.md` — mas o enunciado pede a estratégia como item próprio.
-> **Fazer:** consolidar em `docs/governance/estrategia-api-publica.md`.
+> ~~Lacuna: estratégia espalhada por três documentos.~~ **Fechada em 2026-09-24** com `estrategia-api-publica.md`, que consolida autenticação, autorização, quotas e versionamento — e declara, item a item, o que está implementado e o que é desenho da onda 60. Quatro de nove itens têm verificação executável.
 
 ---
 
@@ -225,7 +224,7 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 | # | Lacuna | Seção | Esforço |
 |---|---|---|---|
 | ~~1~~ | ~~Serviços AWS não nomeados~~ | §2.5.3, §1 | ✅ **feito** |
-| **2** | **Estratégia de API pública não consolidada** — autenticação e quotas espalhadas | §2.3.2 | ~40 min |
+| ~~2~~ | ~~Estratégia de API pública não consolidada~~ | §2.3.2 | ✅ **feito** |
 | **3** | **CI nunca executou** — sem evidência de "automatizado no pipeline" | §2.4.2, §2.5.2 | ~20 min |
 | **4** | **Feature flag sem implementação** — sustenta "sem janela de indisponibilidade" | §2.2.1 b7 | ~1 h |
 | **5** | **Gateway de notificação a parceiros sem código** | §2.2.1 b4 | onda 60 — fora da fatia |
