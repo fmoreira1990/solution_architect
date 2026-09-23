@@ -180,7 +180,7 @@ $ cd slice && python prova.py
 | **Time** | 5,5 pessoas — 1 arquiteto (30%), 2 sênior, 1 pleno, 1,5 SRE |
 | **Prazo** | 20 dias úteis · cabe nos 30 |
 | **Preço de pessoas** | **R$ 172.306** faturados, com contingência |
-| **Infraestrutura** | US$ 925–1.649/mês · **< meio centavo por pedido** |
+| **Infraestrutura** | US$ 1.775–2.949/mês · **< meio centavo por pedido** |
 
 O preço é **faturado**: sobre o custo carregado de CLT incidem ainda **19,53%** de tributos do Lucro Presumido. Das quatro camadas, 53,6% é custo de pessoal, 19,5% tributo e 26,8% overhead e margem.
 
@@ -199,6 +199,7 @@ A causa é *zero janela de indisponibilidade*: rollout progressivo, alertas de f
 | **V1** | Há integrações no caminho de criação além do Catálogo? | **prazo da onda 30** |
 | **V3** | Baseline atual — duplicatas, eventos perdidos, p95 | **gate G30** |
 | **V7** | Teto de custo de infraestrutura | verificação da dimensão custo |
+| **V11** | A hospedagem do **Catálogo** entra no escopo? | **~80 a 90% da conta de infra** e esforço não decomposto |
 
 **47 lacunas permanecem marcadas `???`** — todas de baseline de produção. Números que só existem **medindo**. Inventá-los contaminaria métricas e estimativa.
 

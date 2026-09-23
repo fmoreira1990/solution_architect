@@ -66,7 +66,7 @@ flowchart TB
     end
 
     apoio["Secrets Manager · KMS regional · ECR · S3<br/><i>via VPC Endpoint, não pelo NAT</i>"]
-    cat["<b>Catálogo</b><br/><i>existente · não orçado aqui</i>"]
+    cat["<b>Catálogo</b><br/><i>escopo B · ver V11</i>"]
 
     ext --> apigw
     apigw -.->|"valida token"| cognito
@@ -116,7 +116,7 @@ flowchart TB
 | **API Pública de Parceiros** | ECS Fargate, tarefas adicionais | **60** | ❌ — fora do escopo da fase 1 |
 | **Gateway de Notificação** | ECS Fargate + SQS + DLQ | **60** | ❌ |
 | **BFF multi-canal** | ECS Fargate | **90** | ❌ |
-| Catálogo e seu banco | já existem | — | ❌ — não é entrega desta proposta |
+| **Catálogo e seu banco** | ECS Fargate + RDS Multi-AZ **com réplica de leitura** | 30 | ⚠️ **depende de `V11`** — está no escopo B, não no A |
 
 ¹ O API Gateway entra já na onda 30 porque a fachada síncrona `/v1` e o roteamento por versão (`ADR-0004`) dependem dele. As quotas por parceiro só passam a ser exercidas na onda 60.
 
@@ -238,6 +238,44 @@ flowchart TB
 
 ---
 
+## 8. Catálogo — o escopo que a premissa `A7` tinha apagado
+
+Uma versão anterior deste documento orçava **só o Pedidos** e resolvia o Catálogo com uma linha de premissa: *"já existe, não é orçado aqui"*. Isso está errado por três motivos, e nenhum deles é de arredondamento.
+
+**O enunciado nomeia a plataforma como "Pedidos e Catálogo".** Orçar metade do escopo nomeado e chamar de custo de infraestrutura da proposta é responder outra pergunta.
+
+**A proposta mexe no Catálogo.** A resolução em lote da onda 60 — *9 chamadas → 2* (`CTX-05`) — é trabalho **dentro** dele. Não dá para mudar um serviço na onda 60 e afirmar que ele não faz parte da entrega.
+
+**O `CTX-17` depende da disponibilidade dele.** A derivação inteira — 99,9% × 99,9% = 99,8% — exige 99,9% do Catálogo. Exigir disponibilidade de um componente cuja infraestrutura não foi dimensionada é transferir o problema, não resolvê-lo. Era exatamente a saída nº 1 que `constraints.md` §8 rejeita.
+
+### O dimensionamento existe — o que faltava era assumir o escopo
+
+De `constraints.md` §7, a carga do Catálogo **já estava derivada**:
+
+| Medida | Alvo |
+|---|---|
+| Carga com N+1 *(8 itens)* | **~338 req/s** |
+| Carga com N+1 *(p95, 15 itens)* | **~600 req/s** |
+| Carga com lote, após a onda 60 | ~75 req/s |
+
+**O Catálogo recebe ~27× mais requisições que Pedidos** e é leitura quase pura. Isso inverte o dimensionamento: onde Pedidos precisa de transação, o Catálogo precisa de **capacidade de leitura**.
+
+| Componente | Serviço | Tier | US$/mês |
+|---|---|---|---|
+| Computação | ECS Fargate | 4 tarefas de 1 vCPU / 2 GB, autoscaling até 12 | **150–400** |
+| Store | RDS PostgreSQL Multi-AZ **+ 1 réplica de leitura** | `db.m6g.large` | **700–900** |
+| | | **Subtotal** | **US$ 850–1.300** |
+
+> **A réplica de leitura é a diferença de desenho.** No Pedidos ela foi rejeitada — o gargalo é escrita, e Aurora custaria 30% a mais por capacidade que ninguém pede. No Catálogo a conclusão se inverte: a 338 req/s de leitura, a réplica é o que evita subir a instância inteira. **É a mesma análise chegando a respostas opostas porque o perfil de carga é oposto.**
+
+> **O dimensionamento acima é da onda 30, com o N+1 ainda de pé.** Depois da onda 60 a carga cai 78%, e esta é a única linha do documento que **encolhe** com a evolução. A réplica pode então ser reavaliada.
+
+### O que isto muda além do custo
+
+**A hospedagem do Catálogo não está nas 79 dias-pessoa.** A decomposição da onda 30 cobre idempotência, outbox e snapshot — tudo em Pedidos. Migrar ou assumir a operação do Catálogo é trabalho que não foi decomposto e, portanto, **não está estimado**. Se a resposta a `V11` for "sim", muda custo **e** esforço.
+
+---
+
 ## Consolidado
 
 | Componente | Serviço | Mín. | Máx. |
@@ -249,29 +287,49 @@ flowchart TB
 | Borda | API Gateway HTTP + Cognito | 40 | 90 |
 | Observabilidade | CloudWatch + X-Ray | 120 | 350 |
 | Rede e apoio | NAT, Secrets, KMS, S3, ECR | 80 | 149 |
-| | **Total mensal** | **US$ 925** | **US$ 1.649** |
+| | **Subtotal — Pedidos** | **US$ 925** | **US$ 1.649** |
+| | | | |
+| Catálogo — computação | ECS Fargate, 4→12 tarefas | 150 | 400 |
+| Catálogo — store | RDS PostgreSQL Multi-AZ + réplica de leitura | 700 | 900 |
+| | **Subtotal — Catálogo** | **US$ 850** | **US$ 1.300** |
+| | **Total — plataforma completa** | **US$ 1.775** | **US$ 2.949** |
 
-### Isto corrige a estimativa anterior
+### Dois números, porque há duas perguntas
 
-`estimativa-fase1.md` §4.2 projetava **US$ 1.700–3.700/mês** com componentes genéricos. Com os serviços nomeados e dimensionados, o número real fica em **US$ 925–1.649** — a faixa anterior era conservadora **por falta de especificidade**, não por prudência.
+| Escopo | US$/mês | Quando é o número certo |
+|---|---|---|
+| **A — Pedidos** | **925–1.649** | O cliente já hospeda o Catálogo e continua hospedando |
+| **B — Pedidos e Catálogo** | **1.775–2.949** | A proposta assume a plataforma nomeada pelo enunciado |
 
-A diferença vem quase toda de duas escolhas:
+**`V11` decide qual vale.** Enquanto não decidir, o número a levar para a proposta é o **B** — é o escopo que o enunciado nomeia, e errar para mais numa premissa declarada é recuperável; errar para menos vira aditivo.
+
+### Sobre a correção anterior deste documento
+
+`estimativa-fase1.md` §4.2 projetava **US$ 1.700–3.700/mês** com componentes genéricos, e uma versão anterior daqui anunciou ter *"corrigido o número pela metade"*. **A comparação era inválida:** confrontava uma faixa de escopo não declarado com um número que cobria só o Pedidos.
+
+Contra o escopo **B**, que é o comparável, a faixa antiga estava **próxima do certo pelo motivo errado** — genérica e larga o bastante para acertar por acidente.
+
+O que sobrevive da análise original é o mérito das duas escolhas, e elas continuam valendo:
 
 | | Faixa anterior presumia | Escolha real | Economia |
 |---|---|---|---|
 | Broker | Kafka gerenciado (MSK) | SNS + SQS FIFO | ~US$ 500/mês |
-| Banco | Aurora | RDS Multi-AZ | ~US$ 200/mês |
+| Banco de Pedidos | Aurora | RDS Multi-AZ | ~US$ 200/mês |
 
-**Nos dois casos, a opção mais cara entregava capacidade que o dimensionamento não pede.** É o mesmo raciocínio de `AV-08` aplicado a custo: pagar por replay histórico e por leitura escalável antes de alguém precisar é superdimensionamento com recibo mensal.
+**Nos dois casos, a opção mais cara entregava capacidade que o dimensionamento não pede** — raciocínio de `AV-08` aplicado a custo. O que não vale é a conclusão de que a conta caiu pela metade: ela não caiu, **o escopo é que tinha encolhido sem ninguém declarar.**
 
 ---
 
 ## Custo por pedido
 
 ```
-US$ 925–1.649/mês ÷ (600.000 pedidos/dia × 30)
-= US$ 0,000051 a 0,000092 por pedido
-≈ R$ 0,00028 a 0,00050 (a R$ 5,40/US$)
+Escopo A — Pedidos
+US$   925–1.649/mês ÷ 18.000.000 pedidos/mês
+= US$ 0,000051 a 0,000092   ≈  R$ 0,00028 a 0,00050
+
+Escopo B — Pedidos e Catálogo
+US$ 1.775–2.949/mês ÷ 18.000.000 pedidos/mês
+= US$ 0,000099 a 0,000164   ≈  R$ 0,00053 a 0,00089
 ```
 
 **Menos de meio centavo por pedido.** Isso responde a perna (e) da hipótese do PRD — *"o ganho de escala não exige crescimento proporcional de infraestrutura"* — e mostra que `CTX-16` é atendível: a maior parte do custo é **fixo** (Multi-AZ, NAT, control planes), não por transação.
@@ -305,7 +363,7 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 | A4 | 2 AZs, não 3 | 3 AZs adicionam ~US$ 35/mês de NAT |
 | A5 | Tráfego de saída moderado | Egress a US$ 0,09/GB pode surpreender com webhooks volumosos |
 | A6 | **Conjunto de trabalho do Catálogo cabe em ~3 GB** — nº de SKUs ativos é `???` | Catálogo muito maior ou com mídia embutida exige subir o tier do ElastiCache |
-| A7 | O Catálogo e seu banco **já existem e não são orçados aqui** | Se a proposta tiver de hospedá-los também, a conta muda de patamar |
+| A7 | ~~O Catálogo e seu banco já existem e não são orçados aqui~~ **Retirada.** Era premissa inventada: apagava metade do escopo nomeado sem apoio no enunciado. Substituída pelos escopos A e B e pela decisão `V11` | — |
 
 ## Riscos
 
@@ -313,7 +371,8 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 2. **NAT Gateway é custo fixo que ninguém lembra.** ~US$ 65/mês antes de qualquer tráfego.
 3. **Preços mudam e variam por negociação.** Nenhum número aqui substitui a calculadora oficial.
 4. **A escolha SQS sobre MSK assume que ninguém pedirá replay histórico.** Se pedir, o custo do broker sobe ~5×.
-5. **O tier do cache é o número menos ancorado do documento.** Depende do tamanho do Catálogo, que é `???`. Subir dois tiers triplica essa linha — e ela é a segunda maior depois do banco.
+5. **O tier do cache é o número menos ancorado do documento.** Depende do tamanho do Catálogo, que é `???`. Subir dois tiers triplica essa linha.
+6. **`V11` é o maior risco de custo deste documento.** A diferença entre os escopos A e B é de **79 a 92%** na conta mensal — e, se a resposta for B, também há esforço não decomposto. Nenhuma outra premissa daqui move tanto.
 
 ## Pendências registradas
 
@@ -321,3 +380,4 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 - `CTX-15` (teto de custo) segue `???` — decisão `V7`.
 - A escolha de região para a operação dos EUA depende de `V10`.
 - **Dimensionar o cache exige o nº de SKUs ativos e o tamanho médio do registro do Catálogo** (`A6`). É a primeira medição a pedir junto com o baseline `P1`.
+- **`V11` — a hospedagem do Catálogo entra no escopo?** Move ~90% da conta mensal e acrescenta esforço não decomposto. É a pergunta de custo mais consequente em aberto.

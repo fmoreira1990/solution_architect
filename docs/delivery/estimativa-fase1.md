@@ -116,11 +116,16 @@ Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`]
 | Borda | API Gateway HTTP + Cognito | 40–90 |
 | Observabilidade | CloudWatch + X-Ray | 120–350 |
 | Rede e apoio | NAT, Secrets, KMS, S3, ECR | 80–149 |
-| **Total** | | **US$ 925–1.649** |
+| **Subtotal — Pedidos** | | **US$ 925–1.649** |
+| Catálogo — computação | ECS Fargate, 4→12 tarefas | 150–400 |
+| Catálogo — store | RDS Multi-AZ + réplica de leitura | 700–900 |
+| **Total — plataforma completa** | | **US$ 1.775–2.949** |
 
-**Custo por pedido: menos de meio centavo** (US$ 0,000051 a 0,000092). A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
+**Custo por pedido: menos de meio centavo** — US$ 0,000051 a 0,000092 no escopo Pedidos, US$ 0,000099 a 0,000164 na plataforma completa. A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
 
-> **Uma versão anterior deste documento projetava US$ 1.700–3.700/mês** com componentes genéricos. Com os serviços nomeados, o número real é **metade disso**. A faixa anterior era conservadora por falta de especificidade, não por prudência — e quase toda a diferença veio de duas escolhas: SQS no lugar de Kafka gerenciado (~US$ 500/mês) e RDS no lugar de Aurora (~US$ 200/mês). Nos dois casos, a opção mais cara entregava capacidade que o dimensionamento não pede.
+> **`V11` decide qual total vale.** O enunciado nomeia *"Pedidos e Catálogo"*, e a onda 60 mexe no Catálogo — por isso o número levado à proposta é o da plataforma completa. Se o cliente seguir hospedando o Catálogo, cai para US$ 925–1.649. **A hospedagem do Catálogo não está nas 79 dias-pessoa**: se entrar no escopo, muda custo e esforço.
+
+> **Uma versão anterior deste documento projetava US$ 1.700–3.700/mês** com componentes genéricos — e chegou perto do escopo completo **pelo motivo errado**: era larga o bastante para acertar por acidente. O que sobrevive da análise é o mérito de duas escolhas, SQS no lugar de Kafka gerenciado (~US$ 500/mês) e RDS no lugar de Aurora (~US$ 200/mês), em que a opção mais cara entregava capacidade que o dimensionamento não pede.
 
 **O salto de custo é a onda 90, não a 30:** multi-região duplica quase toda a infraestrutura fixa (**+70 a 90%**). Precisa estar claro antes de aprovar as três ondas olhando só o número da primeira.
 

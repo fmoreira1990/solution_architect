@@ -46,7 +46,7 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | **Prazo** | 20 dias úteis · **cabe nos 30 corridos** |
 | **Contingência** | +15% (12 d.p.), como linha separada e negociável |
 | **Preço de pessoas** | **R$ 172.306** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
-| **Custo de infraestrutura** | **US$ 925–1.649/mês** · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
+| **Custo de infraestrutura** | **US$ 1.775–2.949/mês** para a plataforma nomeada (Pedidos **e** Catálogo) · **US$ 925–1.649** se o cliente seguir hospedando o Catálogo (`V11`) · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido nos dois casos** |
 
 **A composição do time saiu do esforço, não o contrário.** E ela revelou algo contraintuitivo: **SRE consome 26%** — mais que o dobro do arquiteto. A causa é a exigência de *zero janela de indisponibilidade*: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de operação, não de desenvolvimento.
 
@@ -97,6 +97,7 @@ Nenhuma pode ser resolvida pela equipe técnica. As três primeiras afetam prazo
 | **V1** | Existem integrações no caminho de criação além do Catálogo? | Client Face / arquitetura da conta | **Prazo da onda 30** |
 | **V3** | Baseline atual: duplicatas/mês, eventos perdidos, p95, disponibilidade | Operação | **Gate G30** — sem régua, indecidível |
 | **V7** | Teto de custo de infraestrutura | Negócio | Uma das cinco dimensões do objetivo fica sem verificação |
+| **V11** | **A hospedagem do Catálogo entra no escopo?** | Client Face / negócio | **~80 a 90% da conta de infraestrutura** — e acrescenta esforço que não foi decomposto |
 | V8 | Dono do endereço de entrega — Pedidos ou Logística? | Arquitetura da conta | Estratégia de pseudonimização (LGPD) |
 | V9 | Instrumento jurídico para transferência Brasil → EUA | Jurídico / DPO | Onda 90; nenhuma PII brasileira atravessa sem ele |
 | V10 | Em quais estados dos EUA a operação estará sujeita | Jurídico / negócio | Quais leis estaduais se aplicam |

@@ -138,7 +138,8 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 
 | | |
 |---|---|
-| AWS em regime | US$ 925–1.649/mês → **R$ 4.995–8.905/mês** |
+| AWS — escopo Pedidos | US$ 925–1.649/mês → R$ 4.995–8.905/mês |
+| AWS — plataforma completa *(`V11`)* | US$ 1.775–2.949/mês → **R$ 9.585–15.925/mês** |
 
 *Câmbio de R$ 5,40/US$, premissa declarada. Normalmente contratada direto pelo cliente ou repassada a custo — neste caso não sofre o gross-up.*
 
@@ -147,8 +148,8 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md):
 | | |
 |---|---|
 | Serviços, com contingência | R$ 172.306 |
-| Infraestrutura | R$ 4.995–8.905 |
-| **Total** | **≈ R$ 177.300 – 181.200** |
+| Infraestrutura *(plataforma completa)* | R$ 9.585–15.925 |
+| **Total** | **≈ R$ 181.900 – 188.200** |
 
 ---
 
