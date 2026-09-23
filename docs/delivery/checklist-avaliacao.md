@@ -118,7 +118,7 @@ E a honestidade de dizer que **a fricção piora antes de melhorar**: reconcilia
 | **111 testes** em PostgreSQL real | [`slice/`](../../slice/) |
 | Um comando documentado | `python prova.py` |
 | Dados sintéticos, sem PII | `slice/seed/` |
-| CI com Postgres, diagramas e varredura de confidencialidade | `.github/workflows/ci.yml` |
+| CI com Postgres, diagramas e varredura de confidencialidade | `.github/workflows/ci.yml` — **verde em 5 execuções** |
 
 **Os dois critérios críticos do §2.4.2:**
 
@@ -135,7 +135,9 @@ E a honestidade de dizer que **a fricção piora antes de melhorar**: reconcilia
 
 Corrigido com saída UTF-8 tolerante e **diagnóstico por tipo de falha** — banco ausente, usuário ausente ou serviço parado geram instruções diferentes, com o comando exato. Ciclo completo validado: banco e usuário destruídos, prova executada, instruções seguidas ao pé da letra, **111 testes verdes do zero**.
 
-Permanece: broker stub, não real — escopo declarado; e o CI nunca rodou, porque o repositório ainda não tem remote configurado.
+**O CI está verde em 5 execuções**, com os três jobs. A prova roda em Linux sem ajuste — o que também demonstra que ela não depende do ambiente onde foi escrita.
+
+Permanece: broker stub, não real — escopo declarado na `ADR-0005`.
 
 ---
 
@@ -189,7 +191,7 @@ Na capacidade de IA proposta, a conclusão desconfortável está escrita: **a ma
 | AV-03 Decisões | 7 ADRs; rejeição por prazo declarada | `ADR-0006` depende de enquadramento não jurídico |
 | AV-04 Evolução | ordem por natureza do dano | feature flag não existe no código |
 | AV-05 Segurança | **3 defeitos próprios achados e corrigidos** | 19 de 26 ameaças sem verificação |
-| AV-06 Prova | 2 critérios críticos + mutação + ciclo do zero validado | CI nunca rodou — repositório sem remote |
+| AV-06 Prova | 2 critérios críticos + mutação + ciclo do zero + **CI verde** | broker stub, não real — escopo declarado |
 | AV-07 IA | rejeições são o corpo do log | capacidade de IA sem teste |
 | AV-08 Sênior | ausências com gatilho numérico | 40 documentos é muito |
 

@@ -127,7 +127,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | *"Versionar uma especificação OpenAPI para criação/consulta de pedidos e uma AsyncAPI ou schema para mudança de status"* | `orders-v1.yaml`, `orders-v2.yaml`, `order-status.yaml` | ✅ |
 | *"Implementar uma prova mínima de uma decisão crítica: idempotência, outbox, contract test ou compatibilidade de versão"* | **as quatro**, não uma | ✅ |
-| *"Incluir testes positivos e negativos reproduzíveis e execução automatizada no pipeline"* | 111 testes, positivos e negativos; pipeline existe mas **nunca executou** | 🟡 |
+| *"Incluir testes positivos e negativos reproduzíveis e execução automatizada no pipeline"* | 116 testes, positivos e negativos; **CI verde em 5 execuções** | ✅ |
 | *"Disponibilizar dados sintéticos e um único comando documentado"* | `slice/seed/` + `python prova.py`; caminho de erro testado em máquina limpa | ✅ |
 
 ### Critério crítico
@@ -139,7 +139,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | mesma chave não duplica | `test_vinte_requisicoes_concorrentes_criam_exatamente_um_pedido` — 20 threads, 1 pedido, 1× `201` + 19× `200` | ✅ |
 | contrato não quebra consumidor **demonstrado no teste** | `test_consumidor_v1_continua_passando_com_a_v2_no_ar` — consumidor de referência que emite nota no `201` | ✅ |
 
-> **Parcial no terceiro bullet:** *"execução automatizada no pipeline"*. O workflow existe com três jobs, mas **nunca rodou** — o repositório só ganhou remote ontem. Sem execução, não há evidência.
+> ~~Parcial: o pipeline nunca rodou.~~ **Fechado em 2026-09-24.** Cinco execuções verdes, com os três jobs — prova com serviço `postgres:18`, validação de diagramas e varredura de confidencialidade. A prova roda em Linux sem nenhum ajuste, o que também valida que ela não depende do ambiente Windows onde foi escrita.
 
 ---
 
@@ -156,10 +156,10 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 
 | Bullet do PDF | Resposta | |
 |---|---|---|
-| *"Automatizar validações de OpenAPI/AsyncAPI, ADRs e regras arquiteturais como fitness functions no CI"* | 18 fitness functions em 3 categorias; 3 validadas por **teste de mutação** | 🟡 |
+| *"Automatizar validações de OpenAPI/AsyncAPI, ADRs e regras arquiteturais como fitness functions no CI"* | 18 fitness functions em 3 categorias, **rodando no CI**; 3 validadas por teste de mutação | ✅ |
 | *"Definir política de evolução de contratos e processo leve de exceção técnica"* | `politica-contratos.md` + `excecao-tecnica.md` — este com validade obrigatória que **quebra o build** | ✅ |
 
-> **Parcial:** as fitness functions existem e rodam localmente, mas **"no CI" não foi demonstrado** — mesmo motivo do §2.4.2.
+> ~~Parcial: "no CI" não demonstrado.~~ **Fechado em 2026-09-24** — as fitness functions rodam a cada push, junto com a prova.
 
 ---
 
@@ -210,12 +210,12 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 | §2.3.1 Visões | 4 | — | — |
 | §2.3.2 Domínios | 4 | 1 | — |
 | §2.4.1 Migração | 5 | — | — |
-| §2.4.2 Fatia | 3 | 1 | — |
+| §2.4.2 Fatia | 4 | — | — |
 | §2.5.1 IA | 2 | — | — |
-| §2.5.2 Governança | 1 | 1 | — |
+| §2.5.2 Governança | 2 | — | — |
 | §2.5.3 Estimativa | 4 | 1 | — |
 | §4 Entrega | 7 | — | — |
-| **Total** | **52** | **7** | **1** |
+| **Total** | **56** | **3** | **1** |
 
 ---
 
@@ -225,7 +225,7 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 |---|---|---|---|
 | ~~1~~ | ~~Serviços AWS não nomeados~~ | §2.5.3, §1 | ✅ **feito** |
 | ~~2~~ | ~~Estratégia de API pública não consolidada~~ | §2.3.2 | ✅ **feito** |
-| **3** | **CI nunca executou** — sem evidência de "automatizado no pipeline" | §2.4.2, §2.5.2 | ~20 min |
+| ~~3~~ | ~~CI nunca executou~~ | §2.4.2, §2.5.2 | ✅ **verde em 5 execuções** |
 | **4** | **Feature flag sem implementação** — sustenta "sem janela de indisponibilidade" | §2.2.1 b7 | ~1 h |
 | **5** | **Gateway de notificação a parceiros sem código** | §2.2.1 b4 | onda 60 — fora da fatia |
 | **6** | **SAI App 3.0 não endereçado** | §1 | sem informação disponível |
