@@ -47,7 +47,7 @@ Esta camada **é** a métrica-alvo do PRD.
 
 | SLI | Definição | SLO | Error budget |
 |---|---|---|---|
-| Disponibilidade do aceite | `201 ÷ (201 + 5xx)` em janela de 1 min | 99,9% mensal | 43 min/mês |
+| Disponibilidade do aceite | `201 ÷ (201 + 5xx)` em janela de 1 min, **medido na borda** (API Gateway) e, em paralelo, no serviço | 99,9% mensal | 43 min/mês — consumido por qualquer componente, inclusive os gerenciados (`constraints.md` §8.1) |
 | Latência de aceitação | p95 de `POST /v2/orders` | ≤ 500 ms | — |
 | Latência de confirmação | p95 de `RECEBIDO` → desfecho | **≤ 30 s** | — |
 | **Idade do evento mais antigo não publicado** | `now − min(criado_em)` onde `publicado_em IS NULL` | alerta em **5 min** | — |

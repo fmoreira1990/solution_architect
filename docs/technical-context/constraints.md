@@ -133,13 +133,39 @@ Três saídas, e a escolha entre elas é decisão de arquitetura, não de implem
 
 A opção 2 resolve `CTX-03`, `CTX-04`, `CTX-05` e `CTX-06` de uma vez. Este é o argumento quantitativo que sustenta a ADR-0003, e é mais forte do que "desacoplar é boa prática": **com a dependência síncrona, o SLA não fecha na aritmética**, independentemente de quão bem o código for escrito.
 
+### 8.1 A mesma conta, aplicada ao caminho novo — SLA não é SLO
+
+O argumento acima multiplica disponibilidades. Aplicado com honestidade, ele vale também para os serviços gerenciados que a chamada atravessa no desenho novo (`servicos-aws.md`):
+
+| Componente no caminho da criação | SLA publicado pela AWS |
+|---|---|
+| Route 53 | 100% |
+| CloudFront + WAF | 99,9% |
+| API Gateway | 99,95% |
+| ALB | 99,99% |
+| ECS Fargate, em duas AZs | 99,99% |
+| RDS PostgreSQL Multi-AZ | 99,95% |
+| **Produto** | **≈ 99,78%** — cerca de 95 min/mês, contra 43,2 de orçamento |
+
+Pela mesma aritmética do `CTX-17`, o caminho novo também não fecharia 99,9%. Três pontos respondem a isso — e os três precisam estar escritos, porque é a objeção mais natural a esta proposta:
+
+1. **SLA é piso contratual, não previsão.** É o nível abaixo do qual a AWS devolve crédito; a disponibilidade observada desses serviços costuma ficar bem acima dele. Multiplicar SLAs dá o pior caso de contrato, não o comportamento esperado. Quanto a borda entrega de fato, na conta e na região escolhidas, é `???` até ser medido.
+2. **A borda está em qualquer desenho — inclusive no atual.** O caminho de hoje é borda × Pedidos × Catálogo; o novo é borda × Pedidos. Com os mesmos pisos de SLA, o atual fica em ≈ 99,68% e o novo em ≈ 99,78%. Seja qual for a borda, a arquitetura **retira um fator da multiplicação** — é esse o ganho, e ele não depende do número da AWS.
+3. **O SLO precisa dizer onde é medido.** O SLO de 99,9% do aceite (`metricas.md`) é medido **na borda**, no API Gateway: é o que o cliente vive. Por isso o orçamento de 43,2 min é consumido por **qualquer** componente, inclusive os gerenciados. O SLA da AWS só compensa em crédito; não devolve minuto de disponibilidade ao cliente.
+
+**Consequências:**
+
+- **Premissa nova, declarada:** a meta de 99,9% pressupõe que a borda gerenciada entregue bem acima do seu SLA (`PR-11` em `riscos-premissas.md`).
+- **Medição separada desde a onda 30:** o mesmo SLI é medido na borda **e** no serviço. A diferença entre os dois é quanto do orçamento a borda consome — e deixa de ser suposição.
+- **Gatilho:** se a borda consumir mais da metade do orçamento (21,6 min/mês), o elo mais fraco da série sai. O CloudFront tem o menor SLA da cadeia e está ali só por causa do WAF; trocar o API Gateway HTTP por REST API, que aceita WAF nativo, tira o CloudFront do caminho — ao custo de ~3,5× no gateway, que hoje foi rejeitado por custo.
+
 ---
 
 ## Riscos abertos
 
 1. **`CTX-13` e `CTX-14` (equipe) em aberto bloqueiam `D-05`.** A estimativa é requisito obrigatório da vaga, não apenas do PDF. Precisam ser declarados como premissa em `/estimativa`, com efeito explícito caso falsos.
 2. **`CTX-15` (orçamento) sem teto retira uma das cinco dimensões do §2.1.** Sem custo-limite, "equilibrar custo" vira afirmação não verificável.
-3. **`PR-03` (segundo país) bloqueia a ADR-0006.** Residência de dados não pode ser decidida em abstrato — o regime muda conforme o país.
+3. **A meta de 99,9% depende de a borda gerenciada entregar acima do seu SLA** (§8.1). Pelos pisos publicados, a série de serviços da AWS fica em ≈ 99,78%. Medido desde a onda 30, com gatilho declarado.
 4. **As premissas de distribuição (60% em 8h, pico 3×) são inventadas.** Se o varejo tiver pico concentrado de campanha — Black Friday, lançamento — o fator de pico pode ser 10× ou 20×, não 3×. Isso muda o dimensionamento inteiro da seção 7.
 
 ## Pendências registradas

@@ -33,6 +33,8 @@ Error budget exigido: 43,2 min/mês
 
 A arquitetura proposta não é orientada a eventos por preferência de estilo. É a única forma de a conta fechar: tudo que exige resposta externa foi deslocado para **antes** da criação (cotação assinada) ou para **depois** dela (validação assíncrona). O aceite do pedido passa a ser uma operação **puramente local**.
 
+**A mesma conta vale para a AWS, e está feita.** Os serviços gerenciados que a chamada atravessa somam ≈ 99,78% pelos SLAs publicados — mas SLA é piso de contrato, não previsão, e essa borda existe em qualquer desenho, inclusive no atual. O ganho da arquitetura é tirar o Catálogo da multiplicação. O SLO é medido na borda, e quanto dela a AWS consome é medido desde a onda 30.
+
 O resultado mensurável: **de seis componentes, apenas um derruba a criação de pedido** — o banco de Pedidos, Multi-AZ. Broker, relay, Catálogo, validador e notificação podem cair sem impedir o aceite.
 
 ---

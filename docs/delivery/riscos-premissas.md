@@ -23,6 +23,7 @@ Se qualquer uma for falsa, algo muda. A coluna da direita diz **o quê**.
 | PR-08 | A capacidade de **cotação** pode já existir na plataforma atual | declarada | Se existir, é evolução de algo e não capacidade nova — o esforço da onda 30 cai |
 | PR-09 | ~40 ms por chamada ao Catálogo | estimativa | Todo o orçamento de latência de `constraints.md` §7.2 se desloca |
 | PR-10 | TTL de 24h cobre o retry dos parceiros | declarada | Retry legítimo além disso cria pedido novo |
+| PR-11 | A borda gerenciada — CloudFront, API Gateway, ALB — entrega bem acima do SLA publicado | declarada | Pelos pisos de SLA, a série fica em ≈ 99,78% e o SLO de 99,9% não fecha. Medido desde a onda 30; gatilho em `constraints.md` §8.1 |
 
 **O desenho não supõe sistemas que o enunciado não nomeia.** Estoque, Pagamento e Carrinho ficam fora — supô-los exigiria inventar contrato e disponibilidade justamente no caminho crítico. A `ADR-0007` se ancora no Catálogo, que o enunciado nomeia, e o argumento do `CTX-17` não depende de nenhum outro sistema.
 
