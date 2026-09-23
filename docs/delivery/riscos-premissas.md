@@ -20,12 +20,11 @@ Se qualquer uma for falsa, algo muda. A coluna da direita diz **o quê**.
 | PR-04 | Cloud AWS | decidida | Muda serviços, não a arquitetura lógica |
 | PR-05 | Entrega ao parceiro por webhook assinado + polling | declarada | Muda o contrato de notificação |
 | PR-06 | 60% do volume em 8h comerciais, pico de 3× | **inventada** | **Varejo tem Black Friday.** Se o pico real for 10× ou 20×, o dimensionamento inteiro muda |
-| ~~PR-07~~ | ~~Estoque e Pagamento existem como serviços integráveis~~ | ✅ **eliminada** | Removida em 2026-09-23 pelo recorte de escopo: contextos não nomeados pelo enunciado saíram do desenho. O risco deixou de existir em vez de ser administrado |
 | PR-08 | A capacidade de **cotação** pode já existir na plataforma atual | declarada | Se existir, é evolução de algo e não capacidade nova — o esforço da onda 30 cai |
 | PR-09 | ~40 ms por chamada ao Catálogo | estimativa | Todo o orçamento de latência de `constraints.md` §7.2 se desloca |
 | PR-10 | TTL de 24h cobre o retry dos parceiros | declarada | Retry legítimo além disso cria pedido novo |
 
-**O maior risco da proposta foi eliminado, não mitigado.** `PR-07` supunha Estoque e Pagamento como serviços existentes — inventando escopo que o enunciado não nomeia. O recorte de 2026-09-23 removeu esses contextos do desenho, e a `ADR-0007` foi reancorada no Catálogo sem perder o argumento do `CTX-17`.
+**O desenho não supõe sistemas que o enunciado não nomeia.** Estoque, Pagamento e Carrinho ficam fora — supô-los exigiria inventar contrato e disponibilidade justamente no caminho crítico. A `ADR-0007` se ancora no Catálogo, que o enunciado nomeia, e o argumento do `CTX-17` não depende de nenhum outro sistema.
 
 ---
 
@@ -89,21 +88,22 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 | # | Decisão | Quem decide | Bloqueia |
 |---|---|---|---|
 | V1 | Existem integrações no caminho de criação além do Catálogo? | Client Face / arquitetura da conta | Prazo da onda 30; cada uma reintroduz o `CTX-17` |
-| ~~V2~~ | ~~Consumidores internos ou externos?~~ **Resolvido: mistos** | — | ✅ fechado em 2026-09-23. O que resta é o **inventário** (tarefa `P3`) |
-| V3 | ~~Qual é o segundo país?~~ **Resolvido: EUA** | — | ✅ fechado |
-| V9 | **Instrumento jurídico para transferência BR → EUA** (`CTX-09c`) | Jurídico / DPO | `ADR-0006`; nenhuma PII brasileira cruza sem ele |
-| V10 | **Em quais estados dos EUA a operação estará sujeita** | Jurídico / negócio | Define quais leis estaduais se aplicam |
-| ~~V4~~ | ~~Limite de rejeição pós-aceite~~ **Definido: 2% próprio, 8% parceiro** | — | ✅ definido; aguarda validação do negócio |
-| ~~V5~~ | ~~Defasagem tolerável de preço sob falha~~ | — | ✅ **extinta**: o fallback foi superseded pela cotação assinada (`ADR-0007`) |
-| ~~V6~~ | ~~Política de desfecho para pedido preso~~ **Definida: cancela em 24 h** | — | ✅ definida; aguarda validação da operação |
+| V12 | **Baseline atual** — duplicatas por mês, eventos perdidos, p95, disponibilidade | Operação | **Gate G30**: sem régua, é indecidível. É a tarefa `P1` da onda 30 |
 | V7 | Teto de custo de infraestrutura (`CTX-15`) | Negócio | Uma das 5 dimensões do §2.1 fica sem verificação |
 | V8 | **Quem é dono do endereço de entrega** — Pedidos ou Logística? | Arquitetura da conta | `ADR-0006`: se ficar em Pedidos, a pseudonimização deixa de bastar |
-| **V11** | **A hospedagem do Catálogo entra no escopo da proposta?** | Client Face / negócio | **Quase dobra a conta de infraestrutura** (US$ 925–1.649 → 1.775–2.949, +79 a 92%) **e esforço não decomposto**. O enunciado nomeia *"Pedidos e Catálogo"*; a onda 60 mexe no Catálogo; o `CTX-17` exige 99,9% dele |
+| V9 | **Instrumento jurídico para transferência BR → EUA** (`CTX-09c`) | Jurídico / DPO | `ADR-0006`; nenhuma PII brasileira cruza sem ele |
+| V10 | **Em quais estados dos EUA a operação estará sujeita** | Jurídico / negócio | Define quais leis estaduais se aplicam |
+| V2 | Consumidores internos ou externos? | — | ✅ **mistos**. O que resta é o **inventário** (tarefa `P3`) |
+| V3 | Qual é o segundo país? | — | ✅ **Estados Unidos** |
+| V4 | Limite de rejeição pós-aceite | — | ✅ **2% nos canais próprios, 8% no de parceiro**; aguarda validação do negócio |
+| V5 | Defasagem tolerável de preço sob falha | — | ✅ **não se aplica**: com a cotação assinada (`ADR-0007`), não há preço de fallback |
+| V6 | Política de desfecho para pedido preso | — | ✅ **cancela em 24 h**; aguarda validação da operação |
+| V11 | Hospedagem do Catálogo | — | ✅ **na mesma infraestrutura de Pedidos, hoje e depois da evolução** — conta de infraestrutura única e nenhum esforço de migração |
 
 ---
 
 ## O que este documento admite
 
-A proposta tem **três premissas inventadas** (PR-06, PR-07, PR-08), **nove débitos aceitos** e **oito decisões que dependem do cliente**. Isso não é fragilidade da análise — é o estado real de qualquer proposta feita sobre um enunciado, e declará-lo é o que permite ao cliente decidir com informação.
+A proposta tem **nove premissas declaradas** — uma delas, `PR-06`, sem âncora alguma —, **nove débitos aceitos** e **seis decisões que dependem do cliente**. Isso não é fragilidade da análise — é o estado real de qualquer proposta feita sobre um enunciado, e declará-lo é o que permite ao cliente decidir com informação.
 
-O recorte de escopo de 2026-09-23 eliminou o maior risco isolado — `PR-07`, que supunha Estoque e Pagamento como existentes. O que resta de mais perigoso é `V1`: se a plataforma real tiver integrações no caminho de criação que o enunciado não nomeia, cada uma reintroduz o `CTX-17` e muda o prazo.
+O risco mais perigoso é `V1`: se a plataforma real tiver integrações no caminho de criação que o enunciado não nomeia, cada uma reintroduz o `CTX-17` e muda o prazo.

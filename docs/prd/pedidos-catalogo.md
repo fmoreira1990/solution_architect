@@ -133,11 +133,9 @@ Declaradas porque o enunciado não as informa. São **premissas, não fatos**, e
 
 1. **Baseline inexistente.** Sem os números de hoje, as metas (a) e (e) são verificáveis apenas em termos relativos. Levantar antes de G30, ou o gate fica indecidível.
 2. **"Sem janela de indisponibilidade" em 30 dias é a restrição mais dura do desafio.** Ela força feature flag e convivência já na primeira onda, o que encarece a fase 1 em relação a uma migração com janela.
-3. **O segundo país indefinido bloqueia decisão de residência de dados.** `PR-03` precisa fechar antes da ADR de multi-região, não depois.
+3. **O segundo país define o regime de dados.** Com os Estados Unidos (`PR-03`), não há residência obrigatória; a restrição real é a transferência internacional de dado brasileiro sob a LGPD (`ADR-0006`).
 
 ## Pendências registradas
 
-- ~~A persona primária foi presumida aqui como "operação de pedidos".~~ **Corrigido em `docs/business-context/personas.md`:** a derivação de §2.2.1 aponta para a **liderança técnica da plataforma de Pedidos** — cinco das oito evidências convergem para quem responde simultaneamente por dívida técnica, prazo, compatibilidade e metas de qualidade. A operação de pedidos é persona secundária (quem audita preço). A ordem de intensidade da dor no §1 deste PRD reflete a leitura antiga e deve ser revista quando as personas forem confirmadas com o Client Face.
-- `docs/business-context/jornada.md` ainda não existe — próximo comando (`/jornada`).
-- Os `CTX-*` citados vivem hoje em `docs/requisitos/matriz-entregaveis.md` e migram para `docs/technical-context/constraints.md` via `/constraints`.
+- **Persona primária: a liderança técnica da plataforma de Pedidos**, derivada em `docs/business-context/personas.md` — cinco das oito evidências de §2.2.1 convergem para quem responde ao mesmo tempo por dívida técnica, prazo, compatibilidade e metas de qualidade. A operação de pedidos é persona secundária (quem audita preço). A ordem de intensidade da dor no §1 deve ser confirmada com o Client Face junto com as personas.
 - A hipótese (e), sobre custo, não tem métrica instrumentável definida — depende de `/metricas` e da escolha de cloud detalhar o custo por pedido.

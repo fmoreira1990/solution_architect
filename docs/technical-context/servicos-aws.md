@@ -57,6 +57,11 @@ flowchart TB
         valid["<b>ECS Fargate — validador</b><br/><i>1 tarefa</i>"]
         rds[("<b>RDS PostgreSQL</b> Multi-AZ<br/>db.m6g.large<br/><i>AZ-a primário · AZ-b standby</i>")]
         cache[("<b>ElastiCache</b><br/><i>primário AZ-a · réplica AZ-b</i>")]
+
+        subgraph catb["Catálogo"]
+            catsvc["<b>ECS Fargate — Catálogo</b><br/><i>4 tarefas, autoscaling até 12</i>"]
+            catrds[("<b>RDS PostgreSQL do Catálogo</b><br/>Multi-AZ + réplica de leitura<br/><i>instância própria</i>")]
+        end
     end
 
     subgraph msg["Mensageria gerenciada"]
@@ -66,7 +71,6 @@ flowchart TB
     end
 
     apoio["Secrets Manager · KMS regional · ECR · S3<br/><i>via VPC Endpoint, não pelo NAT</i>"]
-    cat["<b>Catálogo</b><br/><i>escopo B · ver V11</i>"]
 
     ext --> apigw
     apigw -.->|"valida token"| cognito
@@ -74,7 +78,7 @@ flowchart TB
 
     aceite ===>|"1 transação: pedido+snapshot<br/>+chave+outbox"| rds
     aceite -->|"cotação em lote<br/><i>fora do caminho crítico</i>"| cache
-    cache -.->|"popula · miss não falha"| cat
+    cache -.->|"popula · miss não falha"| catsvc
 
     relay -->|"FOR UPDATE SKIP LOCKED"| rds
     relay -->|"publica ANTES de marcar"| sns
@@ -82,10 +86,11 @@ flowchart TB
     sqs --> valid
     sqs -.->|"após maxReceiveCount"| dlq
     valid -->|"confirma ou rejeita"| rds
-    valid -.->|"confere termos"| cat
+    valid -.->|"confere termos"| catsvc
 
     aceite -.-> apoio
     relay -.->|"egress: patches e imagens"| nat
+    catsvc --> catrds
 
     style rds stroke-width:4px
     style aceite stroke-width:3px
@@ -102,6 +107,8 @@ flowchart TB
 
 **Secrets, KMS, ECR e S3 saem por VPC Endpoint, não pelo NAT.** Decisão de custo, não de segurança: tráfego de imagem e de segredo pelo NAT é pago duas vezes.
 
+**Catálogo e Pedidos dividem região, VPC e subredes — não dividem banco.** Não há seta entre os dois RDS, e é de propósito: Pedidos só alcança o Catálogo pelo cache e pelo validador, nunca pelo dado. O porquê está em §8.
+
 ### Cada contêiner lógico, e o serviço que o hospeda
 
 | Contêiner em `containers-to-be.md` | Serviço AWS | Onda | No custo da onda 30? |
@@ -116,7 +123,7 @@ flowchart TB
 | **API Pública de Parceiros** | ECS Fargate, tarefas adicionais | **60** | ❌ — fora do escopo da fase 1 |
 | **Gateway de Notificação** | ECS Fargate + SQS + DLQ | **60** | ❌ |
 | **BFF multi-canal** | ECS Fargate | **90** | ❌ |
-| **Catálogo e seu banco** | ECS Fargate + RDS Multi-AZ **com réplica de leitura** | 30 | ⚠️ **depende de `V11`** — está no escopo B, não no A |
+| **Catálogo e seu banco** | ECS Fargate + RDS Multi-AZ **com réplica de leitura** | 30 | ✅ *(ver §8)* |
 
 ¹ O API Gateway entra já na onda 30 porque a fachada síncrona `/v1` e o roteamento por versão (`ADR-0004`) dependem dele. As quotas por parceiro só passam a ser exercidas na onda 60.
 
@@ -240,13 +247,24 @@ flowchart TB
 
 ## 8. Catálogo
 
-O Catálogo é orçado aqui, e não tratado como infraestrutura de terceiro. Três razões:
+O Catálogo **já roda na mesma infraestrutura que Pedidos e continua nela** (`V11`, decidida). É orçado aqui, e não tratado como infraestrutura de terceiro, por três razões:
 
 **O enunciado nomeia a plataforma como "Pedidos e Catálogo".** Orçar metade do escopo nomeado e chamar de custo de infraestrutura da proposta responde outra pergunta.
 
 **A proposta mexe no Catálogo.** A resolução em lote da onda 60 — *9 chamadas → 2* (`CTX-05`) — é trabalho **dentro** dele. Não dá para mudar um serviço na onda 60 e afirmar que ele não faz parte da entrega.
 
 **O `CTX-17` depende da disponibilidade dele.** A derivação inteira — 99,9% × 99,9% = 99,8% — exige 99,9% do Catálogo. Exigir disponibilidade de um componente cuja infraestrutura não foi dimensionada é transferir o problema, não resolvê-lo: é a saída nº 1 que `constraints.md` §8 rejeita.
+
+### Mesma região e mesma VPC, banco separado
+
+O Catálogo roda na **mesma região, na mesma VPC e nas mesmas subredes privadas** que Pedidos. Não há razão para separá-los na rede: a latência entre os dois fica mínima e a fronteira de confiança é uma só. Na onda 90, os dois vão juntos para a segunda região.
+
+**O banco é que não se compartilha.** Colocar o Catálogo na instância de Pedidos economizaria uma linha da conta e custaria três coisas:
+
+1. **Devolveria ao aceite a dependência que a arquitetura tirou dele.** O banco de Pedidos é o **único** componente que derruba a criação de pedido — e foi isolado para isso. Na mesma instância, as leituras do Catálogo disputam CPU, I/O e conexões com a transação do aceite: um pico de cotação, uma consulta pesada ou uma campanha derrubaria o aceite **pela infraestrutura**, sem uma única chamada entre os serviços. O `CTX-17` voltaria por baixo.
+2. **As cargas são opostas.** Pedidos é escrita transacional (~190/s no pico); o Catálogo é leitura quase pura (338 req/s, 600 no p95). Uma instância que atendesse os dois precisaria ser dimensionada para a soma — e a réplica de leitura, que só o Catálogo pede, passaria a carregar o banco inteiro. O que se economizaria numa instância se gastaria no tier da outra.
+3. **Banco compartilhado vira contrato não declarado.** Com as tabelas ao alcance, alguém faz o primeiro `JOIN` entre contextos, e daí em diante o schema de um só muda com a permissão do outro. O snapshot da `ADR-0003` existe justamente para Pedidos não depender do dado do Catálogo em tempo de leitura; dividir a instância desfaria isso na infraestrutura.
+
 
 ### O dimensionamento
 
@@ -272,7 +290,7 @@ De `constraints.md` §7, a carga do Catálogo:
 
 ### O que isto muda além do custo
 
-**A hospedagem do Catálogo não está nas dias-pessoa estimadas** — 63 com IA, 79 sem. A decomposição da onda 30 cobre idempotência, outbox e snapshot — tudo em Pedidos. Migrar ou assumir a operação do Catálogo é trabalho que não foi decomposto e, portanto, **não está estimado**. Se a resposta a `V11` for "sim", muda custo **e** esforço.
+**Nenhum esforço de migração.** Como o Catálogo já roda nessa infraestrutura, a onda 30 não o move nem assume a operação dele: as dias-pessoa estimadas — 63 com IA, 79 sem — cobrem idempotência, outbox e snapshot, e o trabalho dentro do Catálogo começa na onda 60, com a resolução em lote.
 
 ---
 
@@ -292,16 +310,9 @@ De `constraints.md` §7, a carga do Catálogo:
 | Catálogo — computação | ECS Fargate, 4→12 tarefas | 150 | 400 |
 | Catálogo — store | RDS PostgreSQL Multi-AZ + réplica de leitura | 700 | 900 |
 | | **Subtotal — Catálogo** | **US$ 850** | **US$ 1.300** |
-| | **Total — plataforma completa** | **US$ 1.775** | **US$ 2.949** |
+| | **Total — plataforma** | **US$ 1.775** | **US$ 2.949** |
 
-### Dois números, porque há duas perguntas
-
-| Escopo | US$/mês | Quando é o número certo |
-|---|---|---|
-| **A — Pedidos** | **925–1.649** | O cliente já hospeda o Catálogo e continua hospedando |
-| **B — Pedidos e Catálogo** | **1.775–2.949** | A proposta assume a plataforma nomeada pelo enunciado |
-
-**`V11` decide qual vale.** Enquanto não decidir, o número a levar para a proposta é o **B** — é o escopo que o enunciado nomeia, e errar para mais numa premissa declarada é recuperável; errar para menos vira aditivo.
+**O Catálogo é quase metade da conta** e é leitura: a linha que mais pesa é a réplica que sustenta os 338 req/s do N+1 — e a única que encolhe depois da onda 60.
 
 ### Onde o dimensionamento evitou gasto
 
@@ -319,11 +330,6 @@ Duas escolhas respondem por ~US$ 700/mês, e as duas seguem o mesmo raciocínio:
 ## Custo por pedido
 
 ```
-Escopo A — Pedidos
-US$   925–1.649/mês ÷ 18.000.000 pedidos/mês
-= US$ 0,000051 a 0,000092   ≈  R$ 0,00028 a 0,00050
-
-Escopo B — Pedidos e Catálogo
 US$ 1.775–2.949/mês ÷ 18.000.000 pedidos/mês
 = US$ 0,000099 a 0,000164   ≈  R$ 0,00053 a 0,00089
 ```
@@ -367,7 +373,6 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 3. **Preços mudam e variam por negociação.** Nenhum número aqui substitui a calculadora oficial.
 4. **A escolha SQS sobre MSK assume que ninguém pedirá replay histórico.** Se pedir, o custo do broker sobe ~5×.
 5. **O tier do cache é o número menos ancorado do documento.** Depende do tamanho do Catálogo, que é `???`. Subir dois tiers triplica essa linha.
-6. **`V11` é o maior risco de custo deste documento.** A diferença entre os escopos A e B é de **79 a 92%** na conta mensal — e, se a resposta for B, também há esforço não decomposto. Nenhuma outra premissa daqui move tanto.
 
 ## Pendências registradas
 
@@ -375,4 +380,3 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 - `CTX-15` (teto de custo) segue `???` — decisão `V7`.
 - A escolha de região para a operação dos EUA depende de `V10`.
 - **Dimensionar o cache exige o nº de SKUs ativos e o tamanho médio do registro do Catálogo** (`A6`). É a primeira medição a pedir junto com o baseline `P1`.
-- **`V11` — a hospedagem do Catálogo entra no escopo?** Move ~90% da conta mensal e acrescenta esforço não decomposto. É a pergunta de custo mais consequente em aberto.

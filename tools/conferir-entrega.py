@@ -247,6 +247,27 @@ for adr in sorted(RAIZ.joinpath("docs/decisions").glob("ADR-*.md")):
 print(f"  {'problemas: ' + str(incompletas) if incompletas else f'{n_adrs} ADRs completas'}")
 
 
+# ───────────────────────────────── 9. estado final, não histórico de edição
+secao("9. Narrativa de edição")
+
+# O entregável descreve o estado final. Texto riscado e "fechado em <data>"
+# contam como o arquivo foi editado, não como o sistema é. Ficam de fora a
+# história do sistema (a seção superseded da ADR-0003, prática de ADR) e o
+# registro de IA, que o §2.5.1 exige com as decisões rejeitadas.
+PERMITIDOS = ("docs/ai-context/", "docs/decisions/ADR-0003-")
+MARCA_DATADA = re.compile(r"(Fechad|Corrigid|Implementad|Removid|Resolvid|Testad)[oa]s? em 20\d\d-")
+narrativa = 0
+for p in docs_md():
+    rel = p.relative_to(RAIZ).as_posix()
+    if rel.startswith(PERMITIDOS):
+        continue
+    for n, linha in enumerate(ler(p).splitlines(), 1):
+        if "~~" in linha or MARCA_DATADA.search(linha):
+            problemas.append(f"{rel}:{n}: narrativa de edição — {linha.strip()[:70]}")
+            narrativa += 1
+print(f"  {'ocorrências: ' + str(narrativa) if narrativa else 'nenhuma'}")
+
+
 # ───────────────────────────────── resultado
 print("\n" + "=" * 62)
 if problemas:

@@ -80,7 +80,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 
 > **Bullet 4 é parcial:** os contratos existem e são versionados, mas o **gateway de notificação a parceiros não tem implementação nem teste** — é entrega da onda 60.
 >
-> ~~Bullet 7 parcial: feature flag não existe no código.~~ **Fechado em 2026-09-24.** A flag roteia por percentual, o rollback é por desligamento sem deploy, e o **caminho legado foi implementado** para que a convivência seja demonstrável — sem ele não haveria o que comparar nem para onde reverter.
+> **Bullet 7:** a flag roteia por percentual, o rollback é por desligamento sem deploy, e o **caminho legado foi implementado** para que a convivência seja demonstrável — sem ele não haveria o que comparar nem para onde reverter.
 
 ---
 
@@ -139,7 +139,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | mesma chave não duplica | `test_vinte_requisicoes_concorrentes_criam_exatamente_um_pedido` — 20 threads, 1 pedido, 1× `201` + 19× `200` | ✅ |
 | contrato não quebra consumidor **demonstrado no teste** | `test_consumidor_v1_continua_passando_com_a_v2_no_ar` — consumidor de referência que emite nota no `201` | ✅ |
 
-> ~~Parcial: o pipeline nunca rodou.~~ **Fechado em 2026-09-24.** Cinco execuções verdes, com os três jobs — prova com serviço `postgres:18`, validação de diagramas e varredura de confidencialidade. A prova roda em Linux sem nenhum ajuste, o que também valida que ela não depende do ambiente Windows onde foi escrita.
+> O pipeline roda três jobs a cada push — prova com serviço `postgres:18`, validação de diagramas e varredura de confidencialidade. A prova roda em Linux sem nenhum ajuste, o que também valida que ela não depende do ambiente Windows onde foi escrita.
 
 ---
 
@@ -159,7 +159,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | *"Automatizar validações de OpenAPI/AsyncAPI, ADRs e regras arquiteturais como fitness functions no CI"* | 18 fitness functions em 3 categorias, **rodando no CI**; 3 validadas por teste de mutação | ✅ |
 | *"Definir política de evolução de contratos e processo leve de exceção técnica"* | `politica-contratos.md` + `excecao-tecnica.md` — este com validade obrigatória que **quebra o build** | ✅ |
 
-> ~~Parcial: "no CI" não demonstrado.~~ **Fechado em 2026-09-24** — as fitness functions rodam a cada push, junto com a prova.
+> As fitness functions rodam a cada push, junto com a prova.
 
 ---
 
@@ -171,11 +171,11 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 |---|---|---|
 | **esforço** | 63 d.p. com IA, derivados de 79 d.p. em 47 tarefas | ✅ |
 | **composição de time** | 5 pessoas, 1 SRE, **derivada** do esforço | ✅ |
-| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.775–2.949/mês** para Pedidos **e** Catálogo (US$ 925–1.649 só Pedidos, decisão `V11`) · licenças de IA: US$ 100–350/mês | ✅ |
+| **custos principais** | pessoas: tabela pronta, com encargos CLT e tributos · infra: `servicos-aws.md`, **US$ 1.775–2.949/mês** para Pedidos **e** Catálogo, na mesma infraestrutura · licenças de IA: US$ 100–350/mês | ✅ |
 | **premissas** | 8 premissas com efeito declarado se falsas | ✅ |
 | **riscos** | 6 riscos com impacto e resposta, mais faixa de confiança | ✅ |
 
-> `servicos-aws.md` nomeia cada serviço com tier, alternativa confrontada e custo derivado do dimensionamento — e separa o escopo Pedidos do escopo Pedidos e Catálogo, cuja diferença é decisão `V11` do cliente.
+> `servicos-aws.md` nomeia cada serviço com tier, alternativa confrontada e custo derivado do dimensionamento — e orça o Catálogo junto com Pedidos, porque os dois dividem a mesma infraestrutura.
 
 ---
 
@@ -223,11 +223,7 @@ Revisão completa, com as lacunas nomeadas, em **[`checklist-avaliacao.md`](../d
 
 | # | Lacuna | Seção | Esforço |
 |---|---|---|---|
-| ~~1~~ | ~~Serviços AWS não nomeados~~ | §2.5.3, §1 | ✅ **feito** |
-| ~~2~~ | ~~Estratégia de API pública não consolidada~~ | §2.3.2 | ✅ **feito** |
-| ~~3~~ | ~~CI nunca executou~~ | §2.4.2, §2.5.2 | ✅ **verde em 5 execuções** |
-| ~~4~~ | ~~Feature flag sem implementação~~ | §2.2.1 b7 | ✅ **feito** — 10 testes |
-| **5** | **Gateway de notificação a parceiros sem código** | §2.2.1 b4 | onda 60 — fora da fatia |
-| **6** | **SAI App 3.0 não endereçado** | §1 | sem informação disponível |
+| **1** | **Gateway de notificação a parceiros sem código** | §2.2.1 b4 | onda 60 — fora da fatia |
+| **2** | **SAI App 3.0 não endereçado** | §1 | sem informação disponível |
 
-**Os quatro itens endereçáveis foram fechados.** O 5 é escopo declarado de onda futura — implementá-lo agora seria construir a onda 60 numa prova que o enunciado pediu para cobrir **uma** decisão crítica. O 6 não tem como ser resolvido sem informação que o enunciado não fornece.
+**Nenhum dos dois é endereçável nesta entrega.** O 1 é escopo declarado de onda futura — implementá-lo agora seria construir a onda 60 numa prova que o enunciado pediu para cobrir **uma** decisão crítica. O 2 não tem como ser resolvido sem informação que o enunciado não fornece.

@@ -135,7 +135,6 @@ O padrão de segregação é decidido na `ADR-0006`.
 ## Pendências registradas
 
 - Definir o dono do endereço de entrega (`V8`).
-- ~~Fechar `PR-03`~~ ✅ resolvido: Estados Unidos, em 2026-09-23.
 - Acrescentar o serviço de preferências de privacidade ao plano da onda 90.
 - Aprovar prazos de retenção com jurídico — os desta página são propostas.
 - Inventário de quem referencia `cliente_id` precisa existir antes do primeiro pedido de acesso do titular.

@@ -46,9 +46,9 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | **Prazo** | 20 dias úteis · **cabe nos 30 corridos**, que têm 21 dias úteis |
 | **Contingência** | +15% (9,5 d.p.), como linha separada e negociável — com destino previsto: meio SRE nas semanas 3 e 4, se a recalibração da semana 2 pedir |
 | **Preço de pessoas** | **R$ 141.880** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
-| **Custo de infraestrutura** | **US$ 1.775–2.949/mês** para a plataforma nomeada (Pedidos **e** Catálogo) · **US$ 925–1.649** se o cliente seguir hospedando o Catálogo (`V11`) · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido nos dois casos** |
+| **Custo de infraestrutura** | **US$ 1.775–2.949/mês** para Pedidos **e** Catálogo, que já dividem a mesma infraestrutura · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido** |
 | **Licenças de IA** | US$ 100–350/mês |
-| **Total da fase 1** | **≈ R$ 152.000 – 159.700** — pessoas com contingência + um mês de licenças e de infraestrutura da plataforma completa, a R$ 5,40/US$. Sem IA seriam ≈ R$ 181.900 – 188.200 |
+| **Total da fase 1** | **≈ R$ 152.000 – 159.700** — pessoas com contingência + um mês de licenças e de infraestrutura, a R$ 5,40/US$. Sem IA seriam ≈ R$ 181.900 – 188.200 |
 
 **A composição do time saiu do esforço, não o contrário** — e revelou que quem define o prazo é o SRE, não o dev. A exigência de *zero janela de indisponibilidade* faz rollout progressivo, alertas de falha silenciosa e reversibilidade sem deploy pesarem **26% do esforço**, e a IA quase não os acelera: os degraus do rollout levam o tempo que levam.
 
@@ -94,14 +94,13 @@ Mais: queda do relay entre publicar e marcar **não perde evento**; consulta de 
 
 ## Decisões que precisam de validação
 
-Nenhuma pode ser resolvida pela equipe técnica. As quatro em destaque afetam prazo, gate ou custo.
+Nenhuma pode ser resolvida pela equipe técnica. As três em destaque afetam prazo, gate ou custo.
 
 | # | Decisão | Quem decide | O que bloqueia |
 |---|---|---|---|
 | **V1** | Existem integrações no caminho de criação além do Catálogo? | Client Face / arquitetura da conta | **Prazo da onda 30** |
-| **V3** | Baseline atual: duplicatas/mês, eventos perdidos, p95, disponibilidade | Operação | **Gate G30** — sem régua, indecidível |
+| **V12** | Baseline atual: duplicatas/mês, eventos perdidos, p95, disponibilidade | Operação | **Gate G30** — sem régua, indecidível |
 | **V7** | Teto de custo de infraestrutura | Negócio | A dimensão custo do objetivo fica sem régua de verificação |
-| **V11** | **A hospedagem do Catálogo entra no escopo?** | Client Face / negócio | **Quase dobra a conta de infraestrutura** (+79 a 92%) — e acrescenta esforço que não está nos 63 d.p. |
 | V8 | Dono do endereço de entrega — Pedidos ou Logística? | Arquitetura da conta | Estratégia de pseudonimização (LGPD) |
 | V9 | Instrumento jurídico para transferência Brasil → EUA | Jurídico / DPO | Onda 90; nenhuma PII brasileira atravessa sem ele |
 | V10 | Em quais estados dos EUA a operação estará sujeita | Jurídico / negócio | Quais leis estaduais se aplicam |

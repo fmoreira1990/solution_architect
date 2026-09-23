@@ -153,11 +153,11 @@ Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`]
 | **Subtotal — Pedidos** | | **US$ 925–1.649** |
 | Catálogo — computação | ECS Fargate, 4→12 tarefas | 150–400 |
 | Catálogo — store | RDS Multi-AZ + réplica de leitura | 700–900 |
-| **Total — plataforma completa** | | **US$ 1.775–2.949** |
+| **Total — plataforma** | | **US$ 1.775–2.949** |
 
-**Custo por pedido: menos de meio centavo** — US$ 0,000051 a 0,000092 no escopo Pedidos, US$ 0,000099 a 0,000164 na plataforma completa. A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
+**Custo por pedido: menos de meio centavo** — US$ 0,000099 a 0,000164. A maior parte é **fixa** — Multi-AZ, NAT, control planes —, não por transação, o que atende `CTX-16`.
 
-> **`V11` decide qual total vale.** O enunciado nomeia *"Pedidos e Catálogo"*, e a onda 60 mexe no Catálogo — por isso o número levado à proposta é o da plataforma completa. Se o cliente seguir hospedando o Catálogo, cai para US$ 925–1.649. **A hospedagem do Catálogo não está nas 63 dias-pessoa**: se entrar no escopo, muda custo e esforço.
+> **Pedidos e Catálogo já rodam na mesma infraestrutura e continuam nela.** Por isso a conta é uma só, e a onda 30 não tem esforço de migração: o trabalho dentro do Catálogo começa na onda 60.
 
 > **Duas escolhas respondem por ~US$ 700/mês de economia:** SQS FIFO no lugar de Kafka gerenciado (~US$ 500) e RDS Multi-AZ no lugar de Aurora (~US$ 200). Nos dois casos a opção mais cara entregava capacidade que o dimensionamento não pede — `AV-08` aplicado a custo.
 

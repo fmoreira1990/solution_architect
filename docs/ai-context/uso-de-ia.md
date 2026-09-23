@@ -174,6 +174,28 @@
 
 ---
 
+### 2026-09-23 · Catálogo no diagrama de implantação — mesma VPC, banco próprio
+
+- **Prompt:** *"o catálogo e o pedidos não podem estar na mesma região, mesmo RDS, mesma VPC? No desenho da AWS ele está como opcional, não entendi"*.
+- **A pergunta do usuário expôs uma lacuna real.** O diagrama desenhava o Catálogo solto, fora da VPC, porque `V11` estava em aberto — mas a proposta já assume o escopo B. E nenhum documento justificava o RDS separado: a decisão estava certa e sem argumento escrito.
+- **Resposta:** região, VPC e subredes são as mesmas; o banco não. O motivo decisivo é específico do desenho: o banco de Pedidos é o único componente que derruba o aceite, e dividir a instância devolveria ao aceite, pela infraestrutura, a dependência do Catálogo que a `ADR-0007` tirou do código.
+- **Rejeitado:** justificar o banco separado apenas por *database per service*. **Motivo:** é regra genérica, que um avaliador reconhece como citação; o argumento que se sustenta é o do `CTX-17` voltando por baixo.
+- **Decisão seguinte do usuário:** *"assuma que os dois estão na mesma infra hoje, e continuarão"*. `V11` fechada: conta de infraestrutura única, sem escopo A/B e sem esforço de migração. O RDS próprio do Catálogo foi mantido — "mesma infra" é conta, região e VPC, e o argumento contra dividir a instância não depende de quem hospeda.
+- **Achado próprio, ao fechar `V11`:** o resumo e os slides chamavam de `V3` a decisão de baseline, mas em `riscos-premissas.md` `V3` é o segundo país — e o baseline nem constava ali. Virou `V12`, registrada na fonte.
+- **Dados expostos:** nenhum.
+
+---
+
+### 2026-09-23 · Narrativa de edição — limpeza e verificação automática
+
+- **Contexto:** a regra *"o entregável descreve o estado final"* já havia sido aplicada, mas a limpeza foi manual e deixou 13 trechos riscados ou com *"fechado em <data>"* em sete documentos.
+- **Achado junto:** o PRD listava como pendentes a jornada e a migração dos `CTX` — as duas feitas há dias — e tratava o segundo país como indefinido. `riscos-premissas.md` ainda contava `PR-07`, premissa eliminada, entre as "três premissas inventadas".
+- **Correção:** cada trecho reescrito como estado final; itens resolvidos saíram das pendências. Nova seção 9 no `conferir-entrega.py` quebra o build com texto riscado ou marca datada de fechamento, exceto em `ai-context/` e na `ADR-0003`. Validada por mutação.
+- **Rejeitado:** proibir só o `~~`. **Motivo:** metade das ocorrências era *"Fechado em 2026-09-24"* sem riscado; a verificação pegaria o sintoma mais visível e deixaria o outro.
+- **Dados expostos:** nenhum.
+
+---
+
 ## Pendências registradas
 
 - A íntegra dos prompts ainda não foi extraída para `docs/ai-context/prompts/`. Fazer ao final de cada frente, não no fechamento.

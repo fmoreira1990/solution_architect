@@ -134,8 +134,7 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md), medid
 
 | | |
 |---|---|
-| AWS — escopo Pedidos | US$ 925–1.649/mês → R$ 4.995–8.905/mês |
-| AWS — plataforma completa *(`V11`)* | US$ 1.775–2.949/mês → **R$ 9.585–15.925/mês** |
+| AWS — Pedidos e Catálogo | US$ 1.775–2.949/mês → **R$ 9.585–15.925/mês** |
 
 *Câmbio de R$ 5,40/US$, premissa declarada. Normalmente contratada direto pelo cliente ou repassada a custo — neste caso não sofre o gross-up.*
 
@@ -145,7 +144,7 @@ Aplicando às 79 dias-pessoa da [decomposição](decomposicao-onda-30.md), medid
 |---|---|---|
 | Serviços, com contingência | R$ 141.880 | R$ 172.306 |
 | Licenças de IA *(1 mês)* | R$ 540–1.890 | — |
-| Infraestrutura *(plataforma completa, 1 mês)* | R$ 9.585–15.925 | R$ 9.585–15.925 |
+| Infraestrutura *(1 mês)* | R$ 9.585–15.925 | R$ 9.585–15.925 |
 | **Total** | **≈ R$ 152.000 – 159.700** | ≈ R$ 181.900 – 188.200 |
 
 ---

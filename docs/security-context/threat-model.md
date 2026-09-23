@@ -131,7 +131,7 @@ Agrava o problema o fato de `X-Chamador` ser um **header controlado pelo cliente
 ## Riscos abertos
 
 1. **A chave HMAC da oferta (F1.3) é o ativo mais concentrado do desenho.** Quem a obtém falsifica preço em qualquer pedido. Na fatia ela é fixa e sintética; em produção exige cofre e rotação.
-2. ~~Autorização por dono no `GET` não existe na fatia.~~ **Implementada em 2026-09-23**, com resposta `404` indistinguível entre pedido alheio e inexistente. O que permanece aberto é a autorização **por escopo de parceiro** (onda 60): hoje a verificação é por `cliente_id`, não por contrato de parceiro.
+2. **A autorização no `GET` é por dono, não por contrato de parceiro.** Pedido alheio responde `404`, indistinguível de inexistente; a verificação é por `cliente_id`, e a autorização **por escopo de parceiro** fica para a onda 60.
 3. **F5 depende do instrumento de transferência (`V9`)**, que ainda não existe. Enquanto isso, nenhuma PII brasileira deveria atravessar.
 4. **Nenhum teste de segurança automatizado** além dos dois de oferta. SAST, verificação de dependências e teste de autorização ficam como débito.
 

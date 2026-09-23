@@ -180,7 +180,7 @@ $ cd slice && python prova.py
 | **Time** | 5 pessoas — arquiteto em meio período, 2 sênior, 1 pleno, **1 SRE** |
 | **Prazo** | 20 dias úteis · cabe nos 30 corridos |
 | **Preço de pessoas** | **R$ 141.880** faturados, com contingência |
-| **Infraestrutura** | US$ 1.775–2.949/mês com o Catálogo · US$ 925–1.649 sem ele · **< meio centavo por pedido** |
+| **Infraestrutura** | US$ 1.775–2.949/mês, Pedidos e Catálogo · **< meio centavo por pedido** |
 | **Total da fase 1** | **≈ R$ 152–160 mil** · com licenças de IA |
 
 O preço é **faturado**: sobre o custo carregado de CLT incidem ainda **19,53%** de tributos do Lucro Presumido. Do preço, 53,6% é custo de pessoal, 19,5% tributo e 26,8% overhead e margem.
@@ -198,9 +198,8 @@ O preço é **faturado**: sobre o custo carregado de CLT incidem ainda **19,53%*
 | # | Decisão | Bloqueia |
 |---|---|---|
 | **V1** | Há integrações no caminho de criação além do Catálogo? | **prazo da onda 30** |
-| **V3** | Baseline atual — duplicatas, eventos perdidos, p95 | **gate G30** |
+| **V12** | Baseline atual — duplicatas, eventos perdidos, p95 | **gate G30** |
 | **V7** | Teto de custo de infraestrutura | verificação da dimensão custo |
-| **V11** | A hospedagem do **Catálogo** entra no escopo? | **quase dobra a conta de infra** e acrescenta esforço fora dos 63 d.p. |
 
 **47 lacunas permanecem marcadas `???`** — todas de baseline de produção. Números que só existem **medindo**. Inventá-los contaminaria métricas e estimativa.
 
