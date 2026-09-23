@@ -30,7 +30,7 @@ Plataforma de **Pedidos e Catálogo**, hoje um único canal web nacional.
 
 ## 2 · A restrição que decidiu tudo
 
-Duas exigências do edital, multiplicadas:
+Duas exigências do enunciado, multiplicadas:
 
 ```
 Pedidos 99,9%  ×  Catálogo 99,9%  =  99,8%
@@ -113,7 +113,7 @@ sequenceDiagram
 
 **Uma transação, quatro garantias.** Idempotência pela `PRIMARY KEY`, snapshot imutável, outbox no mesmo commit, nenhuma dependência externa.
 
-> **De seis componentes, apenas um derruba a criação de pedido.**
+> **De seis componentes, apenas um derruba a criação de pedido** — o próprio banco, Multi-AZ.
 
 ---
 
@@ -138,7 +138,7 @@ Por isso a onda 30 **não** ataca o N+1, que é a dor mais visível.
 
 ```
 $ cd slice && python prova.py
-128 passed
+127 passed, 1 skipped
 ```
 
 | ⭐ | Teste | Prova |
@@ -148,7 +148,7 @@ $ cd slice && python prova.py
 | | relay derrubado entre publicar e marcar | evento duplica, **nunca se perde** |
 | | consulta com o Catálogo fora do ar | pedido é **autocontido** |
 
-⭐ = critérios críticos do edital
+⭐ = critérios críticos do enunciado · o teste pulado verifica exceção técnica vencida, e nenhuma está registrada
 
 > As 19 respostas de replay só existem por **violação da `PRIMARY KEY`**. As threads competiram de verdade — foi a constraint que segurou, não o código.
 
@@ -177,12 +177,13 @@ $ cd slice && python prova.py
 | | |
 |---|---|
 | **Esforço** | **79 dias-pessoa** · 47 tarefas decompostas |
-| **Time** | 5,5 pessoas — 1 arquiteto (30%), 2 sênior, 1 pleno, 1,5 SRE |
+| **Time** | 5,5 pessoas — 1 arquiteto (50%), 2 sênior, 1 pleno, 1,5 SRE |
 | **Prazo** | 20 dias úteis · cabe nos 30 |
 | **Preço de pessoas** | **R$ 172.306** faturados, com contingência |
-| **Infraestrutura** | US$ 1.775–2.949/mês · **< meio centavo por pedido** |
+| **Infraestrutura** | US$ 1.775–2.949/mês com o Catálogo · US$ 925–1.649 sem ele · **< meio centavo por pedido** |
+| **Total da fase 1** | **≈ R$ 182–188 mil** |
 
-O preço é **faturado**: sobre o custo carregado de CLT incidem ainda **19,53%** de tributos do Lucro Presumido. Das quatro camadas, 53,6% é custo de pessoal, 19,5% tributo e 26,8% overhead e margem.
+O preço é **faturado**: sobre o custo carregado de CLT incidem ainda **19,53%** de tributos do Lucro Presumido. Do preço, 53,6% é custo de pessoal, 19,5% tributo e 26,8% overhead e margem.
 
 **O time saiu do esforço, não o contrário.** E revelou: **SRE consome 26%** — mais que o dobro do arquiteto.
 
@@ -199,7 +200,7 @@ A causa é *zero janela de indisponibilidade*: rollout progressivo, alertas de f
 | **V1** | Há integrações no caminho de criação além do Catálogo? | **prazo da onda 30** |
 | **V3** | Baseline atual — duplicatas, eventos perdidos, p95 | **gate G30** |
 | **V7** | Teto de custo de infraestrutura | verificação da dimensão custo |
-| **V11** | A hospedagem do **Catálogo** entra no escopo? | **~80 a 90% da conta de infra** e esforço não decomposto |
+| **V11** | A hospedagem do **Catálogo** entra no escopo? | **quase dobra a conta de infra** e acrescenta esforço fora dos 79 d.p. |
 
 **47 lacunas permanecem marcadas `???`** — todas de baseline de produção. Números que só existem **medindo**. Inventá-los contaminaria métricas e estimativa.
 

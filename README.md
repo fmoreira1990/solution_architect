@@ -73,7 +73,9 @@ Variável opcional: `PROVA_DATABASE_URL` (padrão `postgresql://prova:prova@127.
 
 Dados são **sintéticos** — nenhum dado real, nenhuma PII.
 
-O ciclo foi validado do zero: banco e usuário destruídos, prova executada, instruções da própria saída seguidas, 127 testes verdes.
+O ciclo foi validado do zero: banco e usuário destruídos, prova executada, instruções da própria saída seguidas.
+
+Resultado esperado: **127 passed, 1 skipped**. O teste pulado é a verificação de exceção técnica vencida — ele só tem o que conferir quando alguma exceção estiver registrada, e hoje nenhuma está.
 
 ---
 
@@ -206,7 +208,7 @@ O que o CI quebra, e não apenas o que ele roda:
 
 | Verificação | Protege |
 |---|---|
-| 127 testes da fatia, **em CI** | os dois critérios críticos |
+| 128 testes da fatia, **em CI** | os dois critérios críticos |
 | Contrato **×** implementação rodando | spec drift |
 | `RECEBIDO` ausente do enum da v1 | a fachada síncrona |
 | Toda ADR com ≥ 2 alternativas rejeitadas | regra Q2 |
@@ -222,9 +224,9 @@ As três primeiras foram validadas por **teste de mutação** — quebra-se o qu
 ## Estrutura
 
 ```
-docs/            45 documentos, por contexto
+docs/            46 documentos, por contexto
 contracts/       OpenAPI v1/v2 + AsyncAPI
-slice/           fatia executável — 127 testes
+slice/           fatia executável — 128 testes
 tools/           validador de diagramas
 .github/         CI: prova, diagramas, confidencialidade
 .claude/         comandos que produziram os artefatos

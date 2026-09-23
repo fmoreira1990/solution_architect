@@ -79,7 +79,6 @@ esperado = {
     r"\*\*(\d+) testes\*\*": n_testes,
     r"(\d+) testes em PostgreSQL": n_testes,
     r"(\d+) testes no total": n_testes,
-    r"(\d+) passed": n_testes,
     r"\*\*(\d+) ADRs\*\*": n_adrs,
     r"(\d+) diagramas válidos": n_diagramas,
     r"(\d+) diagramas validados": n_diagramas,
@@ -113,6 +112,17 @@ for p in docs_md():
                 problemas.append(f"{rel}: cita {achado} onde a realidade é {valor} ({padrao})")
     if CORRIGIR and texto != original:
         io.open(p, "w", encoding="utf-8", newline="\n").write(texto)
+
+# Saída do pytest citada em documento: "passed" + "skipped" é que soma o
+# total. Exigir "N passed" igual ao coletado obrigava a citar uma saída que
+# o pytest nunca imprime — o teste de exceção vencida é pulado sem exceção.
+for p in docs_md():
+    for passou, pulou in re.findall(r"(\d+) passed(?:, (\d+) skipped)?", ler(p)):
+        total = int(passou) + int(pulou or 0)
+        if total != n_testes:
+            problemas.append(
+                f"{p.relative_to(RAIZ)}: saída citada soma {total} onde a realidade é {n_testes}"
+            )
 
 if CORRIGIR:
     print(f"  {corrigidos} número(s) corrigido(s)")

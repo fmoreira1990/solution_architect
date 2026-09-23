@@ -13,7 +13,7 @@
 
 A ordem das ondas **não segue visibilidade, segue natureza do dano**:
 
-> Três dos seis problemas atuais **corrompem dado** — pedido duplicado por retry, evento de pedido perdido e ausência de prova do preço praticado. Cada dia de operação produz estrago que nenhuma correção futura desfaz. Os outros três — N+1, canal de parceiros bloqueado, evolução travada — **degradam experiência**: doem continuamente, mas não deixam cicatriz.
+> Os quatro débitos produzem seis danos distintos. Três deles **corrompem dado** — pedido duplicado por retry, evento de pedido perdido e ausência de prova do preço praticado. Cada dia de operação produz estrago que nenhuma correção futura desfaz. Os outros três — N+1, canal de parceiros bloqueado, evolução travada — **degradam experiência**: doem continuamente, mas não deixam cicatriz.
 
 Por isso a **onda 30 ataca idempotência, publicação confiável e snapshot de preço**, e não o N+1 — que é a dor mais visível e a mais fácil de demonstrar. Um pedido duplicado hoje não pode ser desduplicado depois.
 
@@ -21,7 +21,7 @@ Por isso a **onda 30 ataca idempotência, publicação confiável e snapshot de 
 
 ## O achado que decidiu a arquitetura
 
-Duas restrições que o edital apresenta separadamente, multiplicadas:
+Duas restrições que o enunciado apresenta separadamente, multiplicadas:
 
 ```
 Pedidos 99,9%  ×  Catálogo 99,9%  =  99,8%
@@ -33,7 +33,7 @@ Error budget exigido: 43,2 min/mês
 
 A arquitetura proposta não é orientada a eventos por preferência de estilo. É a única forma de a conta fechar: tudo que exige resposta externa foi deslocado para **antes** da criação (cotação assinada) ou para **depois** dela (validação assíncrona). O aceite do pedido passa a ser uma operação **puramente local**.
 
-O resultado mensurável: **de seis componentes, apenas um derruba a criação de pedido.**
+O resultado mensurável: **de seis componentes, apenas um derruba a criação de pedido** — o banco de Pedidos, Multi-AZ. Broker, relay, Catálogo, validador e notificação podem cair sem impedir o aceite.
 
 ---
 
@@ -42,13 +42,14 @@ O resultado mensurável: **de seis componentes, apenas um derruba a criação de
 | | |
 |---|---|
 | **Esforço** | **79 dias-pessoa**, decompostos em 47 tarefas |
-| **Time** | 5,5 pessoas — 1 arquiteto (30%), 2 dev sênior, 1 dev pleno, 1,5 SRE |
+| **Time** | 5,5 pessoas — 1 arquiteto (50%), 2 dev sênior, 1 dev pleno, 1,5 SRE |
 | **Prazo** | 20 dias úteis · **cabe nos 30 corridos** |
 | **Contingência** | +15% (12 d.p.), como linha separada e negociável |
 | **Preço de pessoas** | **R$ 172.306** com contingência, a taxas de mercado ([`taxas-de-mercado.md`](taxas-de-mercado.md)) — valor **faturado**, já com encargos CLT e tributos do Lucro Presumido (19,53%). Substituir cada camada pelos números reais da empresa |
 | **Custo de infraestrutura** | **US$ 1.775–2.949/mês** para a plataforma nomeada (Pedidos **e** Catálogo) · **US$ 925–1.649** se o cliente seguir hospedando o Catálogo (`V11`) · serviços nomeados em [`servicos-aws.md`](../technical-context/servicos-aws.md) · **menos de meio centavo por pedido nos dois casos** |
+| **Total da fase 1** | **≈ R$ 181.900 – 188.200** — pessoas com contingência + um mês de infraestrutura da plataforma completa, a R$ 5,40/US$ |
 
-**A composição do time saiu do esforço, não o contrário.** E ela revelou algo contraintuitivo: **SRE consome 26%** — mais que o dobro do arquiteto. A causa é a exigência de *zero janela de indisponibilidade*: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de operação, não de desenvolvimento.
+**A composição do time saiu do esforço, não o contrário.** E ela revelou algo contraintuitivo: **SRE consome 26% do esforço** — mais que o dobro do arquiteto. A causa é a exigência de *zero janela de indisponibilidade*: rollout progressivo com comparação a cada degrau, alertas de falha silenciosa e reversibilidade sem deploy são trabalho de operação, não de desenvolvimento.
 
 Uma proposta dimensionada com "4 devs e apoio de infra" erraria exatamente na parte que sustenta o critério mais duro do gate.
 
@@ -65,7 +66,7 @@ Não é desperdício — é o preço de uma restrição que o cliente impôs. Pr
 
 ## O que já está provado
 
-A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **128 testes**, e demonstra os dois critérios críticos do edital:
+A proposta não é apenas documental. A fatia executável roda em PostgreSQL real, com **128 testes**, e demonstra os dois critérios críticos do enunciado:
 
 - **20 requisições concorrentes com a mesma chave criam exatamente um pedido.** As 19 respostas de replay só são alcançadas por violação da `PRIMARY KEY` — as threads competiram de verdade, e foi a constraint que segurou.
 - **O consumidor legado não quebra com a versão nova no ar.** Um consumidor de referência que emite nota fiscal na resposta do POST continua passando.
@@ -84,31 +85,31 @@ Mais: queda do relay entre publicar e marcar **não perde evento**; consulta de 
 | **4** | **Pico de demanda muito acima de 3×** | Alto — varejo tem Black Friday | Teste de carga com cenário de campanha, não de média |
 | **5** | **Ausência de baseline tornar o gate indecidível** | Alto | Medição é **pré-requisito** do gate, não tarefa paralela |
 
-**O desenho não supõe sistemas que o edital não nomeia.** Estoque, Pagamento e Carrinho ficaram fora: assumi-los exigiria inventar contrato e disponibilidade para sustentar justamente o caminho crítico. A decisão central se ancora no Catálogo, que o edital nomeia — uma decisão que não depende de premissa inventada é mais sólida que uma que precisa administrá-la.
+**O desenho não supõe sistemas que o enunciado não nomeia.** Estoque, Pagamento e Carrinho ficaram fora: assumi-los exigiria inventar contrato e disponibilidade para sustentar justamente o caminho crítico. A decisão central se ancora no Catálogo, que o enunciado nomeia — uma decisão que não depende de premissa inventada é mais sólida que uma que precisa administrá-la.
 
 ---
 
 ## Decisões que precisam de validação
 
-Nenhuma pode ser resolvida pela equipe técnica. As três primeiras afetam prazo e compromisso.
+Nenhuma pode ser resolvida pela equipe técnica. As quatro em destaque afetam prazo, gate ou custo.
 
 | # | Decisão | Quem decide | O que bloqueia |
 |---|---|---|---|
 | **V1** | Existem integrações no caminho de criação além do Catálogo? | Client Face / arquitetura da conta | **Prazo da onda 30** |
 | **V3** | Baseline atual: duplicatas/mês, eventos perdidos, p95, disponibilidade | Operação | **Gate G30** — sem régua, indecidível |
-| **V7** | Teto de custo de infraestrutura | Negócio | Uma das cinco dimensões do objetivo fica sem verificação |
-| **V11** | **A hospedagem do Catálogo entra no escopo?** | Client Face / negócio | **~80 a 90% da conta de infraestrutura** — e acrescenta esforço que não foi decomposto |
+| **V7** | Teto de custo de infraestrutura | Negócio | A dimensão custo do objetivo fica sem régua de verificação |
+| **V11** | **A hospedagem do Catálogo entra no escopo?** | Client Face / negócio | **Quase dobra a conta de infraestrutura** (+79 a 92%) — e acrescenta esforço que não está nos 79 d.p. |
 | V8 | Dono do endereço de entrega — Pedidos ou Logística? | Arquitetura da conta | Estratégia de pseudonimização (LGPD) |
 | V9 | Instrumento jurídico para transferência Brasil → EUA | Jurídico / DPO | Onda 90; nenhuma PII brasileira atravessa sem ele |
 | V10 | Em quais estados dos EUA a operação estará sujeita | Jurídico / negócio | Quais leis estaduais se aplicam |
 
-> **Sobre o segundo país.** O edital pede *"requisitos de residência de dados do novo país"*. Os Estados Unidos **não impõem residência** para dado comercial de varejo. A restrição real é outra e inverte de direção: dado pessoal **brasileiro** que vai para os EUA é transferência internacional sob a LGPD e exige instrumento jurídico. A segregação regional foi mantida — não por obrigação legal, mas porque minimiza transferência e simplifica a mecânica de direitos. *(Enquadramento de arquiteto, não parecer jurídico; requer validação do DPO.)*
+> **Sobre o segundo país.** O enunciado pede *"requisitos de residência de dados do novo país"*. Os Estados Unidos **não impõem residência** para dado comercial de varejo. A restrição real é outra e inverte de direção: dado pessoal **brasileiro** que vai para os EUA é transferência internacional sob a LGPD e exige instrumento jurídico. A segregação regional foi mantida — não por obrigação legal, mas porque minimiza transferência e simplifica a mecânica de direitos. *(Enquadramento de arquiteto, não parecer jurídico; requer validação do DPO.)*
 
 ---
 
 ## O que esta proposta assume e o que exclui
 
-**Três premissas inventadas** por ausência de dado: volumetria (60k → 600k/dia), tamanho do pedido (8 itens, 15 no p95) e distribuição de pico (3×). A terceira é a mais frágil.
+**Três premissas numéricas** declaradas por ausência de dado: volumetria (60k → 600k/dia), tamanho do pedido (8 itens, 15 no p95) e distribuição de pico (3×). A terceira é a única sem âncora alguma, e a mais frágil.
 
 **Nove débitos aceitos**, entre eles: a fachada de compatibilidade reintroduz o acoplamento para consumidores antigos — consciente, minoritário e com data de vencimento; o snapshot desnormaliza ~1,1 TB/ano; rejeição pós-aceite vira modo de operação previsto, não incidente.
 

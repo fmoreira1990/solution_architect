@@ -147,6 +147,20 @@
 
 ---
 
+### 2026-09-23 · Revisão de leitura — README, resumo executivo e apresentação
+
+- **Prompt:** *"siga com a revisão de leitura"* — ler os três documentos de entrada com olho de avaliador, conferindo cada número contra a fonte.
+- **Achados corrigidos:**
+  - A apresentação mostrava `128 passed`, saída que o pytest nunca imprime: o real é `127 passed, 1 skipped`. A causa era o próprio `conferir-entrega.py`, que exigia `N passed` igual ao total coletado e **empurrava o documento para o número errado**. A verificação passou a somar os pulados, validada por mutação.
+  - Arquiteto a **30%** no time, mas 9,5 d.p. em 20 dias úteis é ~50%, e só com 50% a alocação média dá os 72% que sustentam o prazo. Corrigido na estimativa, no resumo e nos slides; esforço e preço não mudam.
+  - `V11` descrito como *"~80 a 90% da conta de infraestrutura"*. A conta é outra: o Catálogo é ~45% do total, ou **+79 a 92%** sobre o escopo só de Pedidos. Reescrito como *"quase dobra a conta"*.
+  - O resumo chamava três premissas de *"inventadas"*; a fonte classifica só `PR-06` assim.
+  - O resumo falava em *"seis problemas"* logo depois de o README e o slide 1 apresentarem *"quatro débitos"*, sem ponte entre os dois números.
+- **Rejeitado:** reescrever a prosa dos três documentos para uniformizar o estilo. **Motivo:** o risco era de inconsistência, não de estilo; reescrever a prosa abriria superfície nova de erro na véspera da entrega.
+- **Dados expostos:** nenhum.
+
+---
+
 ## Pendências registradas
 
 - A íntegra dos prompts ainda não foi extraída para `docs/ai-context/prompts/`. Fazer ao final de cada frente, não no fechamento.

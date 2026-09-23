@@ -44,7 +44,7 @@ Há uma âncora de calibração incomum: a fatia executável em `slice/` **já i
 
 | Perfil | d.p. | Alocação | Pessoas | Por que este perfil |
 |---|---|---|---|---|
-| **Arquiteto de Soluções** | 9,5 | 30% | 1 | Normalização de contrato, negociação com consumidores externos, revisão de segurança. Não é papel de tempo integral nesta fase |
+| **Arquiteto de Soluções** | 9,5 | 50% | 1 | Normalização de contrato, negociação com consumidores externos, revisão de segurança. Não é papel de tempo integral nesta fase |
 | **Dev Sênior** | 33 | 80% | 2 | Transação única, relay, rotação de chave HMAC, feature flag — tudo que **erra caro** e cujo erro só aparece em produção |
 | **Dev Pleno** | 16 | 80% | 1 | Expurgo, backfill, reconciliação, adequação de consumidores internos |
 | **SRE / DevOps** | 20,5 | 70% | 1,5 | Observabilidade, alertas, rollout progressivo, runbooks |
@@ -56,7 +56,7 @@ Há uma âncora de calibração incomum: a fatia executável em `slice/` **já i
 
 Uma proposta que dimensionasse esta fase com 4 devs e "apoio de infra" erraria por aí — e erraria justamente na parte que sustenta o critério mais duro do gate: zero janela de indisponibilidade.
 
-**O arquiteto é parcial, e é correto que seja.** 9,5 dias em 30 é meio período nominal. As decisões estruturais já estão tomadas (7 ADRs); o que resta é normalização de contrato, negociação e revisão. Arquiteto em tempo integral nesta fase seria custo sem contrapartida.
+**O arquiteto é parcial, e é correto que seja.** 9,5 dias em 20 úteis é meio período. As decisões estruturais já estão tomadas (7 ADRs); o que resta é normalização de contrato, negociação e revisão. Arquiteto em tempo integral nesta fase seria custo sem contrapartida.
 
 ---
 

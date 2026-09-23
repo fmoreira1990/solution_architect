@@ -98,7 +98,7 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 | ~~V6~~ | ~~Política de desfecho para pedido preso~~ **Definida: cancela em 24 h** | — | ✅ definida; aguarda validação da operação |
 | V7 | Teto de custo de infraestrutura (`CTX-15`) | Negócio | Uma das 5 dimensões do §2.1 fica sem verificação |
 | V8 | **Quem é dono do endereço de entrega** — Pedidos ou Logística? | Arquitetura da conta | `ADR-0006`: se ficar em Pedidos, a pseudonimização deixa de bastar |
-| **V11** | **A hospedagem do Catálogo entra no escopo da proposta?** | Client Face / negócio | **~80 a 90% da conta de infraestrutura** (US$ 925–1.649 vs. 1.775–2.949) **e esforço não decomposto**. O enunciado nomeia *"Pedidos e Catálogo"*; a onda 60 mexe no Catálogo; o `CTX-17` exige 99,9% dele |
+| **V11** | **A hospedagem do Catálogo entra no escopo da proposta?** | Client Face / negócio | **Quase dobra a conta de infraestrutura** (US$ 925–1.649 → 1.775–2.949, +79 a 92%) **e esforço não decomposto**. O enunciado nomeia *"Pedidos e Catálogo"*; a onda 60 mexe no Catálogo; o `CTX-17` exige 99,9% dele |
 
 ---
 
