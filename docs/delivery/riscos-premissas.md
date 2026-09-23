@@ -16,7 +16,7 @@ Se qualquer uma for falsa, algo muda. A coluna da direita diz **o quê**.
 |---|---|---|---|
 | PR-01 | 60k pedidos/dia hoje → 600k no alvo | declarada | Redimensiona particionamento, cache e custo. Abaixo de ~20k/dia, parte da arquitetura vira overengineering |
 | PR-02 | 8 itens em média, 15 no p95 | declarada | Muda o peso do N+1 e o orçamento de latência por hop |
-| PR-03 | ~~Segundo país na América Latina~~ → **Estados Unidos** | ✅ **decidida** | Fechada em 2026-09-23. Mudou o regime de "residência obrigatória" para "mosaico estadual + transferência internacional" |
+| PR-03 | Segundo país: **Estados Unidos** | ✅ **decidida** | Define o regime aplicável: não há residência obrigatória, e sim mosaico estadual mais transferência internacional sob a LGPD |
 | PR-04 | Cloud AWS | decidida | Muda serviços, não a arquitetura lógica |
 | PR-05 | Entrega ao parceiro por webhook assinado + polling | declarada | Muda o contrato de notificação |
 | PR-06 | 60% do volume em 8h comerciais, pico de 3× | **inventada** | **Varejo tem Black Friday.** Se o pico real for 10× ou 20×, o dimensionamento inteiro muda |

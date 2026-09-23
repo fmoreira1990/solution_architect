@@ -39,7 +39,7 @@ flowchart TB
 
 ## Leitura do diagrama
 
-**Só dois sistemas dentro da plataforma.** Uma versão anterior deste diagrama incluía Estoque e Pagamento. Eles foram removidos porque o enunciado não os nomeia — incluí-los era inventar escopo, e estavam registrados como a premissa mais perigosa da proposta (`PR-07`).
+**Só dois sistemas dentro da plataforma.** Estoque e Pagamento não aparecem porque o enunciado não os nomeia. Incluí-los seria inventar escopo — e escopo inventado no caminho crítico é o que `AV-08` avalia como superdimensionamento.
 
 **As duas setas para o Catálogo são de naturezas diferentes.** A sólida é a **cotação**: leitura em lote, fora do caminho crítico. A tracejada é a **validação**: assíncrona, depois do aceite. Nenhuma das duas bloqueia a criação de pedido — é isso que torna `CTX-03` alcançável.
 

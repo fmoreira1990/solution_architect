@@ -84,7 +84,7 @@ Mais: queda do relay entre publicar e marcar **não perde evento**; consulta de 
 | **4** | **Pico de demanda muito acima de 3×** | Alto — varejo tem Black Friday | Teste de carga com cenário de campanha, não de média |
 | **5** | **Ausência de baseline tornar o gate indecidível** | Alto | Medição é **pré-requisito** do gate, não tarefa paralela |
 
-**O maior risco da proposta foi eliminado, não mitigado.** Uma versão anterior supunha sistemas de Estoque e Pagamento como existentes — escopo que o edital não nomeia. Esses contextos foram removidos do desenho, e a decisão central sobreviveu reancorada no Catálogo. Uma decisão que sobrevive à remoção da premissa que a originou é mais sólida que uma que dependia dela.
+**O desenho não supõe sistemas que o edital não nomeia.** Estoque, Pagamento e Carrinho ficaram fora: assumi-los exigiria inventar contrato e disponibilidade para sustentar justamente o caminho crítico. A decisão central se ancora no Catálogo, que o edital nomeia — uma decisão que não depende de premissa inventada é mais sólida que uma que precisa administrá-la.
 
 ---
 

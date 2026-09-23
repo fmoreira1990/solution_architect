@@ -10,15 +10,13 @@
 
 ## A linha de corte
 
-O desafio descreve uma *"plataforma de **Pedidos e Catálogo**"*. Uma versão anterior deste mapa incluía Estoque, Pagamento e Carrinho como contextos.
-
-**Eles foram removidos**, e a regra que os removeu é simples:
+O desafio descreve uma *"plataforma de **Pedidos e Catálogo**"*. O mapa contém exatamente isso, por uma regra simples:
 
 > Entra no mapa o que o enunciado nomeia. Fica fora o que seria preciso **inventar** para que a solução parecesse completa.
 
-Estoque, Pagamento e Carrinho estavam registrados em `riscos-premissas.md` como `PR-07` e `PR-08` — premissas **inventadas**, e a mais perigosa da proposta: *"se não existirem, a onda 30 não cabe em 30 dias"*. Removê-los elimina o risco em vez de administrá-lo, e é o que `AV-08` avalia como não superdimensionar.
+Estoque, Pagamento e Carrinho são os candidatos naturais num desenho de e-commerce, e **nenhum deles é nomeado**. Incluí-los exigiria assumir que existem, com que contrato e com que disponibilidade — três premissas inventadas sustentando a parte mais sensível do desenho. Pior: a onda 30 passaria a depender delas para caber em 30 dias. `AV-08` avalia exatamente isso — não superdimensionar.
 
-A arquitetura não ficou mais fraca com isso. O argumento central da `ADR-0007` — dependência síncrona no caminho crítico torna `CTX-03` inatingível — **não dependia do Estoque**. Depende de haver dependência síncrona, e o Catálogo cumpre esse papel.
+A decisão central não depende deles. O argumento da `ADR-0007` — dependência síncrona no caminho crítico torna `CTX-03` inatingível — depende de **haver** dependência síncrona, e o Catálogo cumpre esse papel.
 
 ---
 

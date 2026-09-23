@@ -4,7 +4,7 @@
 **Escopo deste documento:** referência de mercado para converter esforço em preço. **Não é a estrutura de custo da empresa** — é um modelo transparente, camada por camada, para que o comercial substitua cada uma pelos números reais.
 **Requisitos cobertos:** `D-05`
 **Fontes:** Glassdoor Brasil (junho de 2026), Cálculo Jurídico (encargos CLT 2026), Contabilizei e Contabilidade.com (Lucro Presumido 2026), `docs/delivery/estimativa-fase1.md`
-**Data:** 2026-09-24 *(revisado: camada tributária acrescentada)*
+**Data:** 2026-09-24
 
 ---
 
@@ -22,11 +22,7 @@ salário de mercado
 
 **O esforço em dias-pessoa não muda em nenhuma hipótese** — é isso que torna a estimativa reutilizável quando as premissas comerciais mudarem.
 
-> ### Correção registrada
->
-> Uma versão anterior deste documento **omitia a quarta camada**. O resultado era um preço de R$ 120.576 que parecia ter 33% de margem e, na prática, tinha **13,8%** — porque os tributos sobre faturamento saíam dela, e o overhead ainda teria de sair do que restasse.
->
-> Não é ajuste de arredondamento: é a diferença entre uma proposta com margem e uma proposta que financia o cliente.
+> **A quarta camada é a que costuma faltar.** Um modelo com três camadas entrega um preço que *parece* ter 33% de margem e tem **13,8%**, porque os tributos sobre faturamento saem dela e o overhead ainda teria de sair do que resta. É a diferença entre uma proposta com margem e uma proposta que financia o cliente.
 
 ---
 

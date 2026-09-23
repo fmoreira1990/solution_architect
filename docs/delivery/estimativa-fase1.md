@@ -125,7 +125,7 @@ Serviços nomeados, com tier e alternativa confrontada, em **[`servicos-aws.md`]
 
 > **`V11` decide qual total vale.** O enunciado nomeia *"Pedidos e Catálogo"*, e a onda 60 mexe no Catálogo — por isso o número levado à proposta é o da plataforma completa. Se o cliente seguir hospedando o Catálogo, cai para US$ 925–1.649. **A hospedagem do Catálogo não está nas 79 dias-pessoa**: se entrar no escopo, muda custo e esforço.
 
-> **Uma versão anterior deste documento projetava US$ 1.700–3.700/mês** com componentes genéricos — e chegou perto do escopo completo **pelo motivo errado**: era larga o bastante para acertar por acidente. O que sobrevive da análise é o mérito de duas escolhas, SQS no lugar de Kafka gerenciado (~US$ 500/mês) e RDS no lugar de Aurora (~US$ 200/mês), em que a opção mais cara entregava capacidade que o dimensionamento não pede.
+> **Duas escolhas respondem por ~US$ 700/mês de economia:** SQS FIFO no lugar de Kafka gerenciado (~US$ 500) e RDS Multi-AZ no lugar de Aurora (~US$ 200). Nos dois casos a opção mais cara entregava capacidade que o dimensionamento não pede — `AV-08` aplicado a custo.
 
 **O salto de custo é a onda 90, não a 30:** multi-região duplica quase toda a infraestrutura fixa (**+70 a 90%**). Precisa estar claro antes de aprovar as três ondas olhando só o número da primeira.
 

@@ -105,7 +105,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | *"Definir estratégia para APIs públicas, autenticação, autorização, quotas e versionamento"* | `estrategia-api-publica.md` — os 4 itens consolidados, com estado de implementação por item | ✅ |
 | *"Registrar no mínimo quatro ADRs com contexto, alternativas, decisão e consequências"* | **7 ADRs**, formato verificado por fitness function | ✅ |
 
-> ~~Lacuna: estratégia espalhada por três documentos.~~ **Fechada em 2026-09-24** com `estrategia-api-publica.md`, que consolida autenticação, autorização, quotas e versionamento — e declara, item a item, o que está implementado e o que é desenho da onda 60. Quatro de nove itens têm verificação executável.
+> `estrategia-api-publica.md` consolida autenticação, autorização, quotas e versionamento num só lugar, e declara item a item o que está implementado e o que é desenho da onda 60. Quatro de nove itens têm verificação executável.
 
 ---
 
@@ -175,7 +175,7 @@ Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui p
 | **premissas** | 8 premissas com efeito declarado se falsas | ✅ |
 | **riscos** | 6 riscos com impacto e resposta, mais faixa de confiança | ✅ |
 
-> ~~Lacuna: custo genérico, sem serviço nomeado.~~ **Fechada em 2026-09-24** com `servicos-aws.md`. O exercício corrigiu o número para baixo: de US$ 1.700–3.700 para **US$ 925–1.649**, porque a faixa anterior presumia Kafka gerenciado e Aurora — capacidade que o dimensionamento não pede.
+> `servicos-aws.md` nomeia cada serviço com tier, alternativa confrontada e custo derivado do dimensionamento — e separa o escopo Pedidos do escopo Pedidos e Catálogo, cuja diferença é decisão `V11` do cliente.
 
 ---
 

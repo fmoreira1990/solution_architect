@@ -238,19 +238,19 @@ flowchart TB
 
 ---
 
-## 8. Catálogo — o escopo que a premissa `A7` tinha apagado
+## 8. Catálogo
 
-Uma versão anterior deste documento orçava **só o Pedidos** e resolvia o Catálogo com uma linha de premissa: *"já existe, não é orçado aqui"*. Isso está errado por três motivos, e nenhum deles é de arredondamento.
+O Catálogo é orçado aqui, e não tratado como infraestrutura de terceiro. Três razões:
 
-**O enunciado nomeia a plataforma como "Pedidos e Catálogo".** Orçar metade do escopo nomeado e chamar de custo de infraestrutura da proposta é responder outra pergunta.
+**O enunciado nomeia a plataforma como "Pedidos e Catálogo".** Orçar metade do escopo nomeado e chamar de custo de infraestrutura da proposta responde outra pergunta.
 
 **A proposta mexe no Catálogo.** A resolução em lote da onda 60 — *9 chamadas → 2* (`CTX-05`) — é trabalho **dentro** dele. Não dá para mudar um serviço na onda 60 e afirmar que ele não faz parte da entrega.
 
-**O `CTX-17` depende da disponibilidade dele.** A derivação inteira — 99,9% × 99,9% = 99,8% — exige 99,9% do Catálogo. Exigir disponibilidade de um componente cuja infraestrutura não foi dimensionada é transferir o problema, não resolvê-lo. Era exatamente a saída nº 1 que `constraints.md` §8 rejeita.
+**O `CTX-17` depende da disponibilidade dele.** A derivação inteira — 99,9% × 99,9% = 99,8% — exige 99,9% do Catálogo. Exigir disponibilidade de um componente cuja infraestrutura não foi dimensionada é transferir o problema, não resolvê-lo: é a saída nº 1 que `constraints.md` §8 rejeita.
 
-### O dimensionamento existe — o que faltava era assumir o escopo
+### O dimensionamento
 
-De `constraints.md` §7, a carga do Catálogo **já estava derivada**:
+De `constraints.md` §7, a carga do Catálogo:
 
 | Medida | Alvo |
 |---|---|
@@ -303,20 +303,16 @@ De `constraints.md` §7, a carga do Catálogo **já estava derivada**:
 
 **`V11` decide qual vale.** Enquanto não decidir, o número a levar para a proposta é o **B** — é o escopo que o enunciado nomeia, e errar para mais numa premissa declarada é recuperável; errar para menos vira aditivo.
 
-### Sobre a correção anterior deste documento
+### Onde o dimensionamento evitou gasto
 
-`estimativa-fase1.md` §4.2 projetava **US$ 1.700–3.700/mês** com componentes genéricos, e uma versão anterior daqui anunciou ter *"corrigido o número pela metade"*. **A comparação era inválida:** confrontava uma faixa de escopo não declarado com um número que cobria só o Pedidos.
+Duas escolhas respondem por ~US$ 700/mês, e as duas seguem o mesmo raciocínio:
 
-Contra o escopo **B**, que é o comparável, a faixa antiga estava **próxima do certo pelo motivo errado** — genérica e larga o bastante para acertar por acidente.
-
-O que sobrevive da análise original é o mérito das duas escolhas, e elas continuam valendo:
-
-| | Faixa anterior presumia | Escolha real | Economia |
+| | Alternativa mais cara | Escolha | Diferença |
 |---|---|---|---|
 | Broker | Kafka gerenciado (MSK) | SNS + SQS FIFO | ~US$ 500/mês |
 | Banco de Pedidos | Aurora | RDS Multi-AZ | ~US$ 200/mês |
 
-**Nos dois casos, a opção mais cara entregava capacidade que o dimensionamento não pede** — raciocínio de `AV-08` aplicado a custo. O que não vale é a conclusão de que a conta caiu pela metade: ela não caiu, **o escopo é que tinha encolhido sem ninguém declarar.**
+**Nos dois casos, a opção mais cara entregava capacidade que o dimensionamento não pede** — replay histórico e leitura escalável antes de alguém precisar. É `AV-08` aplicado a custo: superdimensionamento com recibo mensal.
 
 ---
 
@@ -363,7 +359,6 @@ Não orçado — §2.5.3 limita o compromisso à fase 1. Registrado para que a c
 | A4 | 2 AZs, não 3 | 3 AZs adicionam ~US$ 35/mês de NAT |
 | A5 | Tráfego de saída moderado | Egress a US$ 0,09/GB pode surpreender com webhooks volumosos |
 | A6 | **Conjunto de trabalho do Catálogo cabe em ~3 GB** — nº de SKUs ativos é `???` | Catálogo muito maior ou com mídia embutida exige subir o tier do ElastiCache |
-| A7 | ~~O Catálogo e seu banco já existem e não são orçados aqui~~ **Retirada.** Era premissa inventada: apagava metade do escopo nomeado sem apoio no enunciado. Substituída pelos escopos A e B e pela decisão `V11` | — |
 
 ## Riscos
 

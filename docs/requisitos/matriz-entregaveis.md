@@ -139,7 +139,7 @@ Checklist de revisão final. Cada critério precisa ser defensável apontando ar
 
 ## 7. Premissas a fechar (Frente F0)
 
-A lista canônica de premissas é `docs/delivery/riscos-premissas.md` §1 — esta tabela apenas resume o estado. Uma versão anterior mantinha numeração própria, que colidia com a de lá.
+A lista canônica de premissas é `docs/delivery/riscos-premissas.md` §1 — esta tabela apenas resume o estado, e usa a numeração de lá para não haver duas.
 
 | # | Premissa | Valor proposto | Status |
 |---|---|---|---|
