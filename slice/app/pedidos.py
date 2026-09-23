@@ -117,8 +117,19 @@ def aceitar(chamador: str, chave: str, corpo: dict):
             raise
         if existente["payload_hash"] != ph:
             raise ConflitoIdempotencia("chave já utilizada com outro payload")
+
+        pedido = obter(existente["pedido_id"])
+
+        # Threat model F1.5 — defesa em profundidade.
+        # O hash já cobre este caso, porque cliente_id faz parte do payload.
+        # A verificação explícita existe para que a propriedade sobreviva a
+        # uma mudança futura no que entra no hash canônico: chave de
+        # idempotência é superfície de AUTORIZAÇÃO, não só de integridade.
+        if pedido is not None and pedido["cliente_id"] != corpo["cliente_id"]:
+            raise ConflitoIdempotencia("chave pertence a outro cliente")
+
         # ADR-0001: replay devolve o estado CORRENTE, não a resposta gravada.
-        return obter(existente["pedido_id"]), True
+        return pedido, True
 
 
 def _buscar_chave(chamador: str, chave: str):

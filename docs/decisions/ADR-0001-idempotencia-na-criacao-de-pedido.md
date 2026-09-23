@@ -25,6 +25,19 @@ O desafio eleva isso a **critério crítico** (§2.4.2): *"chamadas repetidas co
 
 **Escopo da chave:** `(identidade do chamador, endpoint)` — não global. Dois parceiros distintos podem gerar o mesmo UUID sem colidir, e a unicidade não vira acoplamento entre consumidores.
 
+> ⚠️ **Revisão de 2026-09-23 — `chamador` é o principal autenticado, nunca o canal.**
+>
+> O threat model (ameaça **F1.5**) mostrou que esta ADR tratava a chave apenas como problema de **integridade**, quando ela é também superfície de **autorização**.
+>
+> Se `chamador` identificar o canal (`web`) em vez do principal autenticado, todos os clientes do canal compartilham o mesmo espaço de chaves — e quem adivinhar a chave de outro receberia, no replay, **o pedido alheio completo**. Agravante: na implementação inicial da fatia, `X-Chamador` era um header **controlado pelo cliente**, ou seja, quem chamava escolhia o próprio namespace.
+>
+> **Correções incorporadas:**
+> 1. `chamador` é derivado da identidade autenticada pela borda. A borda **sobrescreve** headers de identidade vindos de fora (generalizado em F3.2).
+> 2. O replay verifica, além do `payload_hash`, que o pedido recuperado **pertence ao solicitante** — defesa em profundidade que sobrevive a mudanças futuras no hash canônico.
+> 3. Verificado por `test_chave_de_outro_cliente_nao_devolve_pedido_alheio` e `test_defesa_em_profundidade_independe_do_hash`, este último com o hash neutralizado para isolar a camada nova.
+>
+> **Lição:** a ADR nasceu correta para o problema que se propôs a resolver, e incompleta para o problema que criou. Modelar o fluxo não revelou isso; modelar ameaças revelou.
+
 ### Store na mesma base, na mesma transação
 
 A chave é gravada junto com o pedido, no mesmo commit descrito na `ADR-0002`:
@@ -115,6 +128,8 @@ A decisão se apoia em dois pontos.
 ## Enforcement
 
 **Fitness functions executáveis — as duas primeiras são o critério crítico de `P2-11`:**
+
+0. **Isolamento entre clientes (F1.5).** Chave reutilizada por outro cliente devolve `409` e **não vaza** o pedido nem o identificador da vítima. Validado por teste de mutação: removendo a verificação de dono, o teste falha.
 
 1. **Concorrência.** N requisições paralelas com a mesma chave produzem **exatamente um** pedido. Teste com N ≥ 20 e asserção de contagem no banco.
 2. **Conflito.** Mesma chave com payload diferente devolve `409`, e **nenhum** segundo pedido é criado.

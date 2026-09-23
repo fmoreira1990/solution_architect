@@ -95,6 +95,7 @@ O que o resumo executivo leva para o cliente. Nenhuma pode ser resolvida por nó
 | V5 | Limite de defasagem tolerável em preço sob falha | Negócio | Regra de fallback da `ADR-0003` |
 | V6 | Política de desfecho para pedido preso em validação | Negócio / operação | Reconciliação |
 | V7 | Teto de custo de infraestrutura (`CTX-15`) | Negócio | Uma das 5 dimensões do §2.1 fica sem verificação |
+| V8 | **Quem é dono do endereço de entrega** — Pedidos ou Logística? | Arquitetura da conta | `ADR-0006`: se ficar em Pedidos, a pseudonimização deixa de bastar |
 
 ---
 
