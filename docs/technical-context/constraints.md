@@ -2,7 +2,7 @@
 
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** as restrições que limitam a solução, com número ou critério verificável. Inclui o dimensionamento derivado delas. Nenhuma camada da arquitetura pode existir sem um `CTX` desta lista que a justifique (regra Q11).
-**Fontes:** `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf` (§2.2, §2.2.1), `docs/prd/pedidos-catalogo.md`, `docs/business-context/jornada.md`
+**Fontes:** o enunciado (§2.2, §2.2.1), `docs/prd/pedidos-catalogo.md`, `docs/business-context/jornada.md`
 **Data:** 2026-09-22
 
 ---
@@ -163,7 +163,7 @@ Pela mesma aritmética do `CTX-17`, o caminho novo também não fecharia 99,9%. 
 
 ## Riscos abertos
 
-1. **`CTX-13` e `CTX-14` (equipe) em aberto bloqueiam `D-05`.** A estimativa é requisito obrigatório da vaga, não apenas do PDF. Precisam ser declarados como premissa em `/estimativa`, com efeito explícito caso falsos.
+1. **`CTX-14` — o time conhecer .NET — segue em aberto.** `CTX-13` (tamanho e senioridade) foi derivado do esforço na estimativa; o conhecimento da stack não é derivável e entra como premissa `E5`, com a rampa como efeito se for falsa.
 2. **`CTX-15` (orçamento) sem teto retira uma das cinco dimensões do §2.1.** Sem custo-limite, "equilibrar custo" vira afirmação não verificável.
 3. **A meta de 99,9% depende de a borda gerenciada entregar acima do seu SLA** (§8.1). Pelos pisos publicados, a série de serviços da AWS fica em ≈ 99,78%. Medido desde a onda 30, com gatilho declarado.
 4. **As premissas de distribuição (60% em 8h, pico 3×) são inventadas.** Se o varejo tiver pico concentrado de campanha — Black Friday, lançamento — o fator de pico pode ser 10× ou 20×, não 3×. Isso muda o dimensionamento inteiro da seção 7.

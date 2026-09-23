@@ -3,7 +3,7 @@
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** o sistema como está hoje: canal web nacional único.
 **Requisitos cobertos:** `P1-01`
-**Fontes:** `contexto/...pdf` (§2.2, §2.2.1), `docs/technical-context/constraints.md`
+**Fontes:** o enunciado (§2.2, §2.2.1), `docs/technical-context/constraints.md`
 **Data:** 2026-09-22
 
 ---

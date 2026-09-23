@@ -16,7 +16,7 @@ import time
 from . import catalogo
 
 # Em produção seria chave gerenciada; aqui é fixa e sintética, de propósito.
-_SEGREDO = b"prova-stefanini-oferta-hmac"
+_SEGREDO = b"fatia-sintetica-oferta-hmac"
 
 
 class OfertaInvalida(Exception):

@@ -2,7 +2,7 @@
 
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** o problema, a aposta e os limites da evolução arquitetural. Não contém solução — a arquitetura nasce daqui, em `docs/technical-context/architecture.md`.
-**Fontes:** `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf` (§2.1, §2.2, §2.5.3, §4), `docs/requisitos/matriz-entregaveis.md`
+**Fontes:** o enunciado (§2.1, §2.2, §2.5.3, §4), `docs/requisitos/matriz-entregaveis.md`
 **Data:** 2026-09-22
 
 ---

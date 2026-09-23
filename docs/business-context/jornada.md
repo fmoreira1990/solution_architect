@@ -3,7 +3,7 @@
 **Slug do PRD:** pedidos-catalogo
 **Persona:** Marina, líder técnica da plataforma de Pedidos (`docs/business-context/personas.md`)
 **Escopo deste documento:** a jornada do **problema** — conviver com quatro débitos estruturais e evoluir sob restrição de continuidade. Não é a jornada de uso do sistema pelo cliente final.
-**Fontes:** `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf` (§2.2, §2.2.1), `docs/prd/pedidos-catalogo.md`, `docs/business-context/personas.md`
+**Fontes:** o enunciado (§2.2, §2.2.1), `docs/prd/pedidos-catalogo.md`, `docs/business-context/personas.md`
 **Data:** 2026-09-22
 
 ---

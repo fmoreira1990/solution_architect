@@ -4,7 +4,7 @@
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** a política de compatibilidade e versionamento dos contratos públicos. Não decide o conteúdo dos contratos, e sim as regras sob as quais eles podem mudar.
 **Requisitos cobertos:** `CTX-08`, `CTX-10`, `CTX-12`, `P1-16`, `P2-06`, `P2-11`, `D-04`
-**Fontes:** `docs/technical-context/constraints.md` (§6), `ADR-0007`, `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf` (§2.2.1)
+**Fontes:** `docs/technical-context/constraints.md` (§6), `ADR-0007`, o enunciado (§2.2.1)
 **Data:** 2026-09-22
 
 ---

@@ -3,7 +3,7 @@
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** contêineres, protocolos e datastores de hoje, com os quatro débitos de `CTX-05` a `CTX-08` localizados no desenho.
 **Requisitos cobertos:** `P1-02`, `P1-07`
-**Fontes:** `contexto/...pdf` (§2.2.1), `docs/business-context/jornada.md`
+**Fontes:** o enunciado (§2.2.1), `docs/business-context/jornada.md`
 **Data:** 2026-09-22
 
 ---

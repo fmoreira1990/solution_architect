@@ -1,6 +1,6 @@
 # Evolução da Plataforma de Pedidos e Catálogo
 
-> Desafio técnico — Arquitetura de Soluções
+> Arquitetura de Soluções — proposta de evolução
 > **Prova executável:** `cd slice && python prova.py` · 132 testes
 
 [![CI](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml/badge.svg)](https://github.com/fmoreira1990/solution_architect/actions/workflows/ci.yml)

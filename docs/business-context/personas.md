@@ -2,7 +2,7 @@
 
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** personas **derivadas** das restrições de §2.2.1 do desafio — não entrevistadas. São premissa, não fato, e precisam ser confirmadas com o Client Face antes de sustentarem decisão irreversível.
-**Fontes:** `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf` (§2.2.1), `docs/prd/pedidos-catalogo.md`
+**Fontes:** o enunciado (§2.2.1), `docs/prd/pedidos-catalogo.md`
 **Data:** 2026-09-22
 
 ---

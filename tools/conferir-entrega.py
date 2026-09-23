@@ -232,7 +232,8 @@ except Exception as e:  # pragma: no cover
 
 # menção textual à classificação
 for p in docs_md():
-    if re.search(r"Confidencial\s*·\s*Stefanini", ler(p)):
+    # o rodapé do material de referência: "Confidencial · <empresa> Group · <página>"
+    if re.search(r"Confidencial\s*·\s*\w+\s+Group", ler(p)):
         problemas.append(f"{p.relative_to(RAIZ)}: reproduz a classificação do material de referência")
 
 

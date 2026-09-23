@@ -1,8 +1,8 @@
-# Matriz de Entregáveis — Desafio COE Sênior / Arquitetura de Soluções
+# Matriz de Entregáveis — Evolução da Plataforma de Pedidos e Catálogo
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** inventário rastreável de tudo que o desafio exige. Não contém decisões — apenas o que precisa existir e como saber que está pronto.
-**Fontes:** `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf`, `contexto/context.md`
+**Escopo deste documento:** inventário rastreável de tudo que o enunciado exige. Não contém decisões — apenas o que precisa existir e como saber que está pronto.
+**Fontes:** o enunciado
 **Data:** 2026-09-22
 
 ---
@@ -92,9 +92,9 @@ Destino final: `docs/technical-context/constraints.md` (via `/constraints`).
 
 ---
 
-## 4. Parte Diferenciais (D) · opcional no PDF, **obrigatório na vaga**
+## 4. Parte Diferenciais (D) · opcional no enunciado, **tratada como obrigatória**
 
-> A descrição da vaga lista "IA aplicada à Arquitetura" e "precificação e construção de propostas" como **requisitos obrigatórios**. Tratados aqui como escopo obrigatório.
+> "IA aplicada à arquitetura" e "precificação e construção de propostas" são competências centrais do perfil a que esta proposta responde. Tratadas aqui como escopo obrigatório.
 
 | ID | Requisito | Destino | Comando | Critério de aceite |
 |---|---|---|---|---|

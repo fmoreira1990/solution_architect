@@ -3,7 +3,7 @@
 **Slug do PRD:** pedidos-catalogo
 **Escopo deste documento:** percorre o enunciado **seção por seção, bullet por bullet**, e aponta o artefato que responde cada um. Diferente da `matriz-entregaveis.md`, que organiza por IDs internos, aqui a ordem é a do próprio documento do desafio.
 **Requisitos cobertos:** todos
-**Fontes:** `contexto/desafio-tecnico-arquiteto-senior-coe 2.pdf`
+**Fontes:** o enunciado
 **Data:** 2026-09-24
 
 ---
@@ -14,7 +14,7 @@
 
 ## §1 · Contextualização
 
-Esta seção descreve o **perfil da vaga**, não entregáveis. Registrada aqui porque alguns itens deveriam se refletir no trabalho.
+Esta seção descreve o **perfil profissional esperado**, não entregáveis. Registrada aqui porque alguns itens deveriam se refletir no trabalho.
 
 | Item do PDF | Onde se reflete | |
 |---|---|---|
