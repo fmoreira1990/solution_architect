@@ -1,7 +1,7 @@
 # Apresentação — Evolução da Plataforma de Pedidos e Catálogo
 
 **Slug do PRD:** pedidos-catalogo
-**Escopo deste documento:** 12 slides cobrindo arquitetura atual, alvo, implantação na AWS, estratégia de migração, demonstração da prova, trade-offs e o uso de IA na elaboração. Formato de apoio a fala de 8 minutos — a profundidade está nos documentos indexados no `README.md`.
+**Escopo deste documento:** 12 slides cobrindo arquitetura atual, alvo, implantação na AWS, estratégia de migração, demonstração da prova, trade-offs e o uso de IA na elaboração. Feitos para leitura autônoma, sem narração: cada slide traz no rodapé o documento com o detalhe, e a profundidade está nos documentos indexados no `README.md`.
 **Fontes:** todos os artefatos do repositório
 **Data:** 2026-09-23
 
